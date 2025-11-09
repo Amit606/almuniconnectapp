@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Almuniconnect</string>
+    <string name="welcome_msg">Welcome to HBTU Almuni Connect </string>
+    <string name="welcome_des">Your all-in-one utility hub — smart tools, daily essentials, and productivity features combined in one clean experience.</string>
+    <string name="whats_up_saver">WhatsApp Status Saver</string>
+    <string name="whats_up_saver_des">Easily save and organize WhatsApp photos and videos you love — quick, simple, and secure.</string>
+
+    <string name="smart_cleaner_title">Smart Cleaner</string>
+    <string name="smart_cleaner_desc">Optimize your phone’s performance by removing unnecessary files and freeing up space safely.</string>
+
+    <string name="secure_fast_title">Secure &amp; Fast</string>
+    <string name="secure_fast_desc">Protect your privacy, lock sensitive apps, and check your internet speed — all in one place.</string>
+
+    <string name="stay_organized_title">Stay Organized</string>
+    <string name="stay_organized_desc">Manage your notes, scan documents, and access all your tools effortlessly within one app.</string>
+
+    <string name="get_started_title">Get Started</string>
+    <string name="get_started_desc">Experience convenience, speed, and control — everything you need to simplify your digital life.</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="get_started">Get Started</string>
+
+
+</resources>

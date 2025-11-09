@@ -1,0 +1,128 @@
+package com.kwh.almuniconnect.navigation
+
+import RegistrationScreen
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.kwh.almuniconnect.login.LoginScreen
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.kwh.almuniconnect.GetStartedCard
+import com.kwh.almuniconnect.PreferenceHelper
+import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.SplashScreen
+import com.kwh.almuniconnect.home.HomeScreen
+import com.kwh.almuniconnect.intro.IntroScreen
+import com.kwh.almuniconnect.network.NetworkScreen
+
+@Composable
+fun AppNavGraph(startDestination: String = Routes.SPLASH) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = startDestination) {
+
+        // 🟣 Splash Screen
+        composable(Routes.SPLASH) {
+            SplashScreen(navController)
+
+
+        }
+
+        // 🟢 Intro Screen
+        composable(Routes.INTRO) {
+            IntroScreen(
+                onContinue = {
+                    navController.navigate(Routes.STARTED) {
+                        popUpTo(Routes.INTRO) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // 🟦 Get Started
+        composable(Routes.STARTED) {
+            GetStartedCard(
+                onJoinNow = { navController.navigate(Routes.LOGIN) }
+            )
+        }
+
+        // 🟩 Login
+        composable(Routes.LOGIN) {
+            val context = LocalContext.current
+            val prefs = remember { PreferenceHelper(context) }
+            LoginScreen(
+                onLogin = { email, password ->
+                    prefs.setLoginStatus(true)
+                    prefs.saveUserData(name = "John Doe", email = email) // use real data
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                },
+                onGoogleSignIn = { /* handle Google sign-in */ },
+                onForgotPassword = { /* navController.navigate("forgot_password") */ },
+                onCreateAccount = { navController.navigate(Routes.REGISTER) }
+            )
+        }
+
+        // 🟨 Registration
+        composable(Routes.REGISTER) {
+            RegistrationScreen(
+                onRegister = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.REGISTER) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // 🟧 Home
+        composable(Routes.HOME) {
+            HomeScreen(
+                navController = navController,
+                onOpenProfile = { navController.navigate(Routes.profileRoute("me")) },
+                onOpenMessages = { navController.navigate(Routes.MESSAGES) },
+                onOpenEventDetails = { event -> navController.navigate(Routes.eventRoute(event.id)) },
+                onOpenJobDetails = { job -> navController.navigate(Routes.jobRoute(job.id)) },
+                onCreatePost = { navController.navigate(Routes.CREATE_POST) }
+            )
+        }
+
+        // 🔵 Optional placeholders
+        composable(Routes.MESSAGES) { /* MessagesScreen(navController) */ }
+        composable(Routes.CREATE_POST) { /* CreatePostScreen(navController) */ }
+
+        composable(
+            Routes.PROFILE,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            /* ProfileScreen(userId) */
+        }
+
+        composable(
+            Routes.EVENT_DETAILS,
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId")
+            /* EventDetailsScreen(eventId) */
+        }
+        composable(Routes.NETWORK) {
+            NetworkScreen(onOpenProfile = { alumni ->
+                navController.navigate(Routes.profileRoute(alumni.id))
+            })
+        }
+
+        composable(
+            Routes.JOB_DETAILS,
+            arguments = listOf(navArgument("jobId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val jobId = backStackEntry.arguments?.getString("jobId")
+            /* JobDetailsScreen(jobId) */
+        }
+    }
+}
