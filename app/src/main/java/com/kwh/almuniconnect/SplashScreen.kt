@@ -81,11 +81,11 @@ fun SplashScreen(navController: NavController) {
 
         delay(5000L) // Wait for animations
         if (prefs.isLoggedIn()) {
-            navController.navigate(Routes.INTRO) {
+            navController.navigate(Routes.REGISTER) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
             }
         } else {
-            navController.navigate(Routes.INTRO) {
+            navController.navigate(Routes.REGISTER) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
             }
         }

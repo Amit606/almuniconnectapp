@@ -16,6 +16,8 @@ import com.kwh.almuniconnect.GetStartedCard
 import com.kwh.almuniconnect.PreferenceHelper
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.SplashScreen
+import com.kwh.almuniconnect.branding.CountryListScreen
+import com.kwh.almuniconnect.branding.MasterTabsScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
 import com.kwh.almuniconnect.network.NetworkScreen
@@ -32,6 +34,9 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
 
         }
+//        composable(Routes.COUTNRYLIST) {
+//            CountryListScreen()
+//        }
 
         // 🟢 Intro Screen
         composable(Routes.INTRO) {
@@ -67,6 +72,11 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
                 onForgotPassword = { /* navController.navigate("forgot_password") */ },
                 onCreateAccount = { navController.navigate(Routes.REGISTER) }
             )
+        }
+        composable(Routes.COUTNRYLIST) {
+            MasterTabsScreen(onItemClick = { masterItem ->
+                // handle selection: navigate back, open edit screen, etc.
+            })
         }
 
         // 🟨 Registration

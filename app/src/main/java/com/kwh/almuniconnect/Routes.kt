@@ -8,6 +8,7 @@ object Routes {
     const val REGISTER = "register"
     const val HOME = "home"
     const val NETWORK = "network"
+    const val COUTNRYLIST = "countrylist"
 
     const val PROFILE = "profile/{userId}"
     fun profileRoute(userId: String) = "profile/$userId"

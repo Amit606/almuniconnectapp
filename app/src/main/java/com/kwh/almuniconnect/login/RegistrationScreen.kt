@@ -55,6 +55,13 @@ import java.util.Calendar
 import java.util.Locale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kwh.almuniconnect.api.BranchRepository
+import com.kwh.almuniconnect.api.MasterItem
+import kotlinx.coroutines.launch
+
+
 data class RegistrationData(
     val name: String = "",
     val mobile: String = "",
@@ -80,13 +87,17 @@ fun RegistrationScreen(
     var email by rememberSaveable { mutableStateOf("") }
 
     // Branch dropdown state
+
     var branchExpanded by remember { mutableStateOf(false) }
-    val branches = listOf("Computer Science", "Mechanical", "Electrical", "Civil", "IT", "ECE")
-    var selectedBranch by rememberSaveable { mutableStateOf(branches.first()) }
+    var branchList by remember { mutableStateOf<List<MasterItem>>(emptyList()) }
+    var selectedBranch by rememberSaveable { mutableStateOf("") }
+   // var branchExpanded by remember { mutableStateOf(false) }
+   // val branches = listOf("Computer Science", "Mechanical", "Electrical", "Civil", "IT", "ECE")
+   // var selectedBranch by rememberSaveable { mutableStateOf(branches.first()) }
 
     // Passing year dropdown (1925..2026)
     var yearExpanded by remember { mutableStateOf(false) }
-    val years = (1925..2026).map { it.toString() }.reversed() // latest first
+    val years = (1975..2026).map { it.toString() }.reversed() // latest first
     var selectedYear by rememberSaveable { mutableStateOf(years.first()) }
 
     var jobDetails by rememberSaveable { mutableStateOf("") }
@@ -128,6 +139,12 @@ fun RegistrationScreen(
     // validation state
     var showError by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        branchList = BranchRepository.fetchBranches()
+        if (branchList.isNotEmpty()) {
+            selectedBranch = branchList.first().name
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -214,33 +231,43 @@ fun RegistrationScreen(
         ExposedDropdownMenuBox(
             expanded = branchExpanded,
             onExpandedChange = { branchExpanded = !branchExpanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().background(Color(0xFF142338))
+
         ) {
             OutlinedTextField(
                 value = selectedBranch,
                 onValueChange = { },
                 readOnly = true,
-                label = { Text("Branch",color=Color.White,) },
+                label = { Text("Branch", color = Color.White) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = branchExpanded) },
                 modifier = Modifier
-                    .menuAnchor() // anchors menu to this text field
+                    .menuAnchor()
                     .fillMaxWidth()
+                    .background(Color(0xFF142338))
             )
             ExposedDropdownMenu(
                 expanded = branchExpanded,
                 onDismissRequest = { branchExpanded = false }
             ) {
-                branches.forEach { selection ->
+                if (branchList.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text(selection,color=Color.White) },
-                        onClick = {
-                            selectedBranch = selection
-                            branchExpanded = false
-                        }
+                        text = { Text("Loading...", color = Color.White) },
+                        onClick = {}
                     )
+                } else {
+                    branchList.forEach { branch ->
+                        DropdownMenuItem(
+                            text = { Text(branch.name, color = Color.White) },
+                            onClick = {
+                                selectedBranch = branch.name
+                                branchExpanded = false
+                            }
+                        )
+                    }
                 }
             }
         }
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
