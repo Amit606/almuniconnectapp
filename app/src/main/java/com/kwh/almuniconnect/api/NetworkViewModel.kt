@@ -2,9 +2,13 @@ package com.kwh.almuniconnect.api
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.common.api.Response
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.http.Body
+import retrofit2.http.Headers
+import retrofit2.http.POST
 
 class NetworkViewModel : ViewModel() {
 
@@ -34,4 +38,5 @@ class NetworkViewModel : ViewModel() {
             }
         }
     }
+
 }

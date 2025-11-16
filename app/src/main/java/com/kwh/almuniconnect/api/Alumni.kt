@@ -25,6 +25,28 @@ data class MasterItem(
     val name: String,
     val shortName: String
 )
+data class SignupRequest(
+    val firstName: String,
+    val lastName: String,
+    val mobileNo: String,
+    val email: String,
+    val dateOfBirth: String,    // e.g. "1989-06-18"
+    val dateOfMarriage: String, // e.g. "2017-12-10"
+    val courseId: Int,
+    val PassoutYear: Int,
+    val companyName: String,
+    val title: String,
+    val countryId: Int,
+    val loggedFrom: String,
+    val deviceToken: String
+)
+
+// Generic ApiResponse (adjust fields if actual API differs)
+data class ApiResponse<T>(
+    val success: Boolean,
+    val message: String?,
+    val data: T?
+)
 
 interface ApiService {
 
@@ -53,5 +75,8 @@ interface ApiService {
 
     @GET("masters/roles")
     suspend fun getRoles(): Response<MasterResponse>
+    @Headers("Content-Type: application/json")
+    @POST("api/v1-stage/auth/signup")
+    suspend fun signup(@Body body: SignupRequest): Response<ApiResponse<Any>>
 }
 

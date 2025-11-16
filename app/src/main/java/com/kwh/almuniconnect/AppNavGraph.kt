@@ -1,6 +1,5 @@
 package com.kwh.almuniconnect.navigation
 
-import RegistrationScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,6 +19,7 @@ import com.kwh.almuniconnect.branding.CountryListScreen
 import com.kwh.almuniconnect.branding.MasterTabsScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
+import com.kwh.almuniconnect.login.RegistrationContainer
 import com.kwh.almuniconnect.network.NetworkScreen
 
 @Composable
@@ -81,13 +81,14 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
         // 🟨 Registration
         composable(Routes.REGISTER) {
-            RegistrationScreen(
-                onRegister = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.REGISTER) { inclusive = true }
-                    }
-                }
-            )
+            RegistrationContainer()
+//            RegistrationScreen(
+//                onRegister = {
+//                    navController.navigate(Routes.HOME) {
+//                        popUpTo(Routes.REGISTER) { inclusive = true }
+//                    }
+//                }
+//            )
         }
 
         // 🟧 Home

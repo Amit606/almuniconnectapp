@@ -1,6 +1,5 @@
 package com.kwh.almuniconnect
 
-import RegistrationScreen
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
