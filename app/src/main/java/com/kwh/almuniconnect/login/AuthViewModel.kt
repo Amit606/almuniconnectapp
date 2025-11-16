@@ -1,6 +1,7 @@
 // AuthViewModel.kt
 package com.kwh.almuniconnect.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kwh.almuniconnect.api.SignupRequest
@@ -39,24 +40,25 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
             _loading.value = true
             _message.value = null
 
-            val (firstName, lastName) = splitName(regData.name)
+            val (firstName, lastName) = splitName(regData.firstName)
             val (company, title) = parseJob(regData.jobDetails)
 
             val request = SignupRequest(
-                firstName = firstName.ifEmpty { regData.name },
+                firstName = firstName.ifEmpty { regData.firstName },
                 lastName = lastName,
-                mobileNo = regData.mobile,
+                mobileNo = regData.mobileNo,
                 email = regData.email,
-                dateOfBirth = regData.dob,        // already yyyy-MM-dd from DatePickerField
-                dateOfMarriage = regData.anniversary,
+                dateOfBirth = regData.dateOfBirth,        // already yyyy-MM-dd from DatePickerField
+                dateOfMarriage = regData.dateOfMarriage,
                 courseId = 1,
-                PassoutYear = regData.passingYear.toIntOrNull() ?: 0,
+                PassoutYear = regData.PassoutYear.toIntOrNull() ?: 0,
                 companyName = company,
                 title = title,
                 countryId = 81,
                 loggedFrom = "Self",
-                deviceToken = ""
+                deviceToken = "sxsssx"
             )
+            Log.e("Registration",request.toString())
 
             val result = repo.signup(request)
             _loading.value = false

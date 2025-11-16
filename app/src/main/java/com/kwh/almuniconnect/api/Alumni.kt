@@ -76,7 +76,7 @@ interface ApiService {
     @GET("masters/roles")
     suspend fun getRoles(): Response<MasterResponse>
     @Headers("Content-Type: application/json")
-    @POST("api/v1-stage/auth/signup")
+    @POST("auth/signup")
     suspend fun signup(@Body body: SignupRequest): Response<ApiResponse<Any>>
 }
 

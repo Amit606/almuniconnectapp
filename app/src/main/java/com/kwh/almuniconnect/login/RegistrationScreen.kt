@@ -190,15 +190,15 @@ fun RegistrationScreen(
                 showError = name.isBlank() || mobile.length < 10 || email.isBlank()
                 if (!showError) {
                     val data = RegistrationData(
-                        name = name,
-                        mobile = mobile,
+                        firstName = name,
+                        mobileNo = mobile,
                         email = email,
                         branch = selectedBranch,
-                        passingYear = selectedYear,
+                        PassoutYear = selectedYear,
                         jobDetails = jobDetails,
                         linkedIn = linkedIn,
-                        dob = dob,
-                        anniversary = anniversary,
+                        dateOfBirth = dob,
+                        dateOfMarriage = anniversary,
                         profileUri = profileUri
                     )
                     onRegister(data)

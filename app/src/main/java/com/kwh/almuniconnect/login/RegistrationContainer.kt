@@ -1,6 +1,7 @@
 // RegistrationContainer.kt
 package com.kwh.almuniconnect.login
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,9 +20,12 @@ fun RegistrationContainer() {
     val loading by authViewModel.loading.collectAsState()
     val message by authViewModel.message.collectAsState()
     val context = LocalContext.current
+    var lastSentData by remember { mutableStateOf<RegistrationData?>(null) }
 
     LaunchedEffect(message) {
         message?.let {
+            Log.e("Registration",message.toString())
+
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
     }
@@ -30,8 +34,10 @@ fun RegistrationContainer() {
         RegistrationScreen(onRegister = { regData ->
             authViewModel.register(regData)
         }, modifier = Modifier.fillMaxSize())
-
         if (loading) {
+            lastSentData?.let {
+                Log.d("RegisterData", "Sending to API: $it")
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
