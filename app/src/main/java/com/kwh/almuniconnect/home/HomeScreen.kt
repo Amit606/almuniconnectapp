@@ -81,11 +81,7 @@ fun HomeScreen(
                 )
             )
         },
-//        floatingActionButton = {
-//            FloatingActionButton(onClick = onCreatePost) {
-//                Icon(Icons.Default.Add, contentDescription = "Create")
-//            }
-//        },
+
         bottomBar = {
             BottomAppBarWithNav(selected = bottomBarState.value) { selected ->
                 bottomBarState.value = selected
@@ -111,20 +107,7 @@ fun HomeScreen(
 
                     verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                // Search bar
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    placeholder = { Text("Search alumni, companies, events...") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clickable { /* open search screen */ }
-                )
-            }
+
 
             item {
                 // Banner / Welcome card
@@ -155,9 +138,13 @@ fun HomeScreen(
 
             // Events section
             item {
-                SectionTitle(title = "Upcoming Events", actionText = "See all") {
-                    // see all events
-                }
+                SectionTitle(
+                    title = "Upcoming Events",
+                    actionText = "View All",
+                    onAction = {
+                        navController.navigate(Routes.EVENTS)
+                    }
+                )
             }
 
             item {
@@ -171,23 +158,25 @@ fun HomeScreen(
 
             // Jobs section
             item {
-                SectionTitle(title = "Jobs & Opportunities", actionText = "More") { }
+                SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
+                    navController.navigate(Routes.EVENTS)
+                })
             }
 
             item {
                 val sampleJobs = sampleJobs()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(sampleJobs) { job ->
-                        JobCard(job = job, onClick = { onOpenJobDetails(job) })
+                        JobCard(job = job, onClick = { navController.navigate(job) })
                     }
                 }
             }
 
             // Feed
             item {
-                SectionTitle(title = "Alumni Feed", actionText = "New Post") {
-                    onCreatePost()
-                }
+                SectionTitle(title = "Alumni Feed", actionText = "New Post", onAction = {
+                    navController.navigate(Routes.EVENTS)
+                })
             }
 
             items(samplePosts()) { post ->
@@ -365,10 +354,4 @@ private fun samplePosts() = listOf(
     Post("2", "Anita Desai", "1d", "We are hiring for multiple roles at our startup.", null)
 )
 
-//@Preview(showBackground = true)
-//@Composable
-//fun HomeScreenPreview() {
-//    HomeScreen(navController = navArgument {
-//
-//    })
-//}
+

@@ -1,26 +1,13 @@
 package com.kwh.almuniconnect
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.kwh.almuniconnect.branding.CountryListScreen
-import com.kwh.almuniconnect.intro.IntroScreen
-import com.kwh.almuniconnect.login.LoginScreen
-import com.kwh.almuniconnect.navigation.AppNavGraph
 import com.kwh.almuniconnect.ui.theme.AlmuniconnectTheme
 
 class MainActivity : ComponentActivity() {

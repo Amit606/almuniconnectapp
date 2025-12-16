@@ -15,6 +15,7 @@ object Routes {
 
     const val MESSAGES = "messages"
     const val CREATE_POST = "create_post"
+    const val EVENTS = "events"
 
     const val EVENT_DETAILS = "event/{eventId}"
     fun eventRoute(eventId: String) = "event/$eventId"

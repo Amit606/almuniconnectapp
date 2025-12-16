@@ -1,4 +1,4 @@
-package com.kwh.almuniconnect.navigation
+package com.kwh.almuniconnect
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
@@ -7,18 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kwh.almuniconnect.login.LoginScreen
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.kwh.almuniconnect.GetStartedCard
-import com.kwh.almuniconnect.PreferenceHelper
-import com.kwh.almuniconnect.Routes
-import com.kwh.almuniconnect.SplashScreen
-import com.kwh.almuniconnect.branding.CountryListScreen
 import com.kwh.almuniconnect.branding.MasterTabsScreen
+import com.kwh.almuniconnect.evetns.EventScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
+import com.kwh.almuniconnect.jobposting.JobListingScreen
 import com.kwh.almuniconnect.login.RegistrationContainer
 import com.kwh.almuniconnect.network.NetworkScreen
 
@@ -30,8 +25,8 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-            SplashScreen(navController)
-
+           // SplashScreen(navController)
+            JobListingScreen()
 
         }
 //        composable(Routes.COUTNRYLIST) {
@@ -55,6 +50,10 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
                 onJoinNow = { navController.navigate(Routes.LOGIN) }
             )
         }
+        composable(Routes.EVENTS) {
+            EventScreen(navController)
+        }
+
 
         // 🟩 Login
         composable(Routes.LOGIN) {

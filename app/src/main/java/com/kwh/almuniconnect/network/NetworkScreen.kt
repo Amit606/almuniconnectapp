@@ -61,12 +61,8 @@ fun NetworkScreen(
                     IconButton(onClick = { }) {
                         Icon(Icons.Default.ArrowBack, tint = Color.White, contentDescription = "Back")
                     }
-                },
-                actions = {
-                    IconButton(onClick = { /* future filter menu */ }) {
-                        Icon(Icons.Default.Search, tint = Color.White, contentDescription = null)
-                    }
-                },colors = TopAppBarDefaults.topAppBarColors(
+                }
+              ,colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF0E1420),
                     titleContentColor = Color.White
                 )
@@ -83,20 +79,7 @@ fun NetworkScreen(
                 .padding(horizontal = 16.dp)
         ) {
             // Search
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                placeholder = { Text("Search alumni by name...", color = Color.White) },
-                leadingIcon = { Icon(Icons.Default.Search, tint = Color.White, contentDescription = null) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Search
-                )
-            )
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -108,19 +91,23 @@ fun NetworkScreen(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             ) {
-                FilterChipDropdown(
-                    label = "Branch",
-                    options = branches,
-                    selectedOption = selectedBranch,
-                    onSelect = { selectedBranch = it }
-                )
+                Box(modifier = Modifier.weight(1f)) {
+                    FilterChipDropdown(
+                        label = "Branch",
+                        options = branches,
+                        selectedOption = selectedBranch,
+                        onSelect = { selectedBranch = it }
+                    )
+                }
 
-                FilterChipDropdown(
-                    label = "Year",
-                    options = years,
-                    selectedOption = selectedYear,
-                    onSelect = { selectedYear = it }
-                )
+                Box(modifier = Modifier.weight(1f)) {
+                    FilterChipDropdown(
+                        label = "Year",
+                        options = years,
+                        selectedOption = selectedYear,
+                        onSelect = { selectedYear = it }
+                    )
+                }
             }
 
             // Alumni List
