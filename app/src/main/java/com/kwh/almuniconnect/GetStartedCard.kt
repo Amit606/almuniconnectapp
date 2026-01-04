@@ -132,17 +132,3 @@ fun GetStartedCard(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GetStartedCardPreview() {
-    Surface(modifier = Modifier.padding(16.dp)) {
-        GetStartedCard()
-    }
-}
-
-/*
-USAGE NOTES:
-- Replace R.drawable.avatar_small and R.drawable.avatar_large with your drawable resources.
-- Tweak sizes, offsets and colors to precisely match the screenshot for your device density.
-- If you want the card full screen (like the screenshot where it looks vertical and centered), place this composable inside a Box with padding and center alignment in your screen composable.
-*/

@@ -100,4 +100,8 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14")
+
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
 }

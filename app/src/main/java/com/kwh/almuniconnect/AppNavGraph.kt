@@ -10,12 +10,14 @@ import com.kwh.almuniconnect.login.LoginScreen
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.kwh.almuniconnect.branding.MasterTabsScreen
-import com.kwh.almuniconnect.evetns.EventScreen
+import com.kwh.almuniconnect.events.EventScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
-import com.kwh.almuniconnect.jobposting.JobListingScreen
+import com.kwh.almuniconnect.login.AlumniLoginScreen
+import com.kwh.almuniconnect.login.PasswordLoginScreen
 import com.kwh.almuniconnect.login.RegistrationContainer
 import com.kwh.almuniconnect.network.NetworkScreen
+import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
 
 @Composable
 fun AppNavGraph(startDestination: String = Routes.SPLASH) {
@@ -26,8 +28,60 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
            // SplashScreen(navController)
-            JobListingScreen()
+           // JobListingScreen()
+          //  EventScreen(navController)
+            AlumniLoginScreen(
+                onRequestOtp = { email ->
+                    // 🔹 Handle Request OTP
+                    // Example:
+                     navController.navigate("otp/$email")
+                },
+                onLoginWithPassword = {
+                    // 🔹 Navigate to Password Login
+                     navController.navigate(Routes.PASSWORD_LOGIN)
+                },
+                onGoogleLogin = {
+                    // 🔹 Google Sign-In
+                }
+            )
 
+
+        }
+        // 🔢 OTP Screen
+        composable(
+            route = "${Routes.OTP}/{email}",
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val email =
+                backStackEntry.arguments?.getString("email") ?: ""
+
+            OtpVerificationScreen(
+                navController,
+                email = email,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.PASSWORD_LOGIN) {
+            PasswordLoginScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onLogin = { email, password ->
+                    // ✅ Handle login
+                    // Example:
+                    // viewModel.loginWithEmail(email, password)
+                },
+                onForgotPassword = {
+                    // Navigate to forgot password
+                }
+            )
         }
 //        composable(Routes.COUTNRYLIST) {
 //            CountryListScreen()
