@@ -13,38 +13,67 @@ import com.kwh.almuniconnect.branding.MasterTabsScreen
 import com.kwh.almuniconnect.events.EventScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
-import com.kwh.almuniconnect.login.AlumniLoginScreen
+import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.login.PasswordLoginScreen
 import com.kwh.almuniconnect.login.RegistrationContainer
+import com.kwh.almuniconnect.login.SplashRoute
 import com.kwh.almuniconnect.network.NetworkScreen
+import com.kwh.almuniconnect.network.sampleAlumniProfiles
 import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
+import com.kwh.almuniconnect.profile.AlumniProfileScreen
 
 @Composable
 fun AppNavGraph(startDestination: String = Routes.SPLASH) {
     val navController = rememberNavController()
 
+
     NavHost(navController = navController, startDestination = startDestination) {
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-           // SplashScreen(navController)
-           // JobListingScreen()
-          //  EventScreen(navController)
-            AlumniLoginScreen(
-                onRequestOtp = { email ->
-                    // 🔹 Handle Request OTP
-                    // Example:
-                     navController.navigate("otp/$email")
-                },
-                onLoginWithPassword = {
-                    // 🔹 Navigate to Password Login
-                     navController.navigate(Routes.PASSWORD_LOGIN)
-                },
-                onGoogleLogin = {
-                    // 🔹 Google Sign-In
+            // SplashScreen(navController)
+            // JobListingScreen()
+            //  EventScreen(navController)
+            SplashRoute(navController)
+
+
+        }
+        composable(Routes.NETWORK) {
+            NetworkScreen(
+                navController = navController,
+                onOpenProfile = { alumni ->
+                    navController.navigate(
+                        Routes.profileRoute(alumni.id)
+                    )
                 }
             )
+        }
 
+        composable(
+            route = Routes.PROFILE,
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments?.getString("id") ?: return@composable
+            val alumni = sampleAlumniProfiles().first { it.id == id }
+
+            AlumniProfileScreen(
+                alumni = alumni,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+
+        composable(Routes.SPLASH_HOME)
+        {
+            SplashScreen(navController)
+        }
+
+        composable(Routes.LOGIN)
+        {
+            LoginRoute(navController)
 
         }
         // 🔢 OTP Screen
@@ -110,22 +139,7 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
 
         // 🟩 Login
-        composable(Routes.LOGIN) {
-            val context = LocalContext.current
-            val prefs = remember { PreferenceHelper(context) }
-            LoginScreen(
-                onLogin = { email, password ->
-                    prefs.setLoginStatus(true)
-                    prefs.saveUserData(name = "John Doe", email = email) // use real data
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.LOGIN) { inclusive = true }
-                    }
-                },
-                onGoogleSignIn = { /* handle Google sign-in */ },
-                onForgotPassword = { /* navController.navigate("forgot_password") */ },
-                onCreateAccount = { navController.navigate(Routes.REGISTER) }
-            )
-        }
+//
         composable(Routes.COUTNRYLIST) {
             MasterTabsScreen(onItemClick = { masterItem ->
                 // handle selection: navigate back, open edit screen, etc.
@@ -160,13 +174,7 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         composable(Routes.MESSAGES) { /* MessagesScreen(navController) */ }
         composable(Routes.CREATE_POST) { /* CreatePostScreen(navController) */ }
 
-        composable(
-            Routes.PROFILE,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId")
-            /* ProfileScreen(userId) */
-        }
+//
 
         composable(
             Routes.EVENT_DETAILS,
@@ -175,11 +183,11 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
             val eventId = backStackEntry.arguments?.getString("eventId")
             /* EventDetailsScreen(eventId) */
         }
-        composable(Routes.NETWORK) {
-            NetworkScreen(onOpenProfile = { alumni ->
-                navController.navigate(Routes.profileRoute(alumni.id))
-            })
-        }
+//        composable(Routes.NETWORK) {
+//            NetworkScreen(onOpenProfile = { alumni ->
+//                navController.navigate(Routes.profileRoute(alumni.id))
+//            })
+//        }
 
         composable(
             Routes.JOB_DETAILS,

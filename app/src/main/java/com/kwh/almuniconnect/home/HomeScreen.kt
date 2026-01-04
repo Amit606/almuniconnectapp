@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +37,9 @@ import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.network.NetworkScreen
+import com.kwh.almuniconnect.permission.RequestNotificationPermission
+import com.kwh.almuniconnect.storage.UserLocalModel
+import com.kwh.almuniconnect.storage.UserPreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,8 +53,21 @@ fun HomeScreen(
     onCreatePost: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
+    val context = LocalContext.current
 
+    val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
+    val userPrefs = remember { UserPreferences(context) }
+    val user by userPrefs.getUser().collectAsState(
+        initial = UserLocalModel("", "", "", "")
+    )
+    RequestNotificationPermission(
+        onPermissionGranted = {
+            // 🔔 Notifications enabled
+        },
+        onPermissionDenied = {
+            // 🚫 User denied (show snackbar or ignore)
+        }
+    )
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -66,14 +83,28 @@ fun HomeScreen(
                         Icon(Icons.Default.Notifications, tint = Color.White,contentDescription = "Notifications")
                     }
                     IconButton(onClick = onOpenProfile) {
-                        // small avatar placeholder
-                        Image(
-                            painter = painterResource(id = R.drawable.girl),
-                            contentDescription = "Profile",
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                        )
+
+                        if (user.photo.isNotEmpty()) {
+                            // 🔹 Google profile photo
+                            AsyncImage(
+                                model = user.photo,
+                                contentDescription = "Profile photo",
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            // 🔹 Fallback local avatar
+                            Image(
+                                painter = painterResource(id = R.drawable.girl),
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 }, colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF0E1420),
@@ -129,7 +160,7 @@ fun HomeScreen(
                                 .align(Alignment.CenterStart)
                                 .padding(16.dp)
                         ) {
-                            Text("Welcome back!", fontSize = 18.sp, color = Color.White)
+                            Text("Welcome back!"+user.name, fontSize = 18.sp, color = Color.Green)
                             Text("See what's happening in your alumni network", maxLines = 2,color = Color.LightGray, overflow = TextOverflow.Ellipsis)
                         }
                     }
@@ -151,7 +182,7 @@ fun HomeScreen(
                 val sampleEvents = sampleEvents()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(sampleEvents) { event ->
-                        EventCard(event = event, onClick = { onOpenEventDetails(event) })
+                        EventCard(event = event, onClick = {  navController.navigate(Routes.EVENTS) })
                     }
                 }
             }
@@ -338,7 +369,7 @@ data class Job(val id: String, val title: String, val company: String, val locat
 data class Post(val id: String, val name: String, val timeAgo: String, val content: String, val imageUrl: String?)
 
 private fun sampleEvents() = listOf(
-    Event("1", "Annual Meetup 2026", "Jan 20, 2026", "Mumbai"),
+    Event("1", "MCA Almuni Meet 2026", "Feb 22, 2026", "Delhi/NCR"),
     Event("2", "Tech Talk: AI in Industry", "Feb 05, 2026", "Online"),
     Event("3", "Regional Chapter: Delhi", "Mar 12, 2026", "Delhi")
 )
@@ -350,7 +381,7 @@ private fun sampleJobs() = listOf(
 )
 
 private fun samplePosts() = listOf(
-    Post("1", "Rohit Sharma", "2h", "Excited to announce our alumni meetup next month!", null),
+    Post("1", "Amit Kumar Gupta ", "2h", "Excited to announce our alumni meetup next month!", null),
     Post("2", "Anita Desai", "1d", "We are hiring for multiple roles at our startup.", null)
 )
 

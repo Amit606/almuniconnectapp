@@ -1,0 +1,171 @@
+package com.kwh.almuniconnect.profile
+
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.kwh.almuniconnect.network.AlumniProfile
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlumniProfileScreen(
+    alumni: AlumniProfile,
+    onBack: () -> Unit = {}
+) {
+    val context = LocalContext.current
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Profile") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {   // ✅ navController.popBackStack()
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // 🔵 Profile Image
+            AsyncImage(
+                model = alumni.imageUrl,
+                contentDescription = "Profile photo",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 👤 Name
+            Text(alumni.name, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+
+            // 💼 Position + Company
+            Text(
+                text = "${alumni.position} @ ${alumni.company}",
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // 🎓 Branch + Year
+            Text(
+                text = "${alumni.branch} • Batch of ${alumni.passingYear}",
+                fontSize = 13.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 📞 Contact Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+
+                    ProfileRow(
+                        label = "Mobile",
+                        value = alumni.phone,
+                        onClick = { callPhone(context, alumni.phone) }
+                    )
+
+                    ProfileRow(
+                        label = "Email",
+                        value = alumni.email,
+                        onClick = { sendEmail(context, alumni.email) }
+                    )
+
+                    ProfileRow(
+                        label = "Location",
+                        value = alumni.location,
+                        onClick = { openLocation(context, alumni.location) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 🔗 LinkedIn Button
+            Button(
+                onClick = {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(alumni.profileUrl))
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Icon(Icons.Default.OpenInNew, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("View Linked Profile")
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileRow(
+    label: String,
+    value: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 8.dp)
+    ) {
+        Text(label, fontSize = 12.sp, color = Color.Gray)
+        Text(value, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+    }
+}
+fun callPhone(context: Context, phone: String) {
+    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+    context.startActivity(intent)
+}
+
+fun sendEmail(context: Context, email: String) {
+    val intent = Intent(
+        Intent.ACTION_SENDTO,
+        Uri.parse("mailto:$email")
+    )
+    context.startActivity(intent)
+}
+
+fun openLocation(context: Context, location: String) {
+    val uri = Uri.parse("geo:0,0?q=${Uri.encode(location)}")
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    context.startActivity(intent)
+}

@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services") // ✅ MUST
+
 }
 
 android {
@@ -103,5 +105,6 @@ dependencies {
 
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
 }

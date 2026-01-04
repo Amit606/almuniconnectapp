@@ -1,6 +1,8 @@
 package com.kwh.almuniconnect.network
 
-import androidx.compose.foundation.Image
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,10 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,18 +20,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.kwh.almuniconnect.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetworkScreen(
+    navController: NavController,
     onOpenProfile: (AlumniProfile) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -58,7 +56,7 @@ fun NetworkScreen(
             CenterAlignedTopAppBar(
                 title = { Text("Almuni Network") },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {navController.popBackStack()  }) {
                         Icon(Icons.Default.ArrowBack, tint = Color.White, contentDescription = "Back")
                     }
                 }
@@ -166,7 +164,10 @@ fun FilterChipDropdown(
 
 @Composable
 fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
+        onClick = onClick, // ✅ ONLY THIS
+
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
@@ -204,26 +205,177 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
                     containerColor = Color(0xFF142338)
                 ),
 
-                onClick = { /* send connection */ }) {
+                onClick = { openUrl(context, alumni.profileUrl) }) {
                 Text("Connect", color = Color.White)
             }
         }
     }
 }
 
-data class AlumniProfile(
+fun openUrl(context: Context, url: String) {
+    if (url.isBlank()) return
+
+    val intent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse(url)
+    )
+    context.startActivity(intent)
+}
+
+
+fun sampleAlumniProfiles(): List<AlumniProfile> = listOf(
+
+    AlumniProfile(
+        id = "1",
+        name = "Amit Gupta",
+        branch = "MCA",
+        passingYear = "2015",
+        company = "Datability Technology Pvt. Ltd.",
+        position = "Senior Android Developer",
+        phone = "+91 9876543210",
+        email = "amit.gupta@gmail.com",
+        location = "Noida, India",
+        imageUrl = "https://i.pravatar.cc/150?img=10",
+        profileUrl = "https://www.linkedin.com/in/amitguptaandroid/"
+    ),
+
+    AlumniProfile(
+        id = "2",
+        name = "Ravi Prakash",
+        branch = "MCA",
+        passingYear = "2013",
+        company = "Microsoft",
+        position = "Software Engineer",
+        phone = "+91 9876501234",
+        email = "ravi.prakash@gmail.com",
+        location = "Hyderabad, India",
+        imageUrl = "https://i.pravatar.cc/150?img=12",
+        profileUrl = "https://www.linkedin.com/in/ravi-prakash"
+    ),
+
+    AlumniProfile(
+        id = "3",
+        name = "Neha Sharma",
+        branch = "MCA",
+        passingYear = "2016",
+        company = "Infosys",
+        position = "Technology Analyst",
+        phone = "+91 9876512345",
+        email = "neha.sharma@gmail.com",
+        location = "Pune, India",
+        imageUrl = "https://i.pravatar.cc/150?img=5",
+        profileUrl = "https://www.linkedin.com/in/neha-sharma"
+    ),
+
+    AlumniProfile(
+        id = "4",
+        name = "Ankit Verma",
+        branch = "MCA",
+        passingYear = "2014",
+        company = "TCS",
+        position = "System Engineer",
+        phone = "+91 9876523456",
+        email = "ankit.verma@gmail.com",
+        location = "Delhi, India",
+        imageUrl = "https://i.pravatar.cc/150?img=8",
+        profileUrl = "https://www.linkedin.com/in/ankit-verma"
+    ),
+
+    AlumniProfile(
+        id = "5",
+        name = "Pooja Singh",
+        branch = "MCA",
+        passingYear = "2017",
+        company = "Wipro",
+        position = "Project Engineer",
+        phone = "+91 9876534567",
+        email = "pooja.singh@gmail.com",
+        location = "Bangalore, India",
+        imageUrl = "https://i.pravatar.cc/150?img=16",
+        profileUrl = "https://www.linkedin.com/in/pooja-singh"
+    ),
+
+    AlumniProfile(
+        id = "6",
+        name = "Saurabh Mishra",
+        branch = "MCA",
+        passingYear = "2012",
+        company = "Accenture",
+        position = "Application Development Lead",
+        phone = "+91 9876545678",
+        email = "saurabh.mishra@gmail.com",
+        location = "Gurgaon, India",
+        imageUrl = "https://i.pravatar.cc/150?img=14",
+        profileUrl = "https://www.linkedin.com/in/saurabh-mishra"
+    ),
+
+    AlumniProfile(
+        id = "7",
+        name = "Kunal Jain",
+        branch = "MCA",
+        passingYear = "2018",
+        company = "Paytm",
+        position = "Android Developer",
+        phone = "+91 9876556789",
+        email = "kunal.jain@gmail.com",
+        location = "Noida, India",
+        imageUrl = "https://i.pravatar.cc/150?img=20",
+        profileUrl = "https://www.linkedin.com/in/kunal-jain"
+    ),
+
+    AlumniProfile(
+        id = "8",
+        name = "Shreya Kapoor",
+        branch = "MCA",
+        passingYear = "2019",
+        company = "Amazon",
+        position = "SDE I",
+        phone = "+91 9876567890",
+        email = "shreya.kapoor@gmail.com",
+        location = "Bangalore, India",
+        imageUrl = "https://i.pravatar.cc/150?img=25",
+        profileUrl = "https://www.linkedin.com/in/shreya-kapoor"
+    ),
+
+    AlumniProfile(
+        id = "9",
+        name = "Rahul Yadav",
+        branch = "MCA",
+        passingYear = "2011",
+        company = "IBM",
+        position = "Technical Consultant",
+        phone = "+91 9876578901",
+        email = "rahul.yadav@gmail.com",
+        location = "Chennai, India",
+        imageUrl = "https://i.pravatar.cc/150?img=18",
+        profileUrl = "https://www.linkedin.com/in/rahul-yadav"
+    ),
+
+    AlumniProfile(
+        id = "10",
+        name = "Simran Kaur",
+        branch = "MCA",
+        passingYear = "2020",
+        company = "Startup Founder",
+        position = "Product Manager",
+        phone = "+91 9876589012",
+        email = "simran.kaur@gmail.com",
+        location = "Delhi, India",
+        imageUrl = "https://i.pravatar.cc/150?img=30",
+        profileUrl = "https://www.linkedin.com/in/simran-kaur"
+    )
+)
+
+            data class AlumniProfile(
     val id: String,
     val name: String,
     val branch: String,
     val passingYear: String,
     val company: String,
-    val imageUrl: String
-)
-
-fun sampleAlumniProfiles(): List<AlumniProfile> = listOf(
-    AlumniProfile("1", "Rohit Sharma", "CSE", "2022", "Google", "https://i.pravatar.cc/150?img=10"),
-    AlumniProfile("2", "Priya Mehta", "ECE", "2023", "Microsoft", "https://i.pravatar.cc/150?img=12"),
-    AlumniProfile("3", "Ankit Verma", "Mechanical", "2020", "Tata Motors", "https://i.pravatar.cc/150?img=8"),
-    AlumniProfile("4", "Sneha Singh", "IT", "2021", "Amazon", "https://i.pravatar.cc/150?img=5"),
-    AlumniProfile("5", "Vivek Agarwal", "Civil", "2019", "L&T", "https://i.pravatar.cc/150?img=14"),
+    val position: String,          // ✅ Job position
+    val phone: String,             // ✅ Mobile number
+    val email: String,             // ✅ Email
+    val location: String,          // ✅ City / Location
+    val imageUrl: String,
+    val profileUrl: String
 )

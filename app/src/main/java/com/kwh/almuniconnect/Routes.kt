@@ -2,6 +2,7 @@ package com.kwh.almuniconnect
 
 object Routes {
     const val SPLASH = "splash"
+    const val SPLASH_HOME ="splash_home"
     const val INTRO = "intro"
     const val STARTED = "started"
     const val LOGIN = "login"
@@ -10,8 +11,8 @@ object Routes {
     const val NETWORK = "network"
     const val COUTNRYLIST = "countrylist"
 
-    const val PROFILE = "profile/{userId}"
-    fun profileRoute(userId: String) = "profile/$userId"
+    const val PROFILE = "profile/{id}"
+    fun profileRoute(id: String) = "profile/$id"
 
     const val MESSAGES = "messages"
     const val CREATE_POST = "create_post"

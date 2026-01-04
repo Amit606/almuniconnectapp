@@ -15,6 +15,7 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.FirebaseException
+import com.google.firebase.auth.GoogleAuthProvider
 
 //class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
 //
@@ -144,6 +145,21 @@ class AuthViewModel : ViewModel() {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener {
                 onError(it.localizedMessage ?: "Invalid OTP")
+            }
+    }
+    fun firebaseAuthWithGoogle(
+        idToken: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+
+        auth.signInWithCredential(credential)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.localizedMessage ?: "Google Sign-In failed")
             }
     }
 }
