@@ -26,4 +26,11 @@ object Routes {
 
     const val JOB_DETAILS = "job/{jobId}"
     fun jobRoute(jobId: String) = "job/$jobId"
+
+    const val JOB_DETAILS_Full = "job_details"
+    const val JOB_POST = "job_post"
+
+    const val ALMUNI_POST="almuni_post"
+    const val SETTINGS = "SETTINGS"
+
 }

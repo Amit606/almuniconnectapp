@@ -9,10 +9,15 @@ import androidx.navigation.navArgument
 import com.kwh.almuniconnect.login.LoginScreen
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.kwh.almuniconnect.almunipost.AlumniFeedScreen
 import com.kwh.almuniconnect.branding.MasterTabsScreen
 import com.kwh.almuniconnect.events.EventScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
+import com.kwh.almuniconnect.jobposting.JobDetailScreen
+import com.kwh.almuniconnect.jobposting.JobListingScreen
+import com.kwh.almuniconnect.jobposting.JobPostScreen
+import com.kwh.almuniconnect.jobposting.sampleJob
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.login.PasswordLoginScreen
 import com.kwh.almuniconnect.login.RegistrationContainer
@@ -21,6 +26,7 @@ import com.kwh.almuniconnect.network.NetworkScreen
 import com.kwh.almuniconnect.network.sampleAlumniProfiles
 import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
+import com.kwh.almuniconnect.settings.SettingsScreen
 
 @Composable
 fun AppNavGraph(startDestination: String = Routes.SPLASH) {
@@ -162,8 +168,8 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         composable(Routes.HOME) {
             HomeScreen(
                 navController = navController,
-                onOpenProfile = { navController.navigate(Routes.profileRoute("me")) },
-                onOpenMessages = { navController.navigate(Routes.MESSAGES) },
+                onOpenProfile = { navController.navigate(Routes.SETTINGS) },
+                onOpenMessages = { navController.navigate(Routes.JOB_DETAILS) },
                 onOpenEventDetails = { event -> navController.navigate(Routes.eventRoute(event.id)) },
                 onOpenJobDetails = { job -> navController.navigate(Routes.jobRoute(job.id)) },
                 onCreatePost = { navController.navigate(Routes.CREATE_POST) }
@@ -173,7 +179,9 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         // 🔵 Optional placeholders
         composable(Routes.MESSAGES) { /* MessagesScreen(navController) */ }
         composable(Routes.CREATE_POST) { /* CreatePostScreen(navController) */ }
-
+        composable(Routes.SETTINGS){
+            SettingsScreen(navController)
+        }
 //
 
         composable(
@@ -188,13 +196,26 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 //                navController.navigate(Routes.profileRoute(alumni.id))
 //            })
 //        }
-
-        composable(
-            Routes.JOB_DETAILS,
-            arguments = listOf(navArgument("jobId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val jobId = backStackEntry.arguments?.getString("jobId")
-            /* JobDetailsScreen(jobId) */
+        composable(Routes.JOB_DETAILS){
+            JobListingScreen(navController)
         }
+        composable(Routes.JOB_DETAILS_Full){
+            JobDetailScreen(sampleJob,navController)
+        }
+        composable(Routes.JOB_POST){
+            JobPostScreen(navController)
+        }
+        composable(Routes.ALMUNI_POST){
+            AlumniFeedScreen(navController)
+        }
+
+
+//        composable(
+//            Routes.JOB_DETAILS,
+//            arguments = listOf(navArgument("jobId") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val jobId = backStackEntry.arguments?.getString("jobId")
+//            JobListingScreen(navController)
+//        }
     }
 }

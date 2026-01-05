@@ -366,7 +366,7 @@ fun sampleAlumniProfiles(): List<AlumniProfile> = listOf(
     )
 )
 
-            data class AlumniProfile(
+data class AlumniProfile(
     val id: String,
     val name: String,
     val branch: String,

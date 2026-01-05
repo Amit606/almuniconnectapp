@@ -121,8 +121,8 @@ fun HomeScreen(
                     BottomNavItem.Network -> {
                         navController.navigate(Routes.NETWORK)
                     }
-                    BottomNavItem.Messages -> onOpenMessages()
-                    BottomNavItem.Profile -> onOpenProfile()
+                    BottomNavItem.JOBS -> onOpenMessages()
+                    BottomNavItem.Settings -> onOpenProfile()
                 }
             }
         }
@@ -146,7 +146,7 @@ fun HomeScreen(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(140.dp)
+                        .height(180.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         AsyncImage(
@@ -160,8 +160,8 @@ fun HomeScreen(
                                 .align(Alignment.CenterStart)
                                 .padding(16.dp)
                         ) {
-                            Text("Welcome back!"+user.name, fontSize = 18.sp, color = Color.Green)
-                            Text("See what's happening in your alumni network", maxLines = 2,color = Color.LightGray, overflow = TextOverflow.Ellipsis)
+                           // Text("Welcome back!"+user.name, fontSize = 18.sp, color = Color.Green)
+                           // Text("See what's happening in your alumni network", maxLines = 2,color = Color.LightGray, overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
@@ -190,7 +190,7 @@ fun HomeScreen(
             // Jobs section
             item {
                 SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
-                    navController.navigate(Routes.EVENTS)
+                    navController.navigate(Routes.JOB_DETAILS)
                 })
             }
 
@@ -198,7 +198,7 @@ fun HomeScreen(
                 val sampleJobs = sampleJobs()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(sampleJobs) { job ->
-                        JobCard(job = job, onClick = { navController.navigate(job) })
+                        JobCard(job = job, onClick = { navController.navigate(Routes.JOB_DETAILS) })
                     }
                 }
             }
@@ -206,15 +206,24 @@ fun HomeScreen(
             // Feed
             item {
                 SectionTitle(title = "Alumni Feed", actionText = "New Post", onAction = {
-                    navController.navigate(Routes.EVENTS)
+                    navController.navigate(Routes.ALMUNI_POST)
                 })
             }
 
             items(samplePosts()) { post ->
                 AlumniPost(post = post)
             }
+            // News
+            item {
+                SectionTitle(title = "News", actionText = "", onAction = {
+                    navController.navigate(Routes.ALMUNI_POST)
+                })
+            }
 
-            item { Spacer(modifier = Modifier.height(80.dp)) }
+            items(sampleNews()) { post ->
+                AlumniNews(post = post)
+            }
+
         }
     }
 }
@@ -322,7 +331,7 @@ fun AlumniPost(post: Post) {
 }
 
 // Bottom navigation items
-enum class BottomNavItem { Home, Network, Messages, Profile }
+enum class BottomNavItem { Home, Network, JOBS, Settings }
 
 @Composable
 fun BottomAppBarWithNav(
@@ -348,24 +357,24 @@ fun BottomAppBarWithNav(
         )
 
         NavigationBarItem(
-            selected = selected == BottomNavItem.Messages,
-            onClick = { onSelect(BottomNavItem.Messages) },
-            icon = { Icon(Icons.Default.Message, contentDescription = null) },
-            label = { Text("Messages") }
+            selected = selected == BottomNavItem.JOBS,
+            onClick = { onSelect(BottomNavItem.JOBS) },
+            icon = { Icon(Icons.Default.PostAdd, contentDescription = null) },
+            label = { Text("Jobs") }
         )
 
         NavigationBarItem(
-            selected = selected == BottomNavItem.Profile,
-            onClick = { onSelect(BottomNavItem.Profile) },
-            icon = { Icon(Icons.Default.Person, contentDescription = null) },
-            label = { Text("Profile") }
+            selected = selected == BottomNavItem.Settings,
+            onClick = { onSelect(BottomNavItem.Settings) },
+            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            label = { Text("Settings") }
         )
     }}
 }
 
 // Sample models + data
 data class Event(val id: String, val title: String, val date: String, val location: String)
-data class Job(val id: String, val title: String, val company: String, val location: String)
+data class Job(val id: String, val title: String, val company: String, val location: String,val experience:String,val salary:String)
 data class Post(val id: String, val name: String, val timeAgo: String, val content: String, val imageUrl: String?)
 
 private fun sampleEvents() = listOf(
@@ -375,14 +384,81 @@ private fun sampleEvents() = listOf(
 )
 
 private fun sampleJobs() = listOf(
-    Job("1", "Senior Android Engineer", "Acme Corp", "Remote"),
-    Job("2", "Product Manager", "Beta Inc.", "Bengaluru"),
-    Job("3", "UI/UX Designer", "DesignCo", "Hyderabad")
+    Job("1", "Senior Android Engineer", "Acme Corp", "Remote","",""),
+    Job("2", "Product Manager", "Beta Inc.", "Bengaluru","",""),
+    Job("3", "UI/UX Designer", "DesignCo", "Hyderabad","","")
 )
 
 private fun samplePosts() = listOf(
     Post("1", "Amit Kumar Gupta ", "2h", "Excited to announce our alumni meetup next month!", null),
-    Post("2", "Anita Desai", "1d", "We are hiring for multiple roles at our startup.", null)
+)
+private fun sampleNews(): List<AlumniNews> {
+    return listOf(
+        AlumniNews(
+            id = "1",
+            title = "HBTU MCA Alumni Meet 2026 Announced 🎉",
+            description = "The grand HBTU MCA Alumni Meet 2026 will be held on 22 February 2026. Registrations are open now.",
+            date = "05 Jan 2026"
+        ),
+        AlumniNews(
+            id = "2",
+            title = "New MCA Lab Inaugurated",
+            description = "A new advanced computer lab has been inaugurated for MCA students with modern infrastructure.",
+            date = "28 Dec 2025"
+        ),
+        AlumniNews(
+            id = "3",
+            title = "HBTU Ranked Among Top Technical Universities",
+            description = "HBTU has been ranked among the top engineering institutions in India for academic excellence.",
+            date = "15 Dec 2025"
+        )
+    )
+}
+data class AlumniNews(
+    val id: String,
+    val title: String,
+    val description: String,
+    val date: String
 )
 
+@Composable
+fun AlumniNews(post: AlumniNews) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            Text(
+                text = post.title,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = post.description,
+                fontSize = 14.sp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Text(
+                    text = post.date,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
 

@@ -15,7 +15,5 @@ class MainActivity : ComponentActivity() {
                 AppNavGraph(startDestination = Routes.SPLASH)
             }
         }
-
-
-                }
-            }
+    }
+}
