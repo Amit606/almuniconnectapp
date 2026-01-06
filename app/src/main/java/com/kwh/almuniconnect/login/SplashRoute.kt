@@ -24,8 +24,8 @@ fun SplashRoute(
                 popUpTo(Routes.HOME) { inclusive = true }
             }
         } else {
-            navController.navigate(Routes.HOME) {
-                popUpTo(Routes.HOME) { inclusive = true }
+            navController.navigate(Routes.PASSWORD_LOGIN) {
+                popUpTo(Routes.SPLASH) { inclusive = true }
             }
         }
     }

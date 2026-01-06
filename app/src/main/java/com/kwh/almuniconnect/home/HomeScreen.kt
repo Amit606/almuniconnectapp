@@ -392,21 +392,21 @@ private fun sampleJobs() = listOf(
 private fun samplePosts() = listOf(
     Post("1", "Amit Kumar Gupta ", "2h", "Excited to announce our alumni meetup next month!", null),
 )
-private fun sampleNews(): List<AlumniNews> {
+private fun sampleNews(): List<UniversityNews> {
     return listOf(
-        AlumniNews(
+        UniversityNews(
             id = "1",
             title = "HBTU MCA Alumni Meet 2026 Announced 🎉",
             description = "The grand HBTU MCA Alumni Meet 2026 will be held on 22 February 2026. Registrations are open now.",
             date = "05 Jan 2026"
         ),
-        AlumniNews(
+        UniversityNews(
             id = "2",
             title = "New MCA Lab Inaugurated",
             description = "A new advanced computer lab has been inaugurated for MCA students with modern infrastructure.",
             date = "28 Dec 2025"
         ),
-        AlumniNews(
+        UniversityNews(
             id = "3",
             title = "HBTU Ranked Among Top Technical Universities",
             description = "HBTU has been ranked among the top engineering institutions in India for academic excellence.",
@@ -414,7 +414,7 @@ private fun sampleNews(): List<AlumniNews> {
         )
     )
 }
-data class AlumniNews(
+data class UniversityNews(
     val id: String,
     val title: String,
     val description: String,
@@ -422,7 +422,7 @@ data class AlumniNews(
 )
 
 @Composable
-fun AlumniNews(post: AlumniNews) {
+fun AlumniNews(post: UniversityNews) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

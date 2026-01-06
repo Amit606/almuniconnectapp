@@ -109,7 +109,7 @@ fun SplashScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "HBTU Alumni Connect",
+            text = "Alumni Connect",
             color = Color.White,
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
