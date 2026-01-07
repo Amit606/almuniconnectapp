@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AlumniConnectTheme {
-                AppNavGraph(startDestination = Routes.SPLASH)
+                AppNavGraph(startDestination = Routes.USER_PROFILE)
                 LaunchedEffect(Unit) {
                     FirebaseMessaging.getInstance().token.addOnSuccessListener {
                         Log.d("FCM_TOKEN", it)

@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,7 +86,7 @@ fun SplashScreen(navController: NavController) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
             }
         } else {
-            navController.navigate(Routes.HOME) {
+            navController.navigate(Routes.INTRO) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
             }
         }
@@ -102,19 +103,13 @@ fun SplashScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Default.PhoneAndroid,
+            painter = painterResource(id = R.drawable.playstore),
             contentDescription = "App Logo",
-            tint = Color.White,
-            modifier = Modifier.size(120.dp).scale(scale.value * pulsate.value)
+            tint = Color.Unspecified,   // ⭐ MOST IMPORTANT
+            modifier = Modifier.size(300.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "Alumni Connect",
-            color = Color.White,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.alpha(alpha.value).offset(y = offsetY.value.dp)
-        )
+
         Spacer(modifier = Modifier.height(50.dp))
     }
 }

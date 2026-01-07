@@ -59,10 +59,6 @@ fun LoginRoute(
                                     photo = user.photoUrl?.toString()
                                 )
                             }
-                            Log.e("GMAILLogin",user.uid)
-                            Log.e("GMAILLogin",""+user.displayName)
-                            Log.e("GMAILLogin",""+user.email)
-                            Log.e("GMAILLogin",""+user.photoUrl?.toString())
 
 
                         }
@@ -71,6 +67,7 @@ fun LoginRoute(
                             popUpTo(Routes.LOGIN) { inclusive = true
                             }
                         }
+
                     },
                     onError = {
                         Log.e("GoogleLogin", it)

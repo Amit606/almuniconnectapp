@@ -6,9 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.kwh.almuniconnect.login.LoginScreen
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import com.kwh.almuniconnect.almunipost.AlumniFeedScreen
 import com.kwh.almuniconnect.branding.MasterTabsScreen
 import com.kwh.almuniconnect.events.EventScreen
@@ -21,11 +18,11 @@ import com.kwh.almuniconnect.jobposting.sampleJob
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.login.PasswordLoginScreen
 import com.kwh.almuniconnect.login.RegistrationContainer
-import com.kwh.almuniconnect.login.SplashRoute
 import com.kwh.almuniconnect.network.NetworkScreen
 import com.kwh.almuniconnect.network.sampleAlumniProfiles
 import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
+import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 
 @Composable
@@ -37,11 +34,7 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-            // SplashScreen(navController)
-            // JobListingScreen()
-            //  EventScreen(navController)
-            SplashRoute(navController)
-
+             SplashScreen(navController)
 
         }
         composable(Routes.NETWORK) {
@@ -53,6 +46,10 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
                     )
                 }
             )
+        }
+        composable(Routes.USER_PROFILE)
+        {
+            ProfileScreen(navController)
         }
 
         composable(
@@ -105,12 +102,14 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
         composable(Routes.PASSWORD_LOGIN) {
             PasswordLoginScreen(
+                navController,
                 onBack = {
                     navController.popBackStack()
                 },
                 onLogin = { email, password ->
                     // ✅ Handle login
                     // Example:
+                    navController.navigate(Routes.HOME)
                     // viewModel.loginWithEmail(email, password)
                 },
                 onForgotPassword = {
@@ -168,7 +167,7 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         composable(Routes.HOME) {
             HomeScreen(
                 navController = navController,
-                onOpenProfile = { navController.navigate(Routes.SETTINGS) },
+                onOpenProfile = { navController.navigate(Routes.USER_PROFILE) },
                 onOpenMessages = { navController.navigate(Routes.JOB_DETAILS) },
                 onOpenEventDetails = { event -> navController.navigate(Routes.eventRoute(event.id)) },
                 onOpenJobDetails = { job -> navController.navigate(Routes.jobRoute(job.id)) },

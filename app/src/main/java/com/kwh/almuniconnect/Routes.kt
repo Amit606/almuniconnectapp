@@ -32,5 +32,6 @@ object Routes {
 
     const val ALMUNI_POST="almuni_post"
     const val SETTINGS = "SETTINGS"
+    const val USER_PROFILE = "user_profile"
 
 }

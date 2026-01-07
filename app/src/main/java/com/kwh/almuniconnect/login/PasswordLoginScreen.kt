@@ -18,10 +18,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.kwh.almuniconnect.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordLoginScreen(
+    navController : NavHostController,
     email: String = "",
     onBack: () -> Unit = {},
     onLogin: (String, String) -> Unit = { _, _ -> },
@@ -139,7 +142,10 @@ fun PasswordLoginScreen(
 
             // 🔵 Login Button
             Button(
-                onClick = { onLogin(userEmail, password) },
+                onClick = {
+                    navController.navigate(Routes.HOME)
+                   // onLogin(userEmail, password)
+                          },
                 enabled = userEmail.isNotBlank() && password.length >= 6,
                 modifier = Modifier
                     .fillMaxWidth()

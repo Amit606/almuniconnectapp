@@ -82,7 +82,9 @@ fun HomeScreen(
                     IconButton(onClick = { /* open notifications */ }) {
                         Icon(Icons.Default.Notifications, tint = Color.White,contentDescription = "Notifications")
                     }
-                    IconButton(onClick = onOpenProfile) {
+                    IconButton(onClick = {
+                        navController.navigate(Routes.USER_PROFILE)
+                    }) {
 
                         if (user.photo.isNotEmpty()) {
                             // 🔹 Google profile photo
