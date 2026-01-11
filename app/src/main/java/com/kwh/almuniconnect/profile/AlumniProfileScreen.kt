@@ -10,18 +10,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Whatsapp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.network.AlumniProfile
 
@@ -29,28 +36,39 @@ import com.kwh.almuniconnect.network.AlumniProfile
 @Composable
 fun AlumniProfileScreen(
     alumni: AlumniProfile,
-    onBack: () -> Unit = {}
+    navController: NavController
 ) {
     val context = LocalContext.current
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile") },
+                title = {
+                    Text("Alumni Profile")
+                },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {   // ✅ navController.popBackStack()
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0E1420),
+                    titleContentColor = Color.White
+                )
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
 
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(paddingValues)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(Color(0xFF0E1420))
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -68,13 +86,13 @@ fun AlumniProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // 👤 Name
-            Text(alumni.name, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(alumni.name, fontSize = 22.sp, color =Color.White, fontWeight = FontWeight.Bold)
 
             // 💼 Position + Company
             Text(
                 text = "${alumni.position} @ ${alumni.company}",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -83,7 +101,7 @@ fun AlumniProfileScreen(
             Text(
                 text = "${alumni.branch} • Batch of ${alumni.passingYear}",
                 fontSize = 13.sp,
-                color = Color.Gray
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -91,27 +109,39 @@ fun AlumniProfileScreen(
             // 📞 Contact Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF142338)),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
                     ProfileRow(
+                        icon = Icons.Default.Phone,
                         label = "Mobile",
                         value = alumni.phone,
                         onClick = { callPhone(context, alumni.phone) }
                     )
 
                     ProfileRow(
+                        icon = Icons.Default.Email,
                         label = "Email",
                         value = alumni.email,
                         onClick = { sendEmail(context, alumni.email) }
                     )
 
                     ProfileRow(
+                        icon = Icons.Default.LocationOn,
                         label = "Location",
                         value = alumni.location,
                         onClick = { openLocation(context, alumni.location) }
                     )
+
+                    ProfileRow(
+                        icon = Icons.Default.Whatsapp,
+                        label = "Whats-up",
+                        value = alumni.phone,
+                        onClick = { openLocation(context, alumni.location) }
+                    )
+
                 }
             }
 
@@ -137,20 +167,35 @@ fun AlumniProfileScreen(
 
 @Composable
 fun ProfileRow(
+    icon: ImageVector,
     label: String,
     value: String,
     onClick: () -> Unit
 ) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(vertical = 8.dp)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, fontSize = 12.sp, color = Color.Gray)
-        Text(value, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(Modifier.width(12.dp))
+
+        Column {
+            Text(label, color = Color.White, fontSize = 12.sp)
+            Text(value, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+        }
     }
 }
+
 fun callPhone(context: Context, phone: String) {
     val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
     context.startActivity(intent)

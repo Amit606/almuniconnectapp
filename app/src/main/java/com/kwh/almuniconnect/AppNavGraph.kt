@@ -12,6 +12,7 @@ import com.kwh.almuniconnect.evetns.EventDetailsScreen
 import com.kwh.almuniconnect.evetns.EventsScreen
 import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
 import com.kwh.almuniconnect.help.HelpSupportScreen
+import com.kwh.almuniconnect.help.WhatsAppChannelsScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
@@ -67,7 +68,8 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
 
             AlumniProfileScreen(
                 alumni = alumni,
-                onBack = { navController.popBackStack() }
+                navController
+
             )
         }
 
@@ -143,6 +145,9 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         }
         composable(Routes.EVENTS) {
             EventsScreen(navController)
+        }
+        composable(Routes.WHATSUP_CHANNEL) {
+            WhatsAppChannelsScreen(navController)
         }
 
 

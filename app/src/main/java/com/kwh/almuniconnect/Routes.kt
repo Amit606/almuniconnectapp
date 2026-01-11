@@ -42,5 +42,6 @@ object Routes {
 
     const val PRIVACY_POLICY_URL = "https://alumniconnect.com/privacy"
     const val TERMS_URL = "https://alumniconnect.com/terms"
+    const val WHATSUP_CHANNEL ="whatsup_channel"
 
 }

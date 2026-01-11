@@ -72,12 +72,8 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("AlumniConnect", color = Color.White, fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { /* open drawer */ }) {
-                        Icon(Icons.Default.Menu, tint = Color.White, contentDescription = "Menu")
-                    }
-                },
+                title = { Text("Alumni Connect", color = Color.White, fontWeight = FontWeight.Bold) },
+
                 actions = {
                     IconButton(onClick = { /* open notifications */ }) {
                         Icon(Icons.Default.Notifications, tint = Color.White,contentDescription = "Notifications")
@@ -124,6 +120,8 @@ fun HomeScreen(
                         navController.navigate(Routes.NETWORK)
                     }
                     BottomNavItem.JOBS -> onOpenMessages()
+                    BottomNavItem.ChANNEL -> {navController.navigate(Routes.WHATSUP_CHANNEL)}
+
                     BottomNavItem.Settings -> {navController.navigate(Routes.SETTINGS)}
                 }
             }
@@ -333,7 +331,7 @@ fun AlumniPost(post: Post) {
 }
 
 // Bottom navigation items
-enum class BottomNavItem { Home, Network, JOBS, Settings }
+enum class BottomNavItem { Home, Network, JOBS,ChANNEL, Settings }
 
 @Composable
 fun BottomAppBarWithNav(
@@ -363,6 +361,12 @@ fun BottomAppBarWithNav(
             onClick = { onSelect(BottomNavItem.JOBS) },
             icon = { Icon(Icons.Default.PostAdd, contentDescription = null) },
             label = { Text("Jobs") }
+        )
+        NavigationBarItem(
+            selected = selected == BottomNavItem.ChANNEL,
+            onClick = { onSelect(BottomNavItem.ChANNEL) },
+            icon = { Icon(Icons.Default.Whatsapp, contentDescription = null) },
+            label = { Text("Channel") }
         )
 
         NavigationBarItem(
@@ -428,7 +432,9 @@ fun AlumniNews(post: UniversityNews) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(horizontal = 6.dp, vertical = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF142338)),
+
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -437,6 +443,7 @@ fun AlumniNews(post: UniversityNews) {
 
             Text(
                 text = post.title,
+                color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -445,6 +452,8 @@ fun AlumniNews(post: UniversityNews) {
 
             Text(
                 text = post.description,
+                color = Color.White,
+
                 fontSize = 14.sp
             )
 
@@ -457,8 +466,8 @@ fun AlumniNews(post: UniversityNews) {
                 Text(
                     text = post.date,
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                    color = Color.White,
+                    )
             }
         }
     }
