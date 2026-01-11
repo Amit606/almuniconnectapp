@@ -231,11 +231,11 @@ fun sampleAlumniProfiles(): List<AlumniProfile> = listOf(
         branch = "MCA",
         passingYear = "2015",
         company = "Datability Technology Pvt. Ltd.",
-        position = "Senior Android Developer",
-        phone = "+91 9876543210",
-        email = "amit.gupta@gmail.com",
+        position = "Senior Software Engineering  Developer",
+        phone = "+91 98xxxxxxxx",
+        email = "amit.xxxx@gmail.com",
         location = "Noida, India",
-        imageUrl = "https://i.pravatar.cc/150?img=10",
+        imageUrl = "https://media.licdn.com/dms/image/v2/D5603AQHPW9sCI3l87Q/profile-displayphoto-shrink_800_800/B56ZPxrPKEH0Ac-/0/1734926465012?e=1769644800&v=beta&t=CLvdtkZ_-RMdZ5qlg9AHqWy3OaSAUaURUpogstIMP2Y",
         profileUrl = "https://www.linkedin.com/in/amitguptaandroid/"
     ),
 

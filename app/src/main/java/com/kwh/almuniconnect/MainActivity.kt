@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -10,9 +11,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.kwh.almuniconnect.ui.theme.AlumniConnectTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var updateHelper: InAppUpdateHelper
+    private var startIntent: Intent? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        updateHelper = InAppUpdateHelper(this)
+        updateHelper.checkUpdate(this)
         setContent {
             AlumniConnectTheme {
                 AppNavGraph(startDestination = Routes.SPLASH)
@@ -23,5 +29,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        updateHelper.onResume(this)
     }
 }

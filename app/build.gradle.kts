@@ -110,6 +110,7 @@ dependencies {
 
     implementation ("org.osmdroid:osmdroid-android:6.1.16")
 
+    implementation ("com.google.android.play:app-update:2.1.0")
 
 
 }
