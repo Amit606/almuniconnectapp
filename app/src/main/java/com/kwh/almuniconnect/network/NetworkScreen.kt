@@ -66,7 +66,7 @@ fun NetworkScreen(
                 )
             )
         },
-       // containerColor = Color(0xFF0E1420),
+        containerColor = Color(0xFF0E1420),
 
         ) { innerPadding ->
         Column(

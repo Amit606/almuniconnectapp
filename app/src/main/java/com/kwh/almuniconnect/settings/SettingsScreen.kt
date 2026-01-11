@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,31 +16,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.kwh.almuniconnect.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    navController: NavController,
-    onEditProfile: () -> Unit = {},
-    onNotifications: () -> Unit = {},
-    onPrivacy: () -> Unit = {},
-    onHelp: () -> Unit = {},
-    onLogout: () -> Unit = {}
+    navController: NavController
 ) {
-    var darkMode by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") }
-            )
-        }
-    ) { padding ->
+                title = {
+                    Text("Settings")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
 
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0E1420),
+                    titleContentColor = Color.White
+                )
+            )
+        },
+        contentColor = Color(0xFF0E1420)
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .background(Color(0xFF0E1420))   // ✅ correct
+                .padding(paddingValues)
         ) {
 
             item {
@@ -48,24 +61,18 @@ fun SettingsScreen(
                     icon = Icons.Default.Person,
                     title = "Edit Profile",
                     subtitle = "Update your personal details",
-                    onClick = onEditProfile
+                    navController = navController
                 )
             }
 
             item {
                 SectionHeader("Preferences")
-                SettingSwitchItem(
-                    icon = Icons.Default.DarkMode,
-                    title = "Dark Mode",
-                    checked = darkMode,
-                    onCheckedChange = { darkMode = it }
-                )
 
                 SettingItem(
                     icon = Icons.Default.Notifications,
                     title = "Notifications",
                     subtitle = "Manage notification settings",
-                    onClick = onNotifications
+                    navController = navController
                 )
             }
 
@@ -75,14 +82,14 @@ fun SettingsScreen(
                     icon = Icons.Default.Lock,
                     title = "Privacy Policy",
                     subtitle = "Read our privacy policy",
-                    onClick = onPrivacy
+                    navController = navController
                 )
 
                 SettingItem(
                     icon = Icons.Default.Help,
                     title = "Help & Support",
                     subtitle = "Get help or contact support",
-                    onClick = onHelp
+                    navController = navController
                 )
             }
 
@@ -93,7 +100,7 @@ fun SettingsScreen(
                     title = "Logout",
                     subtitle = "Sign out from your account",
                     titleColor = MaterialTheme.colorScheme.error,
-                    onClick = onLogout
+                    navController = navController
                 )
             }
         }
@@ -108,7 +115,7 @@ fun SectionHeader(title: String) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
-        color = MaterialTheme.colorScheme.primary
+        color = Color.White
     )
 }
 @Composable
@@ -117,12 +124,12 @@ fun SettingItem(
     title: String,
     subtitle: String,
     titleColor: Color = MaterialTheme.colorScheme.onSurface,
-    onClick: () -> Unit
+    navController: NavController
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable { navController.navigate(Routes.HELP_SUPPORTS) }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -130,7 +137,7 @@ fun SettingItem(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = titleColor
+            tint = Color.White
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -141,12 +148,12 @@ fun SettingItem(
             Text(
                 text = title,
                 fontWeight = FontWeight.Medium,
-                color = titleColor
+                color = Color.White
             )
             Text(
                 text = subtitle,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Color.White
             )
         }
 
@@ -156,36 +163,4 @@ fun SettingItem(
         )
     }
 }
-@Composable
-fun SettingSwitchItem(
-    icon: ImageVector,
-    title: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
 
-        Icon(
-            imageVector = icon,
-            contentDescription = title
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Text(
-            text = title,
-            modifier = Modifier.weight(1f),
-            fontWeight = FontWeight.Medium
-        )
-
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}

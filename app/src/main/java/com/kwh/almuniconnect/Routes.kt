@@ -21,8 +21,8 @@ object Routes {
     const val PASSWORD_LOGIN = "password_login"
 
 
-    const val EVENT_DETAILS = "event/{eventId}"
-    fun eventRoute(eventId: String) = "event/$eventId"
+   // const val EVENT_DETAILS = "event/{eventId}"
+   // fun eventRoute(eventId: String) = "event/$eventId"
 
     const val JOB_DETAILS = "job/{jobId}"
     fun jobRoute(jobId: String) = "job/$jobId"
@@ -33,5 +33,14 @@ object Routes {
     const val ALMUNI_POST="almuni_post"
     const val SETTINGS = "SETTINGS"
     const val USER_PROFILE = "user_profile"
+    const val EVENT_DETAILS = "event_details"
+    const val HELP_SUPPORTS = "help_supports"
+    const val ABOUT_US = "about_us"
+    const val APP_VERSION = "1.0.0"
+    const val DEVELOPER_NAME = "Amit Gupta"
+    const val DEVELOPER_EMAIL = "support@alumniconnect.com"
+
+    const val PRIVACY_POLICY_URL = "https://alumniconnect.com/privacy"
+    const val TERMS_URL = "https://alumniconnect.com/terms"
 
 }

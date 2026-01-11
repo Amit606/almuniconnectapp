@@ -8,7 +8,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kwh.almuniconnect.almunipost.AlumniFeedScreen
 import com.kwh.almuniconnect.branding.MasterTabsScreen
-import com.kwh.almuniconnect.events.EventScreen
+import com.kwh.almuniconnect.evetns.EventDetailsScreen
+import com.kwh.almuniconnect.evetns.EventsScreen
+import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
+import com.kwh.almuniconnect.help.HelpSupportScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.intro.IntroScreen
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
@@ -139,7 +142,7 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
             )
         }
         composable(Routes.EVENTS) {
-            EventScreen(navController)
+            EventsScreen(navController)
         }
 
 
@@ -169,7 +172,7 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
                 navController = navController,
                 onOpenProfile = { navController.navigate(Routes.USER_PROFILE) },
                 onOpenMessages = { navController.navigate(Routes.JOB_DETAILS) },
-                onOpenEventDetails = { event -> navController.navigate(Routes.eventRoute(event.id)) },
+              //  onOpenEventDetails = { event -> navController.navigate(Routes.eventRoute(event.id)) },
                 onOpenJobDetails = { job -> navController.navigate(Routes.jobRoute(job.id)) },
                 onCreatePost = { navController.navigate(Routes.CREATE_POST) }
             )
@@ -178,23 +181,28 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
         // 🔵 Optional placeholders
         composable(Routes.MESSAGES) { /* MessagesScreen(navController) */ }
         composable(Routes.CREATE_POST) { /* CreatePostScreen(navController) */ }
-        composable(Routes.SETTINGS){
-            SettingsScreen(navController)
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                navController = navController
+            )
         }
+        composable(Routes.HELP_SUPPORTS) { HelpSupportScreen(navController) }
+        composable(Routes.ABOUT_US) { AboutAlumniConnectScreen(navController) }
+
 //
 
         composable(
-            Routes.EVENT_DETAILS,
-            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val eventId = backStackEntry.arguments?.getString("eventId")
-            /* EventDetailsScreen(eventId) */
+            route = "${Routes.EVENT_DETAILS}/{title}/{location}/{date}/{price}"
+        ) { backStack ->
+            EventDetailsScreen(
+                navController,
+                title = backStack.arguments?.getString("title") ?: "",
+                location = backStack.arguments?.getString("location") ?: "",
+                date = backStack.arguments?.getString("date") ?: "",
+                price = backStack.arguments?.getString("price") ?: ""
+            )
         }
-//        composable(Routes.NETWORK) {
-//            NetworkScreen(onOpenProfile = { alumni ->
-//                navController.navigate(Routes.profileRoute(alumni.id))
-//            })
-//        }
+
         composable(Routes.JOB_DETAILS){
             JobListingScreen(navController)
         }

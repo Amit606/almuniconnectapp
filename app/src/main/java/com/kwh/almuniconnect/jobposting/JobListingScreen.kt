@@ -41,8 +41,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.home.Job
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBarDefaults
 import com.kwh.almuniconnect.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,25 +55,43 @@ fun JobListingScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { Text("Job Openings") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+
+                        )
+                    }
+                },
                 actions = {
                     IconButton(
                         onClick = {
                             navController.navigate(Routes.JOB_POST)
-                            // TODO: Navigate to JobPostScreen
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Work,
-                            contentDescription = "Post Job"
+                            imageVector = Icons.Default.PostAdd,
+                            contentDescription = "Post Job",
+                            tint = Color.White
+
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0E1420),
+                    titleContentColor = Color.White
+                )
             )
-        }
+        },
+        contentColor = Color(0xFF0E1420)
     ) { padding ->
         LazyColumn(
-            contentPadding = padding,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF0E1420)),
+            contentPadding = padding
         ) {
             items(jobList) { job ->
                 JobCard(job,navController)
@@ -84,20 +105,24 @@ fun JobCard(job: Job,navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF142338)
+        ),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
             Text(
                 text = job.title,
+                color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = job.company, color = Color.Gray)
+            Text(text = job.company, color = Color.White)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -105,13 +130,13 @@ fun JobCard(job: Job,navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("📍 ${job.location}")
-                Text("💼 ${job.experience}")
+                Text("📍 ${job.location}",color = Color.White)
+                Text("💼 ${job.experience}",color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Text("💰 ${job.salary}", fontWeight = FontWeight.Medium)
+            Text("💰 ${job.salary}", color = Color.White,fontWeight = FontWeight.Medium)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -120,7 +145,7 @@ fun JobCard(job: Job,navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Show Full Details")
+                Text("Show Full Details",color = Color.White)
             }
         }
     }

@@ -124,7 +124,7 @@ fun HomeScreen(
                         navController.navigate(Routes.NETWORK)
                     }
                     BottomNavItem.JOBS -> onOpenMessages()
-                    BottomNavItem.Settings -> onOpenProfile()
+                    BottomNavItem.Settings -> {navController.navigate(Routes.SETTINGS)}
                 }
             }
         }

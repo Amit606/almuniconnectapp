@@ -1,10 +1,15 @@
 package com.kwh.almuniconnect.jobposting
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,20 +36,38 @@ fun JobPostScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Post a Job") }
+                title = {
+                    Text("Job Post")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0E1420),
+                    titleContentColor = Color.White
+                )
             )
-        }
-    ) { padding ->
+        },
+        contentColor = Color(0xFF0E1420)
+    ) {paddingValues ->
 
         Column(
             modifier = Modifier
-                .padding(padding)
+                .fillMaxSize()                       // 🔥 IMPORTANT
+                .background(Color(0xFF0E1420))
+                .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
             SectionHeader("Job Information")
-
             AppTextField("Job Title", title) { title = it }
             AppTextField("Company Name", company) { company = it }
             AppTextField("Location", location) { location = it }
@@ -108,6 +131,7 @@ fun SectionHeader(text: String) {
     Text(
         text = text,
         fontSize = 18.sp,
+        color = Color.White,
         fontWeight = FontWeight.Bold
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -121,10 +145,18 @@ fun AppTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { Text(label, color = Color.White) },   // ✅ correct
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
+        textStyle = TextStyle(color = Color.White),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF6A5AE0),
+            unfocusedBorderColor = Color.Gray,
+            focusedLabelColor = Color.White,
+            unfocusedLabelColor = Color.Gray,
+            cursorColor = Color.White
+        )
     )
 }
 
