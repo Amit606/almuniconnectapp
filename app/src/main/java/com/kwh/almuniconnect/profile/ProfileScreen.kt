@@ -22,7 +22,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,168 +40,187 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.jobposting.AppTextField
 import com.kwh.almuniconnect.network.AlumniProfile
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
 
     val context = LocalContext.current
     val userPrefs = remember { UserPreferences(context) }
-
     val user by userPrefs.getUser().collectAsState(
         initial = UserLocalModel("", "", "", "")
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
+    var name by remember { mutableStateOf(user.name) }
+    var email by remember { mutableStateOf(user.email) }
+    var branch by remember { mutableStateOf("") }
+    var year by remember { mutableStateOf("") }
 
-        // 🔹 HEADER
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(260.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.hbtu),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+    var mobile by remember { mutableStateOf("") }
+    var job by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var birthday by remember { mutableStateOf("") }
+    var linkedin by remember { mutableStateOf("") }
 
-            // Overlay
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0x88000000))
-            )
+    val branches = listOf(
+        "B.Tech – Computer Science & Engineering",
+        "B.Tech – Information Technology",
+        "B.Tech – Electronics & Communication",
+        "B.Tech – Electrical Engineering",
+        "B.Tech – Mechanical Engineering",
+        "B.Tech – Civil Engineering",
+        "B.Tech – Chemical Engineering",
+        "B.Tech – Bio Technology",
+        "B.Tech – Industrial & Production Engineering",
+        "M.Tech – Computer Science",
+        "M.Tech – Electrical Engineering",
+        "M.Tech – Mechanical Engineering",
+        "M.Tech – Civil Engineering",
+        "MCA – Master of Computer Applications",
+        "MBA – Master of Business Administration",
+        "BCA – Bachelor of Computer Applications"
+    )
+    val years = (1972..2026).map { it.toString() }
 
-            Text(
-                text = "User PROFILE",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 16.dp)
-            )
-        }
 
-        // 🔹 PROFILE IMAGE (OVERLAP)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = (-60).dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            if (user.photo.isNotEmpty()) {
-                AsyncImage(
-                    model = user.photo,
-                    contentDescription = "Profile photo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, Color.White, CircleShape)
+    Scaffold(
+        containerColor = Color(0xFFF5F6FA),
+        topBar = {
+            TopAppBar(
+                title = { Text("Profile") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, null, tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0E1420),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
                 )
-            } else {
-                Image(
-                    painter = painterResource(id = R.drawable.man),
-                    contentDescription = "Profile",
-                    contentScale = ContentScale.Crop,
+            )
+        },
+        contentColor = Color(0xFF0E1420)
+    ) { padding ->
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(Color(0xFF0E1420))
+        ) {
+
+            // 🔥 Header with image
+            item {
+                Box(
                     modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, Color.White, CircleShape)
+                        .fillMaxWidth()
+                        .height(220.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.hbtu),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color(0x88000000))
+                    )
+                }
+            }
+
+            // 🔥 Profile picture
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = (-50).dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = user.photo.ifEmpty { R.drawable.man },
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .border(4.dp, Color.White, CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            item {
+                Text(
+                    user.name,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "India",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    color = Color.Gray
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            item { Spacer(Modifier.height(20.dp)) }
 
-        // 🔹 NAME
-        Text(
-            text = user.name,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+            // 🔥 Form
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF142338)
+                    )
+                ) {
+                    Column(Modifier.padding(16.dp)) {
 
-        Text(
-            text = "India",
-            fontSize = 14.sp,
-            color = Color.Gray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+                        AppTextField("Name", name) { name = it }
+                        AppTextField("Email", email) { email = it }
+                        AppTextField("Mobile", mobile) { mobile = it }
 
-        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(Modifier.height(10.dp))
+                        DropdownField("Branch", branch, branches) { branch = it }
 
-        // 🔹 SCROLLABLE DETAILS
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                //.verticalScroll(rememberScrollState())
-        ) {
-            ProfileDetailsSection(
-                name = user.name,
-                email = user.email
-            )
-        }
-        // ✏️ EDIT PROFILE FAB
-        FloatingActionButton(
-            onClick = {
-                navController.navigate("edit_profile")
-            },
-            containerColor = Color(0xFF8E44AD),
-            contentColor = Color.White,
+                        Spacer(Modifier.height(10.dp))
+                        DropdownField("Year", year, years) { year = it }
 
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Edit Profile"
-            )
+
+                        AppTextField("Job / Company", job) { job = it }
+                        AppTextField("Location", location) { location = it }
+                        AppTextField("Birthday", birthday) { birthday = it }
+                        AppTextField("LinkedIn URL", linkedin) { linkedin = it }
+
+                        Spacer(Modifier.height(24.dp))
+
+                        Button(
+                            onClick = {
+                                // Save to DataStore / Firebase here
+                                navController.navigate("home") {
+                                    popUpTo("profile") { inclusive = true }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A5AE0))
+                        ) {
+                            Text("Update Profile", color = Color.White)
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(Modifier.height(50.dp)) }
         }
     }
 }
 
-@Composable
-fun ProfileDetailsSection(name: String,email:String) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        item {  ProfileItem("Name",name)}
-        item { ProfileItem("Email", email) }
-        item {  ProfileItem("Mobile No", "7905717240") }
-        item {  ProfileItem("Branch & Year", " MCA 2015") }
-        item {  ProfileItem("Job", "IT Engineer (iZooto)") }
-        item { ProfileItem("Location", "Noida") }
-        item { ProfileItem("Birthday", "24 April 1991") }
-        item { ProfileItem("JobPost", "1")}
-        item { ProfileItem("Linkied ID", "https://aaaaa") }
-    }
-}
-@Composable
-fun ProfileItem(title: String, value: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
-    ) {
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            color = Color(0xFF8E44AD),
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            color = Color.Black,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-        Divider(modifier = Modifier.padding(top = 12.dp))
-    }
-}
