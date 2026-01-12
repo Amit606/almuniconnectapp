@@ -18,16 +18,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,30 +59,52 @@ fun AlumniLoginScreen(
     onGoogleLogin: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Events")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0E1420),
+                )
+            )
+        },
+        contentColor = Color(0xFF0E1420)
+
+    ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())   // ✅ SCROLL ENABLED
                 .imePadding()
+                .background(Color(0xFF0E1420))
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(Modifier.height(60.dp))
+            Spacer(Modifier.height(0.dp))
 
             // 🔵 Logo (HBTU Royal Blue)
             Box(
                 modifier = Modifier
-                    .size(120.dp),
+                    .size(80.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.hbtu_logo),
+                    painter = painterResource(id = R.drawable.playstore),
                     contentDescription = "HBTU Logo",
                     modifier = Modifier.size(120.dp),
                     contentScale = ContentScale.Fit
@@ -86,12 +115,12 @@ fun AlumniLoginScreen(
 
             // 🏷 Title
             Text(
-                text = "HBTU\nALUMNI\nNETWORK",
-                fontSize = 26.sp,
+                text = "Harcourtian ALUMNI NETWORK",
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 30.sp,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground
+                color = Color.White
             )
 
             Spacer(Modifier.height(6.dp))
@@ -99,7 +128,8 @@ fun AlumniLoginScreen(
             Text(
                 text = "POWERED BY AppsChance",
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                 color = Color.White
+
             )
 
             Spacer(Modifier.height(36.dp))
@@ -108,7 +138,8 @@ fun AlumniLoginScreen(
                 text = "Let’s get started",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground
+                color = Color.White
+
             )
 
             Spacer(Modifier.height(20.dp))
@@ -117,7 +148,7 @@ fun AlumniLoginScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = { Text("Enter your email*") },
+                placeholder = { Text("Enter your email*", color = Color.White) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -143,7 +174,8 @@ fun AlumniLoginScreen(
                 Text(
                     text = "Request OTP",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    color = Color.White,
+                   fontWeight = FontWeight.Medium
                 )
             }
 
@@ -152,7 +184,7 @@ fun AlumniLoginScreen(
             // 🔗 Login with Password (Sage Green accent)
             Text(
                 text = "Login with Password",
-                color = MaterialTheme.colorScheme.secondary,
+                color = Color.White,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.clickable { onLoginWithPassword() }
             )
@@ -165,16 +197,19 @@ fun AlumniLoginScreen(
             ) {
                 Divider(
                     modifier = Modifier.width(80.dp),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+                    color = Color.White
+
                 )
                 Text(
                     text = "  OR  ",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    color = Color.White
+                    ,
                     fontSize = 12.sp
                 )
                 Divider(
                     modifier = Modifier.width(80.dp),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+                    color = Color.White
+
                 )
             }
 
@@ -187,13 +222,15 @@ fun AlumniLoginScreen(
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(26.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(
                     text = "Continue with Google",
                     fontSize = 15.sp,
+                    color = Color.White,
                     fontWeight = FontWeight.Medium
                 )
             }
