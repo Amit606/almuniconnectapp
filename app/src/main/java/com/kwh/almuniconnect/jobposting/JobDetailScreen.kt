@@ -18,8 +18,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun JobDetailScreen(job: JobDetail,navController: NavController) {
     Scaffold(
@@ -74,14 +76,14 @@ fun JobDetailScreen(job: JobDetail,navController: NavController) {
                 InfoRow("🕒 Job Type", job.jobType)
             }
 
-            item {
-                SectionTitle("Skills Required")
-                FlowRow {
-                    job.skills.forEach {
-                        SkillChip(it)
-                    }
-                }
-            }
+//            item {
+//                SectionTitle("Skills Required")
+//                FlowRow {
+//                    job.skills.forEach {
+//                        SkillChip(it)
+//                    }
+//                }
+//            }
 
             item {
                 SectionTitle("Job Description")

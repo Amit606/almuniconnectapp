@@ -28,6 +28,7 @@ import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
+import com.kwh.almuniconnect.subscription.PremiumScreen
 
 @Composable
 fun AppNavGraph(startDestination: String = Routes.SPLASH) {

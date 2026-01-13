@@ -111,6 +111,8 @@ dependencies {
     implementation ("org.osmdroid:osmdroid-android:6.1.16")
 
     implementation ("com.google.android.play:app-update:2.1.0")
+    implementation ("com.android.billingclient:billing-ktx:6.1.0")
 
-
+    implementation ("com.github.bumptech.glide:glide:5.0.5")
+    //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }
