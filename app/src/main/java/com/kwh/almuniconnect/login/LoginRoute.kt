@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.storage.UserPreferences
+import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +62,9 @@ fun LoginRoute(
                             }
 
 
+                        }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            UserSession.saveLogin(context)
                         }
 
                         navController.navigate(Routes.HOME) {

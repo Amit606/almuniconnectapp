@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,8 +32,9 @@ import com.kwh.almuniconnect.settings.SettingsScreen
 import com.kwh.almuniconnect.subscription.PremiumScreen
 
 @Composable
-fun AppNavGraph(startDestination: String = Routes.SPLASH) {
-    val navController = rememberNavController()
+fun AppNavGraph(
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = Routes.SPLASH) {
 
 
     NavHost(navController = navController, startDestination = startDestination) {
@@ -222,13 +224,5 @@ fun AppNavGraph(startDestination: String = Routes.SPLASH) {
             AlumniFeedScreen(navController)
         }
 
-
-//        composable(
-//            Routes.JOB_DETAILS,
-//            arguments = listOf(navArgument("jobId") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val jobId = backStackEntry.arguments?.getString("jobId")
-//            JobListingScreen(navController)
-//        }
     }
 }

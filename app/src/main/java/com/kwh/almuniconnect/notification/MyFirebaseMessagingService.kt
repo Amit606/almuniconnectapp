@@ -1,4 +1,4 @@
-package com.kwh.smartkabadiapp.notification
+package com.kwh.almuniconnect.notification
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -24,7 +24,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     companion object {
         private const val TAG = "MyFirebaseMsgService"
         private const val CHANNEL_ID = "fcm_default_channel"
-        private const val CHANNEL_NAME = "App Notifications"
+        private const val CHANNEL_NAME = "Alumni Connect Notifications"
         private const val CHANNEL_DESC = "General notifications from the app"
     }
 

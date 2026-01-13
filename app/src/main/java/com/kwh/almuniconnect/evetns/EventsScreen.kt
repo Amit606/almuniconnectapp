@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.evetns
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +25,9 @@ import com.kwh.almuniconnect.R
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.graphics.Brush
 import androidx.navigation.NavController
+import com.google.common.math.LinearTransformation.horizontal
 import com.kwh.almuniconnect.Routes
 
 // ✅ SINGLE DATA MODEL
@@ -141,7 +144,13 @@ fun EventsScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFF0E1420))
+                .background( Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF0D1B2A), // Navy
+                        Color(0xFF1B4DB1), // Royal
+                        Color(0xFF3A7BD5)  // Light Blue
+                    )
+                ))
         ) {
 //            shape = RoundedCornerShape(12.dp),
 //            colors = CardDefaults.cardColors(
@@ -204,17 +213,30 @@ fun EventBanner() {
 }
 @Composable
 fun EventCard(event: Event,onClick: () -> Unit) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp, vertical = 8.dp)
+//        .clickable { onClick() },   // 👈 Click enabled
+//
+//        shape = RoundedCornerShape(12.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color(0xFF142338)
+//        )
+//    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(180.dp)
             .padding(horizontal = 16.dp, vertical = 8.dp)
-        .clickable { onClick() },   // 👈 Click enabled
-
-        shape = RoundedCornerShape(12.dp),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF142338)
-        )
-    ) {
+            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
+        ),
+        elevation = CardDefaults.cardElevation(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
+    ){
         Row(modifier = Modifier.padding(12.dp)) {
 
             Image(

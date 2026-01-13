@@ -5,7 +5,9 @@
 package com.kwh.almuniconnect.home
 
 import android.R.attr.background
+import android.R.attr.onClick
 import android.R.id.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -72,18 +75,26 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Alumni Connect", color = Color.White, fontWeight = FontWeight.Bold) },
-
+                title = {
+                    Text(
+                        "Alumni Connect",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 actions = {
                     IconButton(onClick = { /* open notifications */ }) {
-                        Icon(Icons.Default.Notifications, tint = Color.White,contentDescription = "Notifications")
+                        Icon(
+                            Icons.Default.Notifications,
+                            tint = Color(0xFFF5B700), // Gold highlight
+                            contentDescription = "Notifications"
+                        )
                     }
+
                     IconButton(onClick = {
                         navController.navigate(Routes.USER_PROFILE)
                     }) {
-
                         if (user.photo.isNotEmpty()) {
-                            // 🔹 Google profile photo
                             AsyncImage(
                                 model = user.photo,
                                 contentDescription = "Profile photo",
@@ -93,7 +104,6 @@ fun HomeScreen(
                                 contentScale = ContentScale.Crop
                             )
                         } else {
-                            // 🔹 Fallback local avatar
                             Image(
                                 painter = painterResource(id = R.drawable.girl),
                                 contentDescription = "Profile",
@@ -104,9 +114,18 @@ fun HomeScreen(
                             )
                         }
                     }
-                }, colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+                modifier = Modifier.background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color(0xFF0D1B2A), // Navy
+                            Color(0xFF1B4DB1), // Royal
+                            Color(0xFF3A7BD5)  // Light Blue
+                        )
+                    )
                 )
             )
         },
@@ -131,8 +150,15 @@ fun HomeScreen(
         // Content
         LazyColumn(
             modifier = Modifier
-                .background(Color(0xFF0d1024))
-                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color(0xFF0D1B2A), // Navy
+                            Color(0xFF1B4DB1), // Royal
+                            Color(0xFF3A7BD5)  // Light Blue
+                        )
+                    )
+                )                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
 
@@ -248,11 +274,12 @@ fun EventCard(event: Event, onClick: () -> Unit) {
             .width(220.dp)
             .height(120.dp)
             .clickable(onClick = onClick),
-
-        shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF142338)
-                )
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
+        ),
+        elevation = CardDefaults.cardElevation(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(event.title,color = Color.White, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -270,13 +297,15 @@ fun JobCard(job: Job, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(220.dp)
-            .height(100.dp)
+            .height(120.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF142338)
-        )
-    ) {
+            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
+        ),
+        elevation = CardDefaults.cardElevation(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
+    ){
         Column(modifier = Modifier.padding(12.dp)) {
             Text(job.title,color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(job.company,color = Color.White, style = MaterialTheme.typography.bodySmall)
@@ -290,13 +319,15 @@ fun JobCard(job: Job, onClick: () -> Unit) {
 @Composable
 fun AlumniPost(post: Post) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+            .height(160.dp),
+            //.clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF142338)
-        )
+            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
+        ),
+        elevation = CardDefaults.cardElevation(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
             Image(
@@ -430,12 +461,16 @@ data class UniversityNews(
 @Composable
 fun AlumniNews(post: UniversityNews) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF142338)),
+        modifier = Modifier.fillMaxWidth()
 
-        elevation = CardDefaults.cardElevation(4.dp)
+            .height(160.dp),
+           // .clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
+        ),
+        elevation = CardDefaults.cardElevation(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
