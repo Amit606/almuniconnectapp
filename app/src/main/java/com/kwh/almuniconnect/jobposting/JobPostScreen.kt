@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,33 +36,17 @@ fun JobPostScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Job Post")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Job Post",
+                navController = navController
             )
-        },
-        contentColor = Color(0xFF0E1420)
-    ) {paddingValues ->
+        }
+    ) { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()                       // 🔥 IMPORTANT
-                .background(Color(0xFF0E1420))
+              //  .background(Color(0xFF0E1420))
                 .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
@@ -130,9 +115,7 @@ fun SectionHeader(text: String) {
     Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = text,
-        fontSize = 18.sp,
-        color = Color.White,
-        fontWeight = FontWeight.Bold
+        style = MaterialTheme.typography.titleMedium
     )
     Spacer(modifier = Modifier.height(8.dp))
 }
@@ -145,10 +128,11 @@ fun AppTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color.White) },   // ✅ correct
+        label = { Text(label,  style = MaterialTheme.typography.titleMedium) },   // ✅ correct
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
+        maxLines = 1,
         textStyle = TextStyle(color = Color.White),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color(0xFF6A5AE0),

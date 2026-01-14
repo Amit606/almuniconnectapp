@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,27 +25,11 @@ fun AlumniFeedScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Alumni Feeds ")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Alumni Feeds",
+                navController = navController
             )
-        },
-        contentColor = Color(0xFF0E1420)
+        }
     ) { paddingValues ->
 
         Column(

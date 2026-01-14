@@ -1,41 +1,6 @@
 package com.kwh.almuniconnect.profile
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.kwh.almuniconnect.jobposting.AppTextField
-import com.kwh.almuniconnect.network.AlumniProfile
 
 import android.app.DatePickerDialog
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -52,21 +15,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
+import kotlinx.coroutines.launch
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,128 +35,146 @@ import java.util.*
 fun ProfileScreen(navController: NavController) {
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val userPrefs = remember { UserPreferences(context) }
-    val user by userPrefs.getUser().collectAsState(UserLocalModel("", "", "", ""))
 
-    var name by remember { mutableStateOf(user.name) }
-    var email by remember { mutableStateOf(user.email) }
-    var mobile by remember { mutableStateOf("") }
-    var branch by remember { mutableStateOf("") }
-    var year by remember { mutableStateOf("") }
-    var job by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var birthday by remember { mutableStateOf("") }
-    var linkedin by remember { mutableStateOf("") }
+    val user by userPrefs.getUser().collectAsState(
+        initial = UserLocalModel()
+    )
+
+    var name by remember(user.name) { mutableStateOf(user.name) }
+    var email by remember(user.email) { mutableStateOf(user.email) }
+    var mobile by remember(user.mobile) { mutableStateOf(user.mobile) }
+    var branch by remember(user.branch) { mutableStateOf(user.branch) }
+    var year by remember(user.year) { mutableStateOf(user.year) }
+    var job by remember(user.job) { mutableStateOf(user.job) }
+    var location by remember(user.location) { mutableStateOf(user.location) }
+    var birthday by remember(user.birthday) { mutableStateOf(user.birthday) }
+    var linkedin by remember(user.linkedin) { mutableStateOf(user.linkedin) }
     var error by remember { mutableStateOf<String?>(null) }
+
+    val profileGradient = Brush.verticalGradient(
+        listOf(
+            Color(0xFF0D1B2A),
+            Color(0xFF1B4DB1),
+            Color(0xFF3A7BD5)
+        )
+    )
 
     val branches = listOf(
         "B.Tech – CSE","B.Tech – IT","B.Tech – ECE","B.Tech – EE",
         "B.Tech – ME","B.Tech – CE","M.Tech","MCA","MBA","BCA"
     )
     val years = (1972..2026).map { it.toString() }
-
+    val safeBranch = if (branch in branches) branch else ""
+    val safeYear = if (year in years) year else ""
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Profile") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, null)
-                    }
-                }
+            HBTUTopBar(
+                title = "Profile  ",
+                navController = navController
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
 
-        LazyColumn(
+        Box(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
+                .background(profileGradient)
+                .padding(paddingValues)
         ) {
+            LazyColumn {
 
-            item {
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(200.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.hbtu),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                item {
+                    Box(
+                        Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = user.photo.ifEmpty { R.drawable.man },
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(CircleShape)
+                                .border(3.dp, Color.White, CircleShape)
+                        )
+                    }
                 }
-            }
 
-            item {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    AsyncImage(
-                        model = user.photo.ifEmpty { R.drawable.man },
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .border(3.dp, Color.White, CircleShape)
-                    )
-                }
-            }
+                item {
+                    Card(
+                        modifier = Modifier.padding(16.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Transparent
+                        )
+                    ) {
+                        Column(Modifier.padding(12.dp)) {
 
-            item {
-                Card(
-                    modifier = Modifier.padding(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF142338))
-                ) {
-                    Column(Modifier.padding(16.dp)) {
+                            AppTextField("Name", name) { name = it }
+                            AppTextField("Email", email) { email = it }
 
-                        AppTextField("Name", name) { name = it }
-                        AppTextField("Email", email) { email = it }
+                            AppTextField(
+                                label = "Mobile",
+                                value = mobile,
+                                onValueChange = {
+                                    if (it.all(Char::isDigit) && it.length <= 10)
+                                        mobile = it
+                                }
+                            )
 
-                        // Mobile
-                        AppTextField(
-                            label = "Mobile",
-                            value = mobile,
+                            Spacer(Modifier.height(8.dp))
+                            DropdownField("Branch", safeBranch, branches) { branch = it }
+                            Spacer(Modifier.height(8.dp))
+                            DropdownField("Year", safeYear, years) { year = it }
+                            AppTextField("Job / Company", job) { job = it }
+                            AppTextField("Location", location) { location = it }
 
-                            onValueChange = {
-                                if (it.all { c -> c.isDigit() } && it.length <= 10) mobile = it
+                            BirthdayPicker(birthday) { birthday = it }
+
+                            AppTextField(
+                                label = "LinkedIn URL",
+                                value = linkedin,
+                                onValueChange = { linkedin = it }
+                            )
+
+                            error?.let {
+                                Text(it, color = Color.Red)
                             }
-                        )
 
-                        Spacer(Modifier.height(10.dp))
-                        DropdownField("Branch", branch, branches) { branch = it }
-                        Spacer(Modifier.height(10.dp))
-                        DropdownField("Year", year, years) { year = it }
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    error = validateProfile(
+                                        name, email, mobile, branch, year,
+                                        job, location, birthday, linkedin
+                                    )
 
-                        AppTextField("Job / Company", job) { job = it }
-                        AppTextField("Location", location) { location = it }
-
-                        BirthdayPicker(birthday) { birthday = it }
-
-                        AppTextField(
-                            label = "LinkedIn URL",
-                            value = linkedin,
-                          //  keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-
-                            onValueChange = { linkedin = it }
-                        )
-
-                        if (error != null) {
-                            Text(error!!, color = Color.Red)
-                        }
-
-                        Button(
-                            onClick = {
-                                error = validateProfile(
-                                    name, email, mobile, branch, year, job, location, birthday, linkedin
-                                )
-                                if (error == null) {
-                                    navController.navigate("home") {
-                                        popUpTo("profile") { inclusive = true }
+                                    if (error == null) {
+                                        scope.launch {
+                                            userPrefs.saveProfile(
+                                                user.copy(
+                                                    name = name,
+                                                    email = email,
+                                                    mobile = mobile,
+                                                    branch = branch,
+                                                    year = year,
+                                                    job = job,
+                                                    location = location,
+                                                    birthday = birthday,
+                                                    linkedin = linkedin
+                                                )
+                                            )
+                                            navController.navigate("home") {
+                                                popUpTo("profile") { inclusive = true }
+                                            }
+                                        }
                                     }
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Update Profile")
+                            ) {
+                                Text("Update Profile")
+                            }
                         }
                     }
                 }
@@ -204,6 +183,7 @@ fun ProfileScreen(navController: NavController) {
     }
 }
 
+/* ---------------- HELPERS ---------------- */
 
 fun validateProfile(
     name: String,

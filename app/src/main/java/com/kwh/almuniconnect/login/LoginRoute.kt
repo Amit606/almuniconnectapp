@@ -67,7 +67,7 @@ fun LoginRoute(
                             UserSession.saveLogin(context)
                         }
 
-                        navController.navigate(Routes.HOME) {
+                        navController.navigate(Routes.PROFILE) {
                             popUpTo(Routes.LOGIN) { inclusive = true
                             }
                         }

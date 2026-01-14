@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -63,7 +64,7 @@ fun AlumniLoginScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Events")
+                    Text("Login ")
                 },
                 navigationIcon = {
                     IconButton(onClick = { }) {
@@ -90,10 +91,20 @@ fun AlumniLoginScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())   // ✅ SCROLL ENABLED
                 .imePadding()
-                .background(Color(0xFF0E1420))
+                .background( Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF0D1B2A), // Navy
+                        Color(0xFF1B4DB1), // Royal
+                        Color(0xFF3A7BD5)  // Light Blue
+                    )
+                ))
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        )
+
+
+
+        {
 
             Spacer(Modifier.height(0.dp))
 

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.navigation.NavController
 import com.google.common.math.LinearTransformation.horizontal
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 // ✅ SINGLE DATA MODEL
 data class Event(
@@ -119,51 +120,24 @@ val events = listOf(
 fun EventsScreen(navController: NavController) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Events")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Events",
+                navController = navController
             )
         }
     ) { paddingValues ->
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background( Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF0D1B2A), // Navy
-                        Color(0xFF1B4DB1), // Royal
-                        Color(0xFF3A7BD5)  // Light Blue
-                    )
-                ))
         ) {
-//            shape = RoundedCornerShape(12.dp),
-//            colors = CardDefaults.cardColors(
-//                containerColor = Color(0xFF142338)
-//            )
             item { EventBanner() }
 
             item {
                 Text(
                     "Upcoming Events",
-                    fontSize = 20.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(16.dp)
                 )
             }
@@ -180,9 +154,14 @@ fun EventsScreen(navController: NavController) {
 }
 
 
+
 @Composable
 fun EventBanner() {
-    Box(modifier = Modifier.height(220.dp)) {
+    Box(
+        modifier = Modifier
+            .height(200.dp)
+            .fillMaxWidth()
+    ) {
         Image(
             painter = painterResource(R.drawable.hbtu),
             contentDescription = null,
@@ -193,7 +172,7 @@ fun EventBanner() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0x88000000))
+                .background(Color(0x66000000))
         )
 
         Column(
@@ -201,77 +180,81 @@ fun EventBanner() {
                 .align(Alignment.BottomStart)
                 .padding(16.dp)
         ) {
-            Text("SUN, 22 Feb 26", color = Color.White, fontSize = 12.sp)
+            Text(
+                "SUN, 22 FEB 2026",
+                color = Color.White,
+                fontSize = 12.sp
+            )
             Text(
                 "MCA Alumni Meet & Greet",
                 color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
 }
+
 @Composable
-fun EventCard(event: Event,onClick: () -> Unit) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(horizontal = 16.dp, vertical = 8.dp)
-//        .clickable { onClick() },   // 👈 Click enabled
-//
-//        shape = RoundedCornerShape(12.dp),
-//        colors = CardDefaults.cardColors(
-//            containerColor = Color(0xFF142338)
-//        )
-//    )
+fun EventCard(
+    event: Event,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
-        ),
-        elevation = CardDefaults.cardElevation(8.dp),
-        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
-    ){
-        Row(modifier = Modifier.padding(12.dp)) {
+        shape = RoundedCornerShape(12.dp),
+
+        elevation = CardDefaults.cardElevation(1.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             Image(
                 painter = painterResource(event.image),
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.FillBounds
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(event.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(event.location, color = Color.Gray, fontSize = 13.sp)
+                Text(
+                    event.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    event.location,
+                    style = MaterialTheme.typography.titleMedium
+                )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.DateRange, null, tint = Color.White, modifier = Modifier.size(14.dp))
-                    Text(event.date, color = Color.White,fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                    Icon(
+                        Icons.Default.DateRange,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        event.date,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
 
-            Column(horizontalAlignment = Alignment.End) {
-                Text(event.price, fontWeight = FontWeight.Bold, color = Color(0xFF7E3FF2))
-                Icon(
-                    Icons.Outlined.FavoriteBorder,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.padding(top = 12.dp)
-                )
-            }
+//
         }
     }
 }
+
 

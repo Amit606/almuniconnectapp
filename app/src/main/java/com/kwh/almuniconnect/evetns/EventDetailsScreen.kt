@@ -28,6 +28,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -63,24 +65,9 @@ fun EventDetailsScreen(navController: NavController,
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Events Details")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Events Details",
+                navController = navController
             )
         }
     ) { paddingValues ->
@@ -91,7 +78,7 @@ fun EventDetailsScreen(navController: NavController,
                     .fillMaxSize()
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
-                    .background(Color(0xFF0E1420))
+                   // .background(Color(0xFF0E1420))
             ) {
 
                 // 🔝 Top Image with Date Badge
@@ -119,7 +106,7 @@ fun EventDetailsScreen(navController: NavController,
                     Text(
                         title,
                         fontSize = 22.sp,
-                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
@@ -135,7 +122,7 @@ fun EventDetailsScreen(navController: NavController,
                     Text(
                         date,
                         fontSize = 16.sp,
-                        color = Color.Gray,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Normal,
                         modifier = Modifier.weight(1f)
                     )
@@ -145,7 +132,8 @@ fun EventDetailsScreen(navController: NavController,
 
                 // 📍 Location & Rating
                 Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Text(location, color = Color.White)
+                    Text(location, style = MaterialTheme.typography.titleMedium,
+                    )
                 }
 
 
@@ -154,14 +142,13 @@ fun EventDetailsScreen(navController: NavController,
                 Text(
                     "Description",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(16.dp)
                 )
 
                 Text(
                     "Join us for an amazing alumni and college event where seniors and juniors come together. Network, celebrate, and relive memories with HBTU family.",
-                    color = Color.Gray,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
@@ -171,8 +158,7 @@ fun EventDetailsScreen(navController: NavController,
                 Text(
                     "Location",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
 
                     modifier = Modifier.padding(16.dp)
                 )
@@ -189,7 +175,7 @@ fun EventDetailsScreen(navController: NavController,
                         .padding(horizontal = 16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4))
                 ) {
-                    Text("Open in Google Maps", color = Color.White)
+                    Text("Open in Google Maps",  style = MaterialTheme.typography.titleMedium,)
                 }
 
                 Spacer(Modifier.height(10.dp))
@@ -202,7 +188,8 @@ fun EventDetailsScreen(navController: NavController,
                         .padding(horizontal = 16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366))
                 ) {
-                    Text("Share Location on WhatsApp", color = Color.White)
+                    Text("Share Location on WhatsApp", style = MaterialTheme.typography.titleMedium,
+                    )
                 }
 
                 Spacer(Modifier.height(20.dp))

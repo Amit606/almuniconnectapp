@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,35 +43,26 @@ import com.kwh.almuniconnect.Routes.DEVELOPER_EMAIL
 import com.kwh.almuniconnect.Routes.DEVELOPER_NAME
 import com.kwh.almuniconnect.Routes.PRIVACY_POLICY_URL
 import com.kwh.almuniconnect.Routes.TERMS_URL
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AboutAlumniConnectScreen(navController: NavController) {
 
     Scaffold(
-        containerColor = Color(0xFF0E1420),
         topBar = {
-            TopAppBar(
-                title = { Text("About AlumniConnect") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "About Us ",
+                navController = navController
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0E1420))
-                .padding(padding)
+             //   .background(Color(0xFF0E1420))
+                .padding(paddingValues)
         ) {
 
             item { AboutHeader() }
@@ -92,8 +84,8 @@ fun AboutHeader() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(Icons.Default.School, contentDescription = null, tint = Color(0xFF6A5AE0), modifier = Modifier.size(64.dp))
-        Text("AlumniConnect", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
-        Text("Connecting Alumni. Creating Opportunities.", color = Color.Gray)
+        Text("AlumniConnect",  style = MaterialTheme.typography.titleMedium)
+        Text("Connecting Alumni. Creating Opportunities.",style = MaterialTheme.typography.titleMedium)
     }
 }
 val aboutText1 =
@@ -116,13 +108,13 @@ fun AboutSection(title: String, content: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
+       // colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(title,  style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(6.dp))
-            Text(content, color = Color.Gray, fontSize = 14.sp)
+            Text(content, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -135,7 +127,7 @@ fun AboutFooter() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
+      //  colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -164,8 +156,8 @@ fun InfoRow(title: String, value: String) {
             .padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(title, color = Color.White)
-        Text(value, color = Color.Gray)
+        Text(title,  style = MaterialTheme.typography.titleMedium)
+        Text(value,  style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -173,7 +165,7 @@ fun InfoRow(title: String, value: String) {
 fun ClickableRow(title: String, onClick: () -> Unit) {
     Text(
         text = title,
-        color = Color(0xFF6A5AE0),
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Medium,
         modifier = Modifier
             .fillMaxWidth()

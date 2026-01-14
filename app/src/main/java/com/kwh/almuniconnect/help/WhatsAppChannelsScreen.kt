@@ -44,6 +44,9 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import com.kwh.almuniconnect.R
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import com.kwh.almuniconnect.appbar.HBTUTopBar
+
 data class WhatsAppChannel(
     val title: String,
     val description: String,
@@ -81,39 +84,23 @@ fun WhatsAppChannelsScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("WhatsUp Community")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        androidx.compose.material3.Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Whats-up Community",
+                navController = navController
             )
-        },
-        contentColor = Color(0xFF0E1420)
+        }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0E1420))
+            //    .background(Color(0xFF0E1420))
                 .padding(paddingValues)
         ) {
 
             item {
                 Text(
                     "Choose a channel to stay connected",
-                    color = Color.Gray,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(16.dp)
                 )
             }
@@ -134,7 +121,7 @@ fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(channel.link))
                 context.startActivity(intent)
             },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
+      //  colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
@@ -152,11 +139,11 @@ fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(channel.title, color = Color.White, fontWeight = FontWeight.Bold)
-                Text(channel.description, color = Color.Gray, fontSize = 13.sp)
+                Text(channel.title,  style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(channel.description,  style = MaterialTheme.typography.titleMedium)
             }
 
-            Text("Join", color = Color(0xFF25D366), fontWeight = FontWeight.Bold)
+            Text("Join", style = MaterialTheme.typography.titleMedium)
         }
     }
 }

@@ -78,9 +78,8 @@ fun HomeScreen(
                 title = {
                     Text(
                         "Alumni Connect",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
+                        style = MaterialTheme.typography.bodyLarge,
+                        )
                 },
                 actions = {
                     IconButton(onClick = { /* open notifications */ }) {
@@ -118,15 +117,7 @@ fun HomeScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 ),
-                modifier = Modifier.background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFF0D1B2A), // Navy
-                            Color(0xFF1B4DB1), // Royal
-                            Color(0xFF3A7BD5)  // Light Blue
-                        )
-                    )
-                )
+
             )
         },
 
@@ -150,18 +141,9 @@ fun HomeScreen(
         // Content
         LazyColumn(
             modifier = Modifier
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xFF0D1B2A), // Navy
-                            Color(0xFF1B4DB1), // Royal
-                            Color(0xFF3A7BD5)  // Light Blue
-                        )
-                    )
-                )                .fillMaxSize()
+                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
-
                     verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
@@ -250,7 +232,9 @@ fun HomeScreen(
                 AlumniNews(post = post)
             }
 
+
         }
+
     }
 }
 
@@ -261,8 +245,8 @@ private fun SectionTitle(title: String, actionText: String, onAction: () -> Unit
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.SemiBold)
-        Text(actionText,color = Color.White, modifier = Modifier.clickable(onClick = onAction))
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Text(actionText, style = MaterialTheme.typography.titleMedium, modifier = Modifier.clickable(onClick = onAction))
     }
 }
 
@@ -275,18 +259,14 @@ fun EventCard(event: Event, onClick: () -> Unit) {
             .height(120.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
-        ),
-        elevation = CardDefaults.cardElevation(8.dp),
-        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
+       // Soft premium border
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(event.title,color = Color.White, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(event.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(event.date,color = Color.White, style = MaterialTheme.typography.bodySmall)
+            Text(event.date, style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.weight(1f))
-            Text(event.location,color = Color.White, style = MaterialTheme.typography.bodySmall)
+            Text(event.location,style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -300,17 +280,14 @@ fun JobCard(job: Job, onClick: () -> Unit) {
             .height(120.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
-        ),
+
         elevation = CardDefaults.cardElevation(8.dp),
-        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
     ){
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(job.title,color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(job.company,color = Color.White, style = MaterialTheme.typography.bodySmall)
+            Text(job.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(job.company, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.weight(1f))
-            Text(job.location, color = Color.White,style = MaterialTheme.typography.bodySmall)
+            Text(job.location, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -320,14 +297,11 @@ fun JobCard(job: Job, onClick: () -> Unit) {
 fun AlumniPost(post: Post) {
     Card(
         modifier = Modifier.fillMaxWidth()
-            .height(160.dp),
+            .height(120.dp),
             //.clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
-        ),
+
         elevation = CardDefaults.cardElevation(8.dp),
-        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
             Image(
@@ -340,22 +314,17 @@ fun AlumniPost(post: Post) {
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(post.name,  color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Text(post.name,   style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(post.timeAgo, color = Color.LightGray,style = MaterialTheme.typography.bodySmall)
+                    Text(post.timeAgo,  style = MaterialTheme.typography.titleMedium,)
                 }
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(post.content,color = Color.White)
+                Text(post.content, style = MaterialTheme.typography.titleMedium)
                 post.imageUrl?.let { url ->
                     Spacer(modifier = Modifier.height(8.dp))
                     AsyncImage(model = url, contentDescription = null, modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.Crop)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    IconButton(onClick = { /* like */ }) { Icon(Icons.Default.FavoriteBorder, tint = Color.White, contentDescription = "Like") }
-                    IconButton(onClick = { /* comment */ }) { Icon(Icons.Default.ChatBubbleOutline,tint = Color.White, contentDescription = "Comment") }
-                    IconButton(onClick = { /* share */ }) { Icon(Icons.Default.Share,tint = Color.White, contentDescription = "Share") }
-                }
+
             }
         }
     }
@@ -463,14 +432,11 @@ fun AlumniNews(post: UniversityNews) {
     Card(
         modifier = Modifier.fillMaxWidth()
 
-            .height(160.dp),
+            .height(120.dp),
            // .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1B2F4B) // Alumni Card Blue
-        ),
+
         elevation = CardDefaults.cardElevation(8.dp),
-        border = BorderStroke(1.dp, Color(0xFF2E4C7D)) // Soft premium border
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -478,18 +444,14 @@ fun AlumniNews(post: UniversityNews) {
 
             Text(
                 text = post.title,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = post.description,
-                color = Color.White,
-
-                fontSize = 14.sp
+                style = MaterialTheme.typography.bodySmall
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -500,8 +462,7 @@ fun AlumniNews(post: UniversityNews) {
             ) {
                 Text(
                     text = post.date,
-                    fontSize = 12.sp,
-                    color = Color.White,
+                    style = MaterialTheme.typography.bodySmall
                     )
             }
         }

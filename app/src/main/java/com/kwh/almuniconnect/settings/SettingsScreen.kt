@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,32 +27,16 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Settings")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Settings ",
+                navController = navController
             )
-        },
-        contentColor = Color(0xFF0E1420)
+        }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0E1420))   // ✅ correct
+             //   .background(Color(0xFF0E1420))   // ✅ correct
                 .padding(paddingValues)
         ) {
 
@@ -113,9 +98,7 @@ fun SectionHeader(title: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
-        color = Color.White
+        style = MaterialTheme.typography.titleMedium
     )
 }
 @Composable
@@ -147,13 +130,11 @@ fun SettingItem(
         ) {
             Text(
                 text = title,
-                fontWeight = FontWeight.Medium,
-                color = Color.White
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = subtitle,
-                fontSize = 12.sp,
-                color = Color.White
+                style = MaterialTheme.typography.titleMedium
             )
         }
 

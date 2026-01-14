@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.network.AlumniProfile
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,24 +43,9 @@ fun AlumniProfileScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Alumni Profile")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Alumni Profile ",
+                navController = navController
             )
         }
     ) { paddingValues ->
@@ -68,7 +54,7 @@ fun AlumniProfileScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(Color(0xFF0E1420))
+              //  .background(Color(0xFF0E1420))
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -86,13 +72,12 @@ fun AlumniProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // 👤 Name
-            Text(alumni.name, fontSize = 22.sp, color =Color.White, fontWeight = FontWeight.Bold)
+            Text(alumni.name, fontSize = 22.sp,  style = MaterialTheme.typography.titleMedium)
 
             // 💼 Position + Company
             Text(
                 text = "${alumni.position} @ ${alumni.company}",
-                fontSize = 14.sp,
-                color = Color.White
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -100,8 +85,7 @@ fun AlumniProfileScreen(
             // 🎓 Branch + Year
             Text(
                 text = "${alumni.branch} • Batch of ${alumni.passingYear}",
-                fontSize = 13.sp,
-                color = Color.White
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -109,7 +93,7 @@ fun AlumniProfileScreen(
             // 📞 Contact Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF142338)),
+             //   colors = CardDefaults.cardColors(containerColor = Color(0xFF142338)),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -190,8 +174,8 @@ fun ProfileRow(
         Spacer(Modifier.width(12.dp))
 
         Column {
-            Text(label, color = Color.White, fontSize = 12.sp)
-            Text(value, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            Text(label,  style = MaterialTheme.typography.titleMedium)
+            Text(value,  style = MaterialTheme.typography.titleMedium)
         }
     }
 }

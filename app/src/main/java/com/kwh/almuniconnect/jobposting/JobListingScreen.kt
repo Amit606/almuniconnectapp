@@ -47,51 +47,62 @@ import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBarDefaults
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobListingScreen(navController: NavController) {
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("Job Openings") },
+//                navigationIcon = {
+//                    IconButton(onClick = { navController.popBackStack() }) {
+//                        Icon(
+//                            imageVector = Icons.Default.ArrowBack,
+//                            contentDescription = "Back",
+//                            tint = Color.White
+//
+//                        )
+//                    }
+//                },
+//                actions = {
+//                    IconButton(
+//                        onClick = {
+//                            navController.navigate(Routes.JOB_POST)
+//                        }
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.PostAdd,
+//                            contentDescription = "Post Job",
+//                            tint = Color.White
+//
+//                        )
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = Color(0xFF0E1420),
+//                    titleContentColor = Color.White
+//                )
+//            )
+//        },
+//        contentColor = Color(0xFF0E1420)
+//    ) { padding ->
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Job Openings") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            navController.navigate(Routes.JOB_POST)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.PostAdd,
-                            contentDescription = "Post Job",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Job Details",
+                navController = navController
             )
-        },
-        contentColor = Color(0xFF0E1420)
-    ) { padding ->
+        }
+
+
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF0E1420)),
-            contentPadding = padding
+                .fillMaxSize(),
+              //  .background(Color(0xFF0E1420)),
+            contentPadding = paddingValues
         ) {
             items(jobList) { job ->
                 JobCard(job,navController)
@@ -106,23 +117,20 @@ fun JobCard(job: Job,navController: NavController) {
             .fillMaxWidth()
             .padding(12.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF142338)
-        ),
+
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
             Text(
                 text = job.title,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium
+
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = job.company, color = Color.White)
+            Text(text = job.company,  style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -130,13 +138,13 @@ fun JobCard(job: Job,navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("📍 ${job.location}",color = Color.White)
-                Text("💼 ${job.experience}",color = Color.White)
+                Text("📍 ${job.location}", style = MaterialTheme.typography.titleMedium)
+                Text("💼 ${job.experience}", style = MaterialTheme.typography.titleMedium)
             }
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Text("💰 ${job.salary}", color = Color.White,fontWeight = FontWeight.Medium)
+            Text("💰 ${job.salary}",  style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -145,7 +153,7 @@ fun JobCard(job: Job,navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Show Full Details",color = Color.White)
+                Text("Show Full Details", style = MaterialTheme.typography.titleMedium)
             }
         }
     }

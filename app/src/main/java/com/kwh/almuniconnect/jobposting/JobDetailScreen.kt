@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 
@@ -26,45 +27,27 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 fun JobDetailScreen(job: JobDetail,navController: NavController) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Job Details")
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Job Details",
+                navController = navController
             )
-        },
-        contentColor = Color(0xFF0E1420)
+        }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFF0E1420))
+              //  .background(Color(0xFF0E1420))
                 .padding(16.dp)
         ) {
 
             item {
                 Text(
                     text = job.title,
-                    fontSize = 22.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium
                 )
 
-                Text(job.company, color = Color.White)
+                Text(job.company,  style = MaterialTheme.typography.titleMedium)
 
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -87,13 +70,15 @@ fun JobDetailScreen(job: JobDetail,navController: NavController) {
 
             item {
                 SectionTitle("Job Description")
-                Text(job.description,color = Color.White)
+                Text(job.description,  style = MaterialTheme.typography.labelSmall,
+                )
             }
 
             item {
                 SectionTitle("Responsibilities")
                 job.responsibilities.forEach {
-                    Text("• $it",color = Color.White)
+                    Text("• $it",  style = MaterialTheme.typography.labelSmall,
+                    )
                 }
             }
 
@@ -110,9 +95,8 @@ fun InfoRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label,color = Color.White,
-            fontWeight = FontWeight.Medium)
-        Text(value, color = Color.White)
+        Text(label, style = MaterialTheme.typography.titleMedium)
+        Text(value,  style = MaterialTheme.typography.titleMedium)
     }
     Spacer(modifier = Modifier.height(8.dp))
 }
@@ -121,28 +105,11 @@ fun SectionTitle(title: String) {
     Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = title,
-        color = Color.White,
-
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold
+        style = MaterialTheme.typography.titleMedium
     )
     Spacer(modifier = Modifier.height(8.dp))
 }
-@Composable
-fun SkillChip(skill: String) {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-        modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
-    ) {
-        Text(
-            text = skill,
-            color = Color.White,
 
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        )
-    }
-}
 
 @Composable
 fun ApplyButton() {
@@ -153,6 +120,6 @@ fun ApplyButton() {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text("Apply Now")
+        Text("Apply Now", style = MaterialTheme.typography.titleMedium)
     }
 }

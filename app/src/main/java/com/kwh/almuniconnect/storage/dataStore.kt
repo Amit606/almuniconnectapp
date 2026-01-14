@@ -16,7 +16,18 @@ class UserPreferences(private val context: Context) {
         val KEY_EMAIL = stringPreferencesKey("email")
         val KEY_PHOTO = stringPreferencesKey("photo")
         val KEY_LOGGED_IN = booleanPreferencesKey("logged_in")
+
+        // 🔽 Profile Keys
+        val KEY_MOBILE = stringPreferencesKey("mobile")
+        val KEY_BRANCH = stringPreferencesKey("branch")
+        val KEY_YEAR = stringPreferencesKey("year")
+        val KEY_JOB = stringPreferencesKey("job")
+        val KEY_LOCATION = stringPreferencesKey("location")
+        val KEY_BIRTHDAY = stringPreferencesKey("birthday")
+        val KEY_LINKEDIN = stringPreferencesKey("linkedin")
     }
+
+    /* ---------------- LOGIN SAVE ---------------- */
 
     suspend fun saveUser(
         uid: String,
@@ -33,18 +44,44 @@ class UserPreferences(private val context: Context) {
         }
     }
 
+    /* ---------------- PROFILE SAVE ---------------- */
+
+    suspend fun saveProfile(profile: UserLocalModel) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_NAME] = profile.name
+            prefs[KEY_EMAIL] = profile.email
+            prefs[KEY_PHOTO] = profile.photo
+            prefs[KEY_MOBILE] = profile.mobile
+            prefs[KEY_BRANCH] = profile.branch
+            prefs[KEY_YEAR] = profile.year
+            prefs[KEY_JOB] = profile.job
+            prefs[KEY_LOCATION] = profile.location
+            prefs[KEY_BIRTHDAY] = profile.birthday
+            prefs[KEY_LINKEDIN] = profile.linkedin
+        }
+    }
+
+    /* ---------------- READERS ---------------- */
+
     fun isLoggedIn(): Flow<Boolean> =
         context.dataStore.data.map {
             it[KEY_LOGGED_IN] ?: false
         }
 
     fun getUser(): Flow<UserLocalModel> =
-        context.dataStore.data.map {
+        context.dataStore.data.map { prefs ->
             UserLocalModel(
-                uid = it[KEY_UID] ?: "",
-                name = it[KEY_NAME] ?: "",
-                email = it[KEY_EMAIL] ?: "",
-                photo = it[KEY_PHOTO] ?: ""
+               // uid = prefs[KEY_UID] ?: "",
+                name = prefs[KEY_NAME] ?: "",
+                email = prefs[KEY_EMAIL] ?: "",
+                photo = prefs[KEY_PHOTO] ?: "",
+                mobile = prefs[KEY_MOBILE] ?: "",
+                branch = prefs[KEY_BRANCH] ?: "",
+                year = prefs[KEY_YEAR] ?: "",
+                job = prefs[KEY_JOB] ?: "",
+                location = prefs[KEY_LOCATION] ?: "",
+                birthday = prefs[KEY_BIRTHDAY] ?: "",
+                linkedin = prefs[KEY_LINKEDIN] ?: ""
             )
         }
 
@@ -52,10 +89,3 @@ class UserPreferences(private val context: Context) {
         context.dataStore.edit { it.clear() }
     }
 }
-
-data class UserLocalModel(
-    val uid: String,
-    val name: String,
-    val email: String,
-    val photo: String
-)

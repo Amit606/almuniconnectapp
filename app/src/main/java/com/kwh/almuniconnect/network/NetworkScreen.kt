@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,27 +54,17 @@ fun NetworkScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Almuni Network") },
-                navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()  }) {
-                        Icon(Icons.Default.ArrowBack, tint = Color.White, contentDescription = "Back")
-                    }
-                }
-              ,colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420),
-                    titleContentColor = Color.White
-                )
+            HBTUTopBar(
+                title = "Alumni Networks ",
+                navController = navController
             )
-        },
-        containerColor = Color(0xFF0E1420),
-
-        ) { innerPadding ->
+        }
+    ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color(0xFF0E1420))
+                .padding(paddingValues)
+              //  .background(Color(0xFF0E1420))
                 .padding(horizontal = 16.dp)
         ) {
             // Search
@@ -172,9 +163,7 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF142338)
-        ),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -195,18 +184,18 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(alumni.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 18.sp)
-                Text("${alumni.branch} - Batch of ${alumni.passingYear}", color = Color.LightGray,fontSize = 14.sp)
+                Text(alumni.name,  style = MaterialTheme.typography.titleMedium)
+                Text("${alumni.branch} - Batch of ${alumni.passingYear}",  style = MaterialTheme.typography.titleMedium)
                 Text(alumni.company, style = MaterialTheme.typography.bodySmall,color = Color.Gray)
             }
 
             Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF142338)
-                ),
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = Color(0xFF142338)
+//                ),
 
                 onClick = { openUrl(context, alumni.profileUrl) }) {
-                Text("Connect", color = Color.White)
+                Text("Connect", style = MaterialTheme.typography.titleMedium)
             }
         }
     }

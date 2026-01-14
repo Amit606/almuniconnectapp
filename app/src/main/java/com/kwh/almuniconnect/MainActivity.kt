@@ -9,13 +9,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kwh.almuniconnect.storage.FcmPrefs
-import com.kwh.almuniconnect.ui.theme.AlumniConnectTheme
+import com.kwh.almuniconnect.ui.theme.LinkedTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,7 +34,7 @@ class MainActivity : ComponentActivity() {
         // get cold-start notification
         notificationIntent = intent
         setContent {
-            AlumniConnectTheme {
+            LinkedTheme {
 
                 val navController = rememberNavController()
 

@@ -33,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -72,13 +73,31 @@ fun IntroScreen(onContinue: () -> Unit) {
             .windowInsetsPadding(WindowInsets.statusBars)
             .background(MaterialTheme.colorScheme.background)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF0D1B2A), // Navy
+                            Color(0xFF1B4DB1), // Royal
+                            Color(0xFF3A7BD5)  // Light Blue
+                        )
+                    )
+                )
+        ) {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .background(color = Color(0xFF142338), shape = RoundedCornerShape(0.dp))
+                    .background( brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF0D1B2A), // Navy
+                            Color(0xFF1B4DB1), // Royal
+                            Color(0xFF3A7BD5)  // Light Blue
+                        )
+                    ), shape = RoundedCornerShape(0.dp))
             ) { page ->
                 IntroPageContent(page = introPages[page])
             }
@@ -146,7 +165,13 @@ fun BottomControls(pagerState: PagerState, onContinue: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF142338)) // ✅ set your background color here
+            .background( brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0xFF3A7BD5), // Navy
+                    Color(0xFF3A7BD5), // Royal
+                    Color(0xFF3A7BD5)  // Light Blue
+                )
+            )) // ✅ set your background color here
 
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(horizontal = 16.dp, vertical = 20.dp),
