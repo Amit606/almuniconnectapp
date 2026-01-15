@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,6 +25,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,188 +48,169 @@ import com.kwh.almuniconnect.R
 import kotlinx.coroutines.launch
 
 data class IntroPage(
-    val imageRes: Int,
-    @StringRes val title: Int,
-    @StringRes val description: Int
+    val title: String,
+    val description: String,
+    val image: Int
+)
+val introPages = listOf(
+    IntroPage(
+        "Connect with Alumni",
+        "Stay connected with batchmates, seniors, and the global HBTU alumni network.",
+        R.drawable.first_screen
+    ),
+    IntroPage(
+        "Explore Opportunities",
+        "Access jobs, referrals, events, and mentorship opportunities from alumni.",
+        R.drawable.second_screen
+    ),
+    IntroPage(
+        "Give Back to HBTU",
+        "Contribute to students, campus initiatives, and the future of HBTU.",
+        R.drawable.third_screen
+    )
+
 )
 
-val introPages = listOf(
-    IntroPage(R.drawable.hbtu, R.string.welcome_msg, R.string.welcome_des),
-    IntroPage(R.drawable.hbtu, R.string.whats_up_saver, R.string.whats_up_saver_des),
-    IntroPage(R.drawable.hbtu, R.string.smart_cleaner_title, R.string.smart_cleaner_desc),
-    IntroPage(R.drawable.hbtu, R.string.secure_fast_title, R.string.secure_fast_desc),
-    IntroPage(R.drawable.hbtu, R.string.stay_organized_title, R.string.stay_organized_desc),
-    IntroPage(R.drawable.hbtu, R.string.get_started_title, R.string.get_started_desc)
-)
+
 
 /**
  * IntroScreen now accepts a callback that's invoked when user finishes/skips the intro.
  * This keeps navigation inside the NavGraph.
  */
 @Composable
-fun IntroScreen(onContinue: () -> Unit) {
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { introPages.size })
+fun IntroScreen(
+    onFinish: () -> Unit
+) {
+    val pagerState = rememberPagerState { introPages.size }
 
-    Surface(
+    HorizontalPager(
+        state = pagerState,
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFFEFF3EE)) // soft background
+    ) { page ->
+        FullScreenIntroPageWithBg(
+            page = introPages[page],
+            pageIndex = page,
+            pageCount = introPages.size,
+            isLast = page == introPages.lastIndex,
+            onFinish = onFinish
+        )
+    }
+}
+@Composable
+fun FullScreenIntroPageWithBg(
+    page: IntroPage,
+    pageIndex: Int,
+    pageCount: Int,
+    isLast: Boolean,
+    onFinish: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
+
+        // 🔹 Background Image (FrameLayout background)
+        Image(
+            painter = painterResource(page.image),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // 🔹 Soft overlay (IMPORTANT for readability)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xAAFFFFFF))
+        )
+
+        // 🔹 Foreground Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF0D1B2A), // Navy
-                            Color(0xFF1B4DB1), // Royal
-                            Color(0xFF3A7BD5)  // Light Blue
-                        )
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 📝 Title & Description
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    page.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    page.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // 🔽 Bottom Controls
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                PagerIndicator(
+                    size = pageCount,
+                    current = pageIndex
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (isLast) onFinish()
+                    },
+                    enabled = isLast,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(26.dp)
+                ) {
+                    Text(
+                        if (isLast) "Get Started" else "Swipe →"
                     )
-                )
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .background( brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF0D1B2A), // Navy
-                            Color(0xFF1B4DB1), // Royal
-                            Color(0xFF3A7BD5)  // Light Blue
-                        )
-                    ), shape = RoundedCornerShape(0.dp))
-            ) { page ->
-                IntroPageContent(page = introPages[page])
+                }
             }
-
-            BottomControls(pagerState = pagerState, onContinue = onContinue)
         }
     }
 }
 
-@Composable
-fun IntroPageContent(page: IntroPage) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.55f),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = page.imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = stringResource(id = page.title),
-            color = Color.White,
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        )
 
-        Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = stringResource(id = page.description),
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-        )
-    }
-}
+
 
 @Composable
-fun BottomControls(pagerState: PagerState, onContinue: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-
+fun PagerIndicator(
+    size: Int,
+    current: Int
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background( brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF3A7BD5), // Navy
-                    Color(0xFF3A7BD5), // Royal
-                    Color(0xFF3A7BD5)  // Light Blue
-                )
-            )) // ✅ set your background color here
-
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.Center
     ) {
-        // Left: Skip Button
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-            if (pagerState.currentPage < introPages.size - 1) {
-                TextButton(onClick = onContinue) {
-                    Text(text = stringResource(id = R.string.skip), color = Color.White,)
-                }
-            } else {
-                Spacer(modifier = Modifier.width(1.dp))
-            }
-        }
-
-        // Center: Dots Indicator
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            PageIndicator(pageCount = introPages.size, currentPage = pagerState.currentPage)
-        }
-
-        // Right: Next or Get Started Button
-        Box(modifier = Modifier.weight(1f),
-
-            contentAlignment = Alignment.CenterEnd) {
-            if (pagerState.currentPage < introPages.size - 1) {
-                Button(onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                }) {
-                    Text(text = stringResource(id = R.string.next),color = Color.White,)
-                }
-            } else {
-                Button(onClick = onContinue) {
-                    Text(text = stringResource(id = R.string.get_started),color = Color.White,)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PageIndicator(pageCount: Int, currentPage: Int) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        repeat(pageCount) { index ->
-            val color = if (index == currentPage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+        repeat(size) { index ->
             Box(
                 modifier = Modifier
-                    .size(if (index == currentPage) 14.dp else 10.dp)
+                    .padding(4.dp)
+                    .size(if (index == current) 10.dp else 8.dp)
                     .clip(CircleShape)
-                    .background(color)
+                    .background(
+                        if (index == current)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.outline
+                    )
             )
         }
     }
 }
+

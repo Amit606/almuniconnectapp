@@ -131,8 +131,8 @@ fun AppNavGraph(
         // 🟢 Intro Screen
         composable(Routes.INTRO) {
             IntroScreen(
-                onContinue = {
-                    navController.navigate(Routes.STARTED) {
+                onFinish = {
+                    navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.INTRO) { inclusive = true }
                     }
                 }
