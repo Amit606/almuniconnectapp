@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.outlined.GroupAdd
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import com.kwh.almuniconnect.R
@@ -93,7 +94,7 @@ fun WhatsAppChannelsScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-            //    .background(Color(0xFF0E1420))
+                .background(Color.White)
                 .padding(paddingValues)
         ) {
 
@@ -121,6 +122,9 @@ fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(channel.link))
                 context.startActivity(intent)
             },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFF4F1)
+        ),
       //  colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -139,11 +143,36 @@ fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(channel.title,  style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(channel.description,  style = MaterialTheme.typography.titleMedium)
+                Text(channel.title,  style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+                Text(channel.description,  style = MaterialTheme.typography.labelSmall)
             }
 
-            Text("Join", style = MaterialTheme.typography.titleMedium)
-        }
+            Row(
+                modifier = Modifier
+                    .background(
+                        color = Color(0xFF1E88E5), // Blue background
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.GroupAdd,
+                    contentDescription = "Join Network",
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "Join",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White
+                )
+            }
+
+
+                   }
     }
 }

@@ -115,6 +115,7 @@ fun SectionHeader(text: String) {
     Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = text,
+        color=Color.Black,
         style = MaterialTheme.typography.titleMedium
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -128,12 +129,12 @@ fun AppTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label,  style = MaterialTheme.typography.titleMedium) },   // ✅ correct
+        label = { Text(label,color=Color.Black,  style = MaterialTheme.typography.titleMedium) },   // ✅ correct
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         maxLines = 1,
-        textStyle = TextStyle(color = Color.White),
+        textStyle = TextStyle(color=Color.Black),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color(0xFF6A5AE0),
             unfocusedBorderColor = Color.Gray,

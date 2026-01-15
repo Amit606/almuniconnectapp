@@ -30,16 +30,16 @@ fun DropdownField(
     var expanded by remember { mutableStateOf(false) }
 
     Column {
-        Text(label, color = Color.Gray, fontSize = 12.sp)
+        Text(label, color = Color.Black, fontSize = 12.sp)
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
                 .clickable { expanded = true }
                 .padding(12.dp)
         ) {
-            Text(selected.ifEmpty { "Select $label" }, color = Color.White)
+            Text(selected.ifEmpty { "Select $label" }, color = Color.Black)
 
             DropdownMenu(
                 expanded = expanded,
@@ -47,7 +47,7 @@ fun DropdownField(
             ) {
                 items.forEach {
                     DropdownMenuItem(
-                        text = { Text(it) },
+                        text = { Text(it, color = Color.Black) },
                         onClick = {
                             onSelect(it)
                             expanded = false

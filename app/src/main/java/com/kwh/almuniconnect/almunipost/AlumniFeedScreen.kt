@@ -34,7 +34,7 @@ fun AlumniFeedScreen(
 
         Column(
                  modifier = Modifier.fillMaxWidth()
-                     .background(Color(0xFF0E1420))
+                     .background(Color.White)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
@@ -85,7 +85,7 @@ fun AlumniPostCard(post: AlumniPost) {
             .padding(vertical = 6.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF142338)
+            containerColor = Color(0xFFFFF4F1)
         ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -93,20 +93,20 @@ fun AlumniPostCard(post: AlumniPost) {
 
             Text(
                 text = post.name,
-                color = Color.White,
+                color = Color.Black,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = post.batch,
                 fontSize = 12.sp,
-                color = Color.White,
+                color = Color.Black,
 
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = post.message,  color = Color.White,
+            Text(text = post.message,  color = Color.DarkGray,
             )
         }
     }

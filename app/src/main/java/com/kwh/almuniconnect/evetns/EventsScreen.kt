@@ -47,21 +47,21 @@ val events = listOf(
         "AAIOI, Safdarjung, Delhi",
         "Feb 22, 11:00 AM",
         "",
-        R.drawable.hbtu
+        R.drawable.first
     ),
     Event(
         "Alumni Networking Lunch",
         "HBTU Main Hall",
         "Mar 05, 01:00 PM",
         "",
-        R.drawable.hbtu
+        R.drawable.second
     ),
     Event(
         "Career Guidance by Seniors",
         "HBTU Auditorium",
         "Mar 10, 10:30 AM",
         "",
-        R.drawable.hbtu
+        R.drawable.third
     ),
     Event(
         "Tech Talk: Android Development",
@@ -206,7 +206,9 @@ fun EventCard(
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
-
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White//Color(0xFFFFF4F1)
+        ),
         elevation = CardDefaults.cardElevation(1.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
@@ -229,11 +231,13 @@ fun EventCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     event.title,
-                    style = MaterialTheme.typography.titleMedium
+                    color = Color.Black,
+                    style = MaterialTheme.typography.labelLarge
                 )
                 Text(
                     event.location,
-                    style = MaterialTheme.typography.titleMedium
+                    color = Color.DarkGray,
+                    style = MaterialTheme.typography.labelMedium
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -247,7 +251,8 @@ fun EventCard(
                     )
                     Text(
                         event.date,
-                        style = MaterialTheme.typography.titleMedium
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
             }

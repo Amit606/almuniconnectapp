@@ -64,7 +64,7 @@ fun NetworkScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-              //  .background(Color(0xFF0E1420))
+               .background(Color.White)
                 .padding(horizontal = 16.dp)
         ) {
             // Search
@@ -163,6 +163,9 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFF4F1)
+        ),
 
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

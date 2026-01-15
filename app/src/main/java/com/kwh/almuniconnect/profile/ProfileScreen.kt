@@ -54,13 +54,7 @@ fun ProfileScreen(navController: NavController) {
     var linkedin by remember(user.linkedin) { mutableStateOf(user.linkedin) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    val profileGradient = Brush.verticalGradient(
-        listOf(
-            Color(0xFF0D1B2A),
-            Color(0xFF1B4DB1),
-            Color(0xFF3A7BD5)
-        )
-    )
+
 
     val branches = listOf(
         "B.Tech – CSE","B.Tech – IT","B.Tech – ECE","B.Tech – EE",
@@ -81,7 +75,7 @@ fun ProfileScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(profileGradient)
+                .background(Color.White)
                 .padding(paddingValues)
         ) {
             LazyColumn {
@@ -209,29 +203,44 @@ fun validateProfile(
 }
 
 @Composable
-fun BirthdayPicker(birthday: String, onDate: (String) -> Unit) {
+fun BirthdayPicker(
+    birthday: String,
+    onDate: (String) -> Unit
+) {
     val context = LocalContext.current
-    val cal = Calendar.getInstance()
+    val calendar = Calendar.getInstance()
 
-    val dialog = remember {
+    val datePickerDialog = remember {
         DatePickerDialog(
             context,
-            { _, y, m, d ->
-                onDate("%02d/%02d/%04d".format(d, m + 1, y))
+            { _, year, month, day ->
+                onDate("%02d/%02d/%04d".format(day, month + 1, year))
             },
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
-        )
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.maxDate = System.currentTimeMillis()
+        }
     }
 
-    OutlinedTextField(
-        value = birthday,
-        onValueChange = {},
-        readOnly = true,
-        label = { Text("Birthday") },
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { dialog.show() }
-    )
+            .clickable { datePickerDialog.show() }
+    ) {
+        OutlinedTextField(
+            value = birthday,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Birthday", color = Color.Black) },
+            enabled = false, // prevents keyboard
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
+        )
+    }
 }
+

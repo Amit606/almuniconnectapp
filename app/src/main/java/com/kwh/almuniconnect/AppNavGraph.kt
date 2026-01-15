@@ -15,6 +15,7 @@ import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
 import com.kwh.almuniconnect.help.HelpSupportScreen
 import com.kwh.almuniconnect.help.WhatsAppChannelsScreen
 import com.kwh.almuniconnect.home.HomeScreen
+import com.kwh.almuniconnect.intro.IntroPage
 import com.kwh.almuniconnect.intro.IntroScreen
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
@@ -127,10 +128,29 @@ fun AppNavGraph(
 //        composable(Routes.COUTNRYLIST) {
 //            CountryListScreen()
 //        }
+        val pages = listOf(
+            IntroPage(
+                "Connect with Alumni",
+                "Stay connected with batchmates, seniors, and the global HBTU alumni network.",
+                R.drawable.first
+            ),
+            IntroPage(
+                "Explore Opportunities",
+                "Access jobs, referrals, events, and mentorship opportunities from alumni.",
+                R.drawable.second
+            ),
+            IntroPage(
+                "Give Back to Harcourtians",
+                "Contribute to students, campus initiatives, and the future of HBTU.",
+                R.drawable.third
+            )
+
+        )
 
         // 🟢 Intro Screen
         composable(Routes.INTRO) {
             IntroScreen(
+                pages= pages,
                 onFinish = {
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.INTRO) { inclusive = true }
