@@ -21,7 +21,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,20 +63,45 @@ fun AboutAlumniConnectScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-             //   .background(Color(0xFF0E1420))
+               .background(Color.White)
                 .padding(paddingValues)
         ) {
 
             item { AboutHeader() }
-            item { AboutSection("🎓 What is AlumniConnect?", aboutText1) }
-            item { AboutSection("🤝 Our Mission", aboutText2) }
-            item { AboutSection("🚀 Why AlumniConnect?", aboutText3) }
-            item { AboutSection("📱 App Features", aboutText4) }
-            item { AboutSection("💙 Built for HBTU Alumni", aboutText5) }
+            item { AboutSection("🎓 What is AlumniConnect?", aboutText1)
+                SectionDividerBlue()
+            }
+            item { AboutSection("🤝 Our Mission", aboutText2)
+                SectionDividerBlue()
+
+            }
+            item { AboutSection("🚀 Why AlumniConnect?", aboutText3)
+                SectionDividerBlue()
+
+            }
+            item { AboutSection("📱 App Features", aboutText4)
+                SectionDividerBlue()
+
+            }
+            item { AboutSection("💙 Built for HBTU Alumni", aboutText5)
+                SectionDividerBlue()
+
+            }
             item { AboutFooter() }
         }
     }
 }
+@Composable
+fun SectionDividerBlue() {
+    HorizontalDivider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        thickness = 0.8.dp,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+    )
+}
+
 @Composable
 fun AboutHeader() {
     Column(
@@ -89,32 +116,32 @@ fun AboutHeader() {
     }
 }
 val aboutText1 =
-    "AlumniConnect is a digital platform designed to bring college alumni, students, and faculty together in one place. It helps alumni stay connected with their institution and with each other."
+    "AlumniConnect is a dedicated digital platform created to keep the HBTU family connected beyond campus life. It brings together alumni, students, and faculty in one trusted space, helping everyone stay professionally and emotionally connected to their alma mater."
 
 val aboutText2 =
-    "Our mission is to strengthen alumni relationships, provide mentorship opportunities, and support career growth through networking, events, and job sharing."
+    "Our mission is to strengthen lifelong bonds among HBTU alumni by encouraging mentorship, meaningful networking, and professional collaboration—so every graduate continues to grow, learn, and give back."
 
 val aboutText3 =
-    "Unlike social media, AlumniConnect is focused only on college connections. It provides a trusted and private space for alumni to communicate, collaborate, and grow."
+    "Unlike general social media platforms, AlumniConnect is built exclusively for the HBTU community. It offers a secure, focused, and respectful environment where alumni can connect with purpose, trust, and shared identity."
 
 val aboutText4 =
-    "You can join alumni events, post updates, find jobs, chat with seniors, and stay informed about college activities—all from one simple app."
+    "Through AlumniConnect, you can participate in alumni events, explore career opportunities, connect with seniors, share experiences, and stay updated with campus life—all through one simple and powerful app."
 
 val aboutText5 =
-    "This app is specially built for HBTU MCA alumni to maintain lifelong connections and support each other’s professional journey."
+    "Built with pride for HBTU MCA alumni, this platform celebrates our shared journey, professional achievements, and lifelong commitment to supporting one another as one HBTU family."
 @Composable
 fun AboutSection(title: String, content: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-       // colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title,  style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(6.dp))
-            Text(content, style = MaterialTheme.typography.titleMedium)
+            Text(content, color=Color.DarkGray, style = MaterialTheme.typography.labelMedium)
         }
     }
 }
