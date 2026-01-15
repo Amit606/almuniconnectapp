@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -17,14 +19,20 @@ import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginRoute(
     navController: NavController,
-    viewModel: AuthViewModel = viewModel()
+    viewModel: AuthViewModel = viewModel() // ⬅️ THIS LINE
 ) {
     val context = LocalContext.current
+
+    // 🔹 Create UserPreferences ONCE
+
+
+    // 🔹 Inject ViewModel with factory
 
     // 🔹 Google Sign-In config
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -40,6 +48,7 @@ fun LoginRoute(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
             try {
                 val account = task.getResult(ApiException::class.java)
                 val idToken = account.idToken ?: return@rememberLauncherForActivityResult
@@ -47,31 +56,18 @@ fun LoginRoute(
                 viewModel.firebaseAuthWithGoogle(
                     idToken = idToken,
                     onSuccess = {
-                        val firebaseUser = FirebaseAuth.getInstance().currentUser
-                        val userPrefs = UserPreferences(context)
+                        val firebaseUser =
+                            FirebaseAuth.getInstance().currentUser ?: return@firebaseAuthWithGoogle
 
-                        firebaseUser?.let { user ->
-                            // ✅ SAVE LOCALLY
-                            CoroutineScope(Dispatchers.IO).launch {
-                                userPrefs.saveUser(
-                                    uid = user.uid,
-                                    name = user.displayName,
-                                    email = user.email,
-                                    photo = user.photoUrl?.toString()
-                                )
+                        // 🔥 HAND OVER TO VIEWMODEL
+                        viewModel.onGoogleLoginSuccess(
+                            firebaseUser = firebaseUser,
+                            onNavigate = {
+                                navController.navigate(Routes.PROFILE) {
+                                    popUpTo(Routes.LOGIN) { inclusive = true }
+                                }
                             }
-
-
-                        }
-                        CoroutineScope(Dispatchers.IO).launch {
-                            UserSession.saveLogin(context)
-                        }
-
-                        navController.navigate(Routes.PROFILE) {
-                            popUpTo(Routes.LOGIN) { inclusive = true
-                            }
-                        }
-
+                        )
                     },
                     onError = {
                         Log.e("GoogleLogin", it)
@@ -81,31 +77,10 @@ fun LoginRoute(
                 Log.e("GoogleLogin", e.localizedMessage ?: "Google Sign-In failed")
             }
         }
-    //            AlumniLoginScreen(
-//                onRequestOtp = { email ->
-//                    // 🔹 Handle Request OTP
-//                    // Example:
-//                     navController.navigate("otp/$email")
-//                },
-//                onLoginWithPassword = {
-//                    // 🔹 Navigate to Password Login
-//                     navController.navigate(Routes.PASSWORD_LOGIN)
-//                },
-//                onGoogleLogin = {
-//                    // 🔹 Google Sign-In
-//                }
-//            )
 
     // 🔹 UI
     AlumniLoginScreen(
-        onRequestOtp = {email->
-          navController.navigate("otp/$email")
 
-            // optional OTP flow
-        },
-        onLoginWithPassword = {
-        navController.navigate(Routes.PASSWORD_LOGIN)
-        },
         onGoogleLogin = {
             launcher.launch(googleSignInClient.signInIntent)
         }

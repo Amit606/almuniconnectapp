@@ -35,6 +35,17 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            item {
+                SectionHeader("About Us")
+                SettingItem(
+                    icon = Icons.Default.Info,
+                    title = "About AlumniConnect",
+                    subtitle = "Learn how to connect with seniors and alumni",
+                    onClick = { navController.navigate(Routes.ABOUT_US) }
+
+                )
+            }
+
 
             item {
                 SectionHeader("Account")
@@ -42,7 +53,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Person,
                     title = "Edit Profile",
                     subtitle = "Update your personal details",
-                    onClick = { navController.navigate(Routes.PROFILE) }
+                    onClick = { navController.navigate(Routes.USER_PROFILE) }
                 )
             }
 

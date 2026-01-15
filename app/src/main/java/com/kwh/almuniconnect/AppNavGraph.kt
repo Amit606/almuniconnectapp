@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,6 +22,7 @@ import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
 import com.kwh.almuniconnect.jobposting.JobPostScreen
 import com.kwh.almuniconnect.jobposting.sampleJob
+import com.kwh.almuniconnect.login.AuthViewModel
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.login.PasswordLoginScreen
 import com.kwh.almuniconnect.login.RegistrationContainer

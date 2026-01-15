@@ -127,17 +127,7 @@ fun OtpVerificationScreen(
             // 🔵 Verify Button
             Button(
                 onClick = {
-                    viewModel.verifyOtp(
-                        otp = otp,
-                        onSuccess = {
-                            navController.navigate(Routes.HOME) {
-                                popUpTo(Routes.LOGIN) { inclusive = true }
-                            }
-                        },
-                        onError = { error ->
-                            errorMessage = error
-                        }
-                    )
+
                 },
                 enabled = otp.length == 6
             ) {

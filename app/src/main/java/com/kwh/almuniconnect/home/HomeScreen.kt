@@ -61,7 +61,7 @@ fun HomeScreen(
     val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
     val userPrefs = remember { UserPreferences(context) }
     val user by userPrefs.getUser().collectAsState(
-        initial = UserLocalModel("", "", "", "")
+        initial = UserLocalModel()
     )
     RequestNotificationPermission(
         onPermissionGranted = {
@@ -348,7 +348,7 @@ fun BottomAppBarWithNav(
     onSelect: (BottomNavItem) -> Unit
 ) {
     BottomAppBar(
-        containerColor = Color(0xFF142338),
+        containerColor = Color.White,
         contentColor = Color.White){
     NavigationBar {
         NavigationBarItem(

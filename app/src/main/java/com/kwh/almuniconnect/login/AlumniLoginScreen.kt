@@ -30,19 +30,7 @@ fun AlumniLoginScreen(
     var email by remember { mutableStateOf("") }
 
     Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {},
-//                navigationIcon = {
-//                    IconButton(onClick = onBack) {
-//                        Icon(
-//                            Icons.AutoMirrored.Filled.ArrowBack,
-//                            contentDescription = "Back"
-//                        )
-//                    }
-//                }
-//            )
-//        }
+//
     ) { padding ->
 
         Column(
@@ -84,43 +72,10 @@ fun AlumniLoginScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // ✉️ Email
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email address") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
 
-            Spacer(Modifier.height(20.dp))
 
-            // 🔵 Continue Button
-            Button(
-                onClick = { onRequestOtp(email) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(26.dp)
-            ) {
-                Text(
-                    "Continue",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
 
-            Spacer(Modifier.height(16.dp))
 
-            // 🔗 Password login
-            Text(
-                text = "Sign in with password",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable { onLoginWithPassword() }
-            )
-
-            Spacer(Modifier.height(32.dp))
 
             // ─── OR ───
             Row(

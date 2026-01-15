@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "user_prefs")
@@ -69,21 +71,27 @@ class UserPreferences(private val context: Context) {
         }
 
     fun getUser(): Flow<UserLocalModel> =
-        context.dataStore.data.map { prefs ->
-            UserLocalModel(
-               // uid = prefs[KEY_UID] ?: "",
-                name = prefs[KEY_NAME] ?: "",
-                email = prefs[KEY_EMAIL] ?: "",
-                photo = prefs[KEY_PHOTO] ?: "",
-                mobile = prefs[KEY_MOBILE] ?: "",
-                branch = prefs[KEY_BRANCH] ?: "",
-                year = prefs[KEY_YEAR] ?: "",
-                job = prefs[KEY_JOB] ?: "",
-                location = prefs[KEY_LOCATION] ?: "",
-                birthday = prefs[KEY_BIRTHDAY] ?: "",
-                linkedin = prefs[KEY_LINKEDIN] ?: ""
-            )
-        }
+        context.dataStore.data
+            .catch { exception ->
+                // 🔥 CRITICAL: prevents NoSuchElementException
+                emit(emptyPreferences())
+            }
+            .map { prefs ->
+                UserLocalModel(
+                    name = prefs[KEY_NAME] ?: "",
+                    email = prefs[KEY_EMAIL] ?: "",
+                    photo = prefs[KEY_PHOTO] ?: "",
+                    mobile = prefs[KEY_MOBILE] ?: "",
+                    branch = prefs[KEY_BRANCH] ?: "",
+                    year = prefs[KEY_YEAR] ?: "",
+                    job = prefs[KEY_JOB] ?: "",
+                    location = prefs[KEY_LOCATION] ?: "",
+                    birthday = prefs[KEY_BIRTHDAY] ?: "",
+                    linkedin = prefs[KEY_LINKEDIN] ?: ""
+                )
+            }
+            .distinctUntilChanged()
+
 
     suspend fun clear() {
         context.dataStore.edit { it.clear() }

@@ -40,15 +40,6 @@ fun HelpSupportScreen(navController: NavController) {
 
             item { SupportHeader() }
 
-            item {
-                SupportCard(
-                    icon = Icons.Default.Info,
-                    title = "About AlumniConnect",
-                    subtitle = "Learn how to connect with seniors and alumni",
-                    onClick = { navController.navigate(Routes.ABOUT_US) }
-                )
-            }
-
             item { ContactSupportSection() }
         }
     }
@@ -62,57 +53,7 @@ fun SupportHeader() {
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
-@Composable
-fun SupportCard(
-    icon: ImageVector,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
 
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
-            )
-
-            Spacer(Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
 @Composable
 fun ContactSupportSection() {
     Column(modifier = Modifier.padding(16.dp)) {
