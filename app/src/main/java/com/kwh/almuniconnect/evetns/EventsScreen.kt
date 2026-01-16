@@ -43,10 +43,10 @@ data class Event(
 // ✅ SAMPLE DATA
 val events = listOf(
     Event(
-        "HBTU MCA Alumni Meet 2026",
+        "Harcourtian  MCA Alumni Meet 2026",
         "AAIOI, Safdarjung, Delhi",
-        "Feb 22, 11:00 AM",
-        "",
+        "Feb 22, 11:00 AM - 5 PM",
+        "Registration Free : 1500 INR",
         R.drawable.first
     ),
     Event(
@@ -159,11 +159,11 @@ fun EventsScreen(navController: NavController) {
 fun EventBanner() {
     Box(
         modifier = Modifier
-            .height(200.dp)
+            .height(250.dp)
             .fillMaxWidth()
     ) {
         Image(
-            painter = painterResource(R.drawable.hbtu),
+            painter = painterResource(R.drawable.newggg),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()

@@ -154,7 +154,7 @@ fun AboutFooter() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-      //  colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

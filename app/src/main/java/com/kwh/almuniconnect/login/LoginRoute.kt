@@ -63,7 +63,7 @@ fun LoginRoute(
                         viewModel.onGoogleLoginSuccess(
                             firebaseUser = firebaseUser,
                             onNavigate = {
-                                navController.navigate(Routes.PROFILE) {
+                                navController.navigate(Routes.USER_PROFILE) {
                                     popUpTo(Routes.LOGIN) { inclusive = true }
                                 }
                             }

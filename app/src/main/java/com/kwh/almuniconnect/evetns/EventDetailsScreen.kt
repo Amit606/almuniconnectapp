@@ -84,7 +84,7 @@ fun EventDetailsScreen(navController: NavController,
                 // 🔝 Top Image with Date Badge
                 Box {
                     Image(
-                        painter = painterResource(R.drawable.hbtu),
+                        painter = painterResource(R.drawable.newggg),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -149,6 +149,7 @@ fun EventDetailsScreen(navController: NavController,
                 Text(
                     "Join us for an amazing alumni and college event where seniors and juniors come together. Network, celebrate, and relive memories with HBTU family.",
                     style = MaterialTheme.typography.titleMedium,
+                    color = Color.Gray,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 

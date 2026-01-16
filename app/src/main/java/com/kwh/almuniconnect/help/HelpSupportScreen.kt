@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,13 +72,13 @@ fun ContactSupportSection() {
         )
 
         SupportAction(
-            icon = Icons.Default.Chat,
+            icon = Icons.Default.Whatsapp,
             title = "WhatsApp Support",
-            value = "+91 98765 43210"
+            value = "+91 79xxxxxxxx0"
         )
 
         SupportAction(
-            icon = Icons.Default.Language,
+            icon = Icons.Default.Web,
             title = "Visit Website",
             value = "www.alumniconnect.com"
         )

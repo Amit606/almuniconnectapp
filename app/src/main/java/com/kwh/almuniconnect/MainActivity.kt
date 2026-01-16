@@ -31,8 +31,17 @@ class MainActivity : ComponentActivity() {
         updateHelper = InAppUpdateHelper(this)
         updateHelper.checkUpdate(this)
 
+
+
         // get cold-start notification
         notificationIntent = intent
+
+
+
+
+
+
+
         setContent {
             LinkedTheme {
 

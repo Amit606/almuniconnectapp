@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,16 +12,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.Routes.PRIVACY_POLICY_URL
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import com.kwh.almuniconnect.help.openLink
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController
 ) {
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -33,6 +38,7 @@ fun SettingsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
         ) {
             item {
@@ -73,7 +79,8 @@ fun SettingsScreen(
                     icon = Icons.Default.Lock,
                     title = "Privacy Policy",
                     subtitle = "Read our privacy policy",
-                    onClick = { /* navigate */ }
+                    onClick = {                 openLink(context, PRIVACY_POLICY_URL)
+                    }
                 )
 
                 SettingItem(

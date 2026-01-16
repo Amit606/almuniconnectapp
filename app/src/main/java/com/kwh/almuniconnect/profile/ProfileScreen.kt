@@ -27,6 +27,7 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
+import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -160,6 +161,9 @@ fun ProfileScreen(navController: NavController) {
                                                     linkedin = linkedin
                                                 )
                                             )
+                                            UserSession.saveLogin(context)
+
+
                                             navController.navigate("home") {
                                                 popUpTo("profile") { inclusive = true }
                                             }

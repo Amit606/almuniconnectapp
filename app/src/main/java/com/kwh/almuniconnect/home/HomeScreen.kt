@@ -60,9 +60,9 @@ fun HomeScreen(
 
     val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
     val userPrefs = remember { UserPreferences(context) }
-    val user by userPrefs.getUser().collectAsState(
-        initial = UserLocalModel()
-    )
+//    val user by userPrefs.getUser().collectAsState(
+//        initial = UserLocalModel()
+//    )
     RequestNotificationPermission(
         onPermissionGranted = {
             // 🔔 Notifications enabled
@@ -94,16 +94,16 @@ fun HomeScreen(
                     IconButton(onClick = {
                         navController.navigate(Routes.USER_PROFILE)
                     }) {
-                        if (user.photo.isNotEmpty()) {
-                            AsyncImage(
-                                model = user.photo,
-                                contentDescription = "Profile photo",
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
+//                        if (user.photo.isNotEmpty()) {
+//                            AsyncImage(
+//                                model = user.photo,
+//                                contentDescription = "Profile photo",
+//                                modifier = Modifier
+//                                    .size(36.dp)
+//                                    .clip(CircleShape),
+//                                contentScale = ContentScale.Crop
+//                            )
+//                        } else {
                             Image(
                                 painter = painterResource(id = R.drawable.girl),
                                 contentDescription = "Profile",
@@ -112,7 +112,7 @@ fun HomeScreen(
                                     .clip(CircleShape),
                                 contentScale = ContentScale.Crop
                             )
-                        }
+                       // }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -71,7 +71,7 @@ fun IntroScreen(
     onFinish: () -> Unit
 ) {
     val pagerState = rememberPagerState { pages.size }
-
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,11 +92,16 @@ fun IntroScreen(
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
         Button(
             onClick = {
-                if (pagerState.currentPage == pages.lastIndex) {
-                    onFinish()
+                scope.launch {
+                    if (pagerState.currentPage == pages.lastIndex) {
+                        onFinish()
+                    } else {
+                        pagerState.animateScrollToPage(
+                            pagerState.currentPage + 1
+                        )
+                    }
                 }
             },
             modifier = Modifier
@@ -108,14 +113,18 @@ fun IntroScreen(
             )
         ) {
             Text(
-                text = if (pagerState.currentPage == pages.lastIndex) "Get Started" else "Next",
+                text = if (pagerState.currentPage == pages.lastIndex)
+                    "Get Started"
+                else
+                    "Next",
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+
+        Spacer(modifier = Modifier.height(54.dp))
     }
 }
 

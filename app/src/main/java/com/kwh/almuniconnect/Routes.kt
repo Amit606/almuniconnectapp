@@ -36,12 +36,13 @@ object Routes {
     const val EVENT_DETAILS = "event_details"
     const val HELP_SUPPORTS = "help_supports"
     const val ABOUT_US = "about_us"
-    const val APP_VERSION = "1.0.0"
-    const val DEVELOPER_NAME = "Amit Gupta"
+    const val APP_VERSION = "1.0.1"
+    const val DEVELOPER_NAME = "Apps Chance"
     const val DEVELOPER_EMAIL = "support@alumniconnect.com"
 
     const val PRIVACY_POLICY_URL = "https://alumniconnect.com/privacy"
     const val TERMS_URL = "https://alumniconnect.com/terms"
     const val WHATSUP_CHANNEL ="whatsup_channel"
+    const val Internet_Splash = "internet_splash"
 
 }

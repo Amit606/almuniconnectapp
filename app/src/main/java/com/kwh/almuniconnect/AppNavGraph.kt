@@ -1,6 +1,10 @@
 package com.kwh.almuniconnect
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,8 +20,11 @@ import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
 import com.kwh.almuniconnect.help.HelpSupportScreen
 import com.kwh.almuniconnect.help.WhatsAppChannelsScreen
 import com.kwh.almuniconnect.home.HomeScreen
+import com.kwh.almuniconnect.internet.NoInternetDialog
+import com.kwh.almuniconnect.intro.ConnectivityObserver
 import com.kwh.almuniconnect.intro.IntroPage
 import com.kwh.almuniconnect.intro.IntroScreen
+import com.kwh.almuniconnect.intro.NetworkUtils
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
 import com.kwh.almuniconnect.jobposting.JobPostScreen
@@ -32,6 +39,8 @@ import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
+import androidx.compose.runtime.getValue
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun AppNavGraph(
@@ -39,13 +48,49 @@ fun AppNavGraph(
     startDestination: String = Routes.SPLASH) {
 
 
+
+    val context = LocalContext.current
+    val connectivityObserver = remember { ConnectivityObserver(context) }
+
+    val isConnected by connectivityObserver.networkStatus
+        .collectAsState(initial = NetworkUtils.isInternetAvailable(context))
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    // 🔁 Navigation side-effect
+    LaunchedEffect(isConnected, currentRoute) {
+
+        // 🚫 Do nothing during Splash
+        if (currentRoute == Routes.SPLASH) return@LaunchedEffect
+
+        if (!isConnected && currentRoute != Routes.Internet_Splash) {
+            navController.navigate(Routes.Internet_Splash) {
+                launchSingleTop = true
+            }
+        }
+
+        if (isConnected && currentRoute == Routes.Internet_Splash) {
+            navController.popBackStack()
+        }
+    }
+
     NavHost(navController = navController, startDestination = startDestination) {
+
+
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
              SplashScreen(navController)
 
+
         }
+        composable(Routes.Internet_Splash) {
+            NoInternetDialog(
+                onConnectNow = {  },
+                onCancel = { /* Optional */ }
+            )
+
+        }
+
         composable(Routes.NETWORK) {
             NetworkScreen(
                 navController = navController,
@@ -69,12 +114,14 @@ fun AppNavGraph(
         ) { backStackEntry ->
 
             val id = backStackEntry.arguments?.getString("id") ?: return@composable
-            val alumni = sampleAlumniProfiles().first { it.id == id }
+
+            val alumni = sampleAlumniProfiles()
+                .firstOrNull { it.id == id }
+                ?: return@composable   // 👈 prevents crash
 
             AlumniProfileScreen(
                 alumni = alumni,
-                navController
-
+                navController = navController
             )
         }
 
