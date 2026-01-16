@@ -195,6 +195,26 @@ fun HomeScreen(
                 }
             }
 
+            // Events section
+            item {
+                SectionTitle(
+                    title = "Products & Services",
+                    actionText = "View All",
+                    onAction = {
+                        navController.navigate(Routes.EVENTS)
+                    }
+                )
+            }
+
+            item {
+                val sampleEvents = getDummyProducts()
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(sampleEvents) { event ->
+                        ProductCard(event = event, onClick = {  navController.navigate(Routes.EVENTS) })
+                    }
+                }
+            }
+
             // Jobs section
             item {
                 SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
@@ -435,6 +455,103 @@ data class UniversityNews(
     val description: String,
     val date: String
 )
+data class HProduct(
+    val id: String,
+    val productName: String,
+    val category: ProductCategory,
+    val tagline: String,
+    val founderName: String,
+    val location: String,
+    val isActive: Boolean = true
+)
+enum class ProductCategory {
+    ALUMNI,
+    CAREER,
+    EDUCATION,
+    NETWORKING
+}
+fun getDummyProducts() = listOf(
+    HProduct(
+        id = "1",
+        productName = "Harcourtian Connect",
+        category = ProductCategory.ALUMNI,
+        tagline = "Connecting alumni across generations",
+        founderName = "Harcourtian Labs",
+        location = "Kanpur"
+    ),
+    HProduct(
+        id = "2",
+        productName = "Harcourtian Jobs",
+        category = ProductCategory.CAREER,
+        tagline = "Jobs and referrals from trusted alumni",
+        founderName = "Harcourtian Team",
+        location = "Bengaluru"
+    ),
+    HProduct(
+        id = "3",
+        productName = "Align My Career",
+        category = ProductCategory.CAREER,
+        tagline = "Career guidance for students and professionals",
+        founderName = "Ankit Gupta",
+        location = "Delhi"
+    ),
+    HProduct(
+        id = "4",
+        productName = "AlumBridge",
+        category = ProductCategory.ALUMNI,
+        tagline = "Reuniting alumni through shared journeys",
+        founderName = "Harcourtian Ventures",
+        location = "Mumbai"
+    ),
+    HProduct(
+        id = "5",
+        productName = "MentorNet",
+        category = ProductCategory.EDUCATION,
+        tagline = "Mentorship from experienced professionals",
+        founderName = "Rohit Verma",
+        location = "Pune"
+    ),
+    HProduct(
+        id = "6",
+        productName = "CampusConnect",
+        category = ProductCategory.EDUCATION,
+        tagline = "Bridging students and alumni",
+        founderName = "Harcourtian Innovation",
+        location = "Noida"
+    ),
+    HProduct(
+        id = "7",
+        productName = "Referra",
+        category = ProductCategory.NETWORKING,
+        tagline = "Smart employee referral platform",
+        founderName = "Amit Sharma",
+        location = "Gurugram"
+    ),
+    HProduct(
+        id = "8",
+        productName = "Netly",
+        category = ProductCategory.NETWORKING,
+        tagline = "Build meaningful professional connections",
+        founderName = "Harcourtian Labs",
+        location = "Hyderabad"
+    ),
+    HProduct(
+        id = "9",
+        productName = "GradLink",
+        category = ProductCategory.ALUMNI,
+        tagline = "From campus to career success",
+        founderName = "EduTech Collective",
+        location = "Chennai"
+    ),
+    HProduct(
+        id = "10",
+        productName = "CareerBond",
+        category = ProductCategory.CAREER,
+        tagline = "Where careers connect",
+        founderName = "Harcourtian Team",
+        location = "Remote"
+    )
+)
 
 @Composable
 fun AlumniNews(post: UniversityNews) {
@@ -485,3 +602,95 @@ fun AlumniNews(post: UniversityNews) {
     }
 }
 
+@Composable
+fun ProductCard(
+    event: HProduct,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            // 🔖 Category Badge
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = categoryColor(event.category),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = event.category.name,
+                    fontSize = 12.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 🏷 Product Name
+            Text(
+                text = event.productName,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // 📝 Tagline
+            Text(
+                text = event.tagline,
+                fontSize = 14.sp,
+                color = Color.Gray,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Divider()
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 👤 Founder & Location
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "By ${event.founderName}",
+                    fontSize = 13.sp,
+                    color = Color.DarkGray
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = event.location,
+                    fontSize = 13.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+    }
+}
+@Composable
+fun categoryColor(category: ProductCategory): Color {
+    return when (category) {
+        ProductCategory.ALUMNI -> Color(0xFF6C63FF)
+        ProductCategory.CAREER -> Color(0xFF4CAF50)
+        ProductCategory.EDUCATION -> Color(0xFF2196F3)
+        ProductCategory.NETWORKING -> Color(0xFFFF9800)
+    }
+}
