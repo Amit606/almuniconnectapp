@@ -1,5 +1,7 @@
 package com.kwh.almuniconnect
 
+import android.util.Log
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +43,10 @@ import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
+import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
+import com.kwh.almuniconnect.almunipost.dummyAlumniStories
+import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.news.NewsListingScreen
 
 @Composable
@@ -142,46 +148,9 @@ fun AppNavGraph(
 
         }
         // 🔢 OTP Screen
-        composable(
-            route = "${Routes.OTP}/{email}",
-            arguments = listOf(
-                navArgument("email") {
-                    type = NavType.StringType
-                }
-            )
-        ) { backStackEntry ->
-            val email =
-                backStackEntry.arguments?.getString("email") ?: ""
 
-            OtpVerificationScreen(
-                navController,
-                email = email,
-                onBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
 
-        composable(Routes.PASSWORD_LOGIN) {
-            PasswordLoginScreen(
-                navController,
-                onBack = {
-                    navController.popBackStack()
-                },
-                onLogin = { email, password ->
-                    // ✅ Handle login
-                    // Example:
-                    navController.navigate(Routes.HOME)
-                    // viewModel.loginWithEmail(email, password)
-                },
-                onForgotPassword = {
-                    // Navigate to forgot password
-                }
-            )
-        }
-//        composable(Routes.COUTNRYLIST) {
-//            CountryListScreen()
-//        }
+
         val pages = listOf(
             IntroPage(
                 "Connect with Alumni",
@@ -254,7 +223,7 @@ fun AppNavGraph(
                 onOpenProfile = { navController.navigate(Routes.USER_PROFILE) },
                 onOpenMessages = { navController.navigate(Routes.JOB_DETAILS) },
               //  onOpenEventDetails = { event -> navController.navigate(Routes.eventRoute(event.id)) },
-                onOpenJobDetails = { job -> navController.navigate(Routes.jobRoute(job.id)) },
+              //  onOpenJobDetails = { job -> navController.navigate(Routes.jobRoute(job.id)) },
                 onCreatePost = { navController.navigate(Routes.CREATE_POST) }
             )
         }
@@ -272,29 +241,75 @@ fun AppNavGraph(
 
 //
 
+//        composable(
+//            route = "${Routes.EVENT_DETAILS}/{title}/{location}/{date}/{price}"
+//        ) { backStack ->
+//            EventDetailsScreen(
+//                navController,
+//                title = backStack.arguments?.getString("title") ?: "",
+//                location = backStack.arguments?.getString("location") ?: "",
+//                date = backStack.arguments?.getString("date") ?: "",
+//                price = backStack.arguments?.getString("price") ?: ""
+//            )
+//        }
         composable(
-            route = "${Routes.EVENT_DETAILS}/{title}/{location}/{date}/{price}"
-        ) { backStack ->
-            EventDetailsScreen(
-                navController,
-                title = backStack.arguments?.getString("title") ?: "",
-                location = backStack.arguments?.getString("location") ?: "",
-                date = backStack.arguments?.getString("date") ?: "",
-                price = backStack.arguments?.getString("price") ?: ""
+            route = "${Routes.EVENT_DETAILS}?title={title}&location={location}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("location") { type = NavType.StringType }
             )
+        ) { entry ->
+            val title = entry.arguments?.getString("title").orEmpty()
+            val location = entry.arguments?.getString("location").orEmpty()
+
+            EventDetailsScreen(navController,title, location,"","")
         }
 
         composable(Routes.JOB_DETAILS){
             JobListingScreen(navController)
         }
-        composable(Routes.JOB_DETAILS_Full){
-            JobDetailScreen(sampleJob,navController)
+
+        composable(
+            route = "job_details/{jobId}",
+            arguments = listOf(
+                navArgument("jobId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val jobId = backStackEntry.arguments?.getString("jobId")
+
+            val job = dummyJobPosts.firstOrNull {
+                it.jobId == jobId
+            }
+
+            job?.let {
+                JobDetailScreen(
+                    navController = navController,
+                    job = it
+                )
+            }
         }
+
+
+
         composable(Routes.JOB_POST){
             JobPostScreen(navController)
         }
         composable(Routes.ALMUNI_POST){
-            AlumniFeedScreen(navController)
+            AlumniStoriesScreen(navController)
+        }
+        composable("story_detail/{name}") { backStackEntry ->
+
+            val name = backStackEntry.arguments?.getString("name")
+
+            val story = dummyAlumniStories.first {
+                it.name == name
+            }
+
+            AlumniStoryDetailScreen(
+                navController =navController,
+                story = story,
+            )
         }
 
     }

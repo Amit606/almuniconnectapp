@@ -45,5 +45,6 @@ object Routes {
     const val WHATSUP_CHANNEL ="whatsup_channel"
     const val Internet_Splash = "internet_splash"
     const val NEWS = "news"
+    fun ALUMNI_STORY_DETAIL(storyName: String) = "alumni_story_details/$storyName"
 
 }

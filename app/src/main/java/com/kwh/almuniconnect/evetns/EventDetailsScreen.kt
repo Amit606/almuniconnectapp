@@ -55,7 +55,8 @@ import org.osmdroid.views.overlay.Marker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetailsScreen(navController: NavController,
+fun EventDetailsScreen(
+    navController: NavController,
     title: String,
     location: String,
     date: String,

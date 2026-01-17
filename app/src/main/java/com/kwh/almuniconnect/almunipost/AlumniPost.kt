@@ -1,22 +1,66 @@
 package com.kwh.almuniconnect.almunipost
 
-data class AlumniPost(
-    val id: String,
+import com.kwh.almuniconnect.R
+
+
+val alumniFeed = listOf(
+    AlumniStory(
+        name = "Rohan Verma",
+        batch = "2012",
+        title = "Senior Engineering Manager",
+        companyOrStartup = "Google",
+        category = StoryCategory.SUCCESS,
+        story = "From late-night coding sessions in college to leading global engineering teams, Rohan’s journey reflects perseverance, curiosity, and the power of alumni connections.",
+        imageRes = R.drawable.man,
+        featured = true
+    ),
+
+    AlumniStory(
+        name = "Ananya Singh",
+        batch = "2016",
+        title = "Founder & CEO",
+        companyOrStartup = "FinEdge",
+        category = StoryCategory.STARTUP,
+        story = "What began as a final-year project is now a fast-growing fintech startup serving over a million users across India.",
+        imageRes = R.drawable.newggg
+    ),
+
+    AlumniStory(
+        name = "Dr. Amit Kulkarni",
+        batch = "2005",
+        title = "Senior Research Scientist",
+        companyOrStartup = "ISRO",
+        category = StoryCategory.AWARD,
+        story = "Recipient of a National Science Award, Dr. Amit has contributed to landmark space missions and continues to mentor young innovators.",
+        imageRes = R.drawable.newggg
+    ),
+
+    AlumniStory(
+        name = "Neha Gupta",
+        batch = "2010",
+        title = "Social Entrepreneur",
+        companyOrStartup = "EducateIndia NGO",
+        category = StoryCategory.FEATURED,
+        story = "Leaving behind a corporate career, Neha chose to transform rural education and has positively impacted thousands of students.",
+        imageRes = R.drawable.first,
+        featured = true
+    ),
+
+)
+data class AlumniStory(
     val name: String,
     val batch: String,
-    val message: String
+    val title: String,
+    val companyOrStartup: String,
+    val category: StoryCategory,
+    val story: String,
+    val imageRes: Int,
+    val featured: Boolean = false
 )
-val alumniFeed = listOf(
-    AlumniPost("1", "Amit Gupta", "MCA 2015", "Excited to attend Alumni Meet 2026! 🎉"),
-    AlumniPost("2", "Rohit Sharma", "MCA 2018", "Great memories with HBTU MCA family ❤️"),
-    AlumniPost("3", "Neha Verma", "MCA 2020", "Looking forward to networking with seniors!"),
 
-    AlumniPost("4", "Sandeep Kumar", "MCA 2012", "HBTU gave me lifelong friends and amazing career opportunities 🙏"),
-    AlumniPost("5", "Priya Singh", "MCA 2016", "Can't wait to reconnect with batchmates at Alumni Meet 2026 😊"),
-    AlumniPost("6", "Ankit Mishra", "MCA 2014", "Alumni gatherings always refresh old golden days ✨"),
-    AlumniPost("7", "Pooja Agarwal", "MCA 2019", "Proud to be a part of HBTU MCA family 🎓"),
-    AlumniPost("8", "Vikas Yadav", "MCA 2013", "Great initiative to bring all MCA alumni together 🤝"),
-    AlumniPost("9", "Ritu Gupta", "MCA 2021", "Hope to learn a lot from seniors during this event 🌟"),
-    AlumniPost("10", "Manish Tiwari", "MCA 2010", "HBTU memories are forever ❤️ Looking forward to meeting everyone!")
-
-)
+enum class StoryCategory {
+    SUCCESS,
+    STARTUP,
+    AWARD,
+    FEATURED
+}

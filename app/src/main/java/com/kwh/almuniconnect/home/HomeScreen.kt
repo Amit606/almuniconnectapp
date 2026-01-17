@@ -12,6 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -39,10 +40,15 @@ import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.almunipost.AlumniStory
+import com.kwh.almuniconnect.almunipost.alumniFeed
+import com.kwh.almuniconnect.jobposting.JobAPost
+import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.NetworkScreen
 import com.kwh.almuniconnect.permission.RequestNotificationPermission
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
+import com.kwh.almuniconnect.utils.encodeRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +58,7 @@ fun HomeScreen(
     onOpenProfile: () -> Unit = {},
     onOpenMessages: () -> Unit = {},
     onOpenEventDetails: (Event) -> Unit = {},
-    onOpenJobDetails: (Job) -> Unit = {},
+    onOpenJobDetails: (JobAPost) -> Unit = {},
     onCreatePost: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -190,7 +196,9 @@ fun HomeScreen(
                 val sampleEvents = sampleEvents()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(sampleEvents) { event ->
-                        EventCard(event = event, onClick = {  navController.navigate(Routes.EVENTS) })
+                        EventCard(event = event, onClick = {   navController.navigate(
+                            "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&location=${event.location.encodeRoute()}"
+                        ) })
                     }
                 }
             }
@@ -223,24 +231,35 @@ fun HomeScreen(
             }
 
             item {
-                val sampleJobs = sampleJobs()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(sampleJobs) { job ->
-                        JobCard(job = job, onClick = { navController.navigate(Routes.JOB_DETAILS) })
+                    items(dummyJobPosts) { job ->
+                        JobCard(job = job, onClick = {
+                            navController.navigate("job_details/${job.jobId}")
+                        }
+                        )
                     }
                 }
             }
 
             // Feed
             item {
-                SectionTitle(title = "Alumni Feed", actionText = "New Post", onAction = {
+                SectionTitle(title = "Alumni Stories & Achievements", actionText = "View All", onAction = {
                     navController.navigate(Routes.ALMUNI_POST)
                 })
             }
 
-            items(samplePosts()) { post ->
-                AlumniPost(post = post)
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(alumniFeed) { post ->
+                        AlumniPost(post = post, onClick={
+                            navController.navigate("story_detail/${post.name}")
+
+                        })
+                    }
+                }
             }
+
+
             // News
             item {
                 SectionTitle(title = "News", actionText = "", onAction = {
@@ -296,7 +315,7 @@ fun EventCard(event: Event, onClick: () -> Unit) {
 
 // Job card
 @Composable
-fun JobCard(job: Job, onClick: () -> Unit) {
+fun JobCard(job: JobAPost, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(220.dp)
@@ -311,7 +330,7 @@ fun JobCard(job: Job, onClick: () -> Unit) {
     ){
         Column(modifier = Modifier.padding(12.dp)) {
             Text(job.title,color=Color.Black, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(job.company,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+            Text(job.description,color=Color.Black, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.weight(1f))
             Text(job.location,color=Color.Black, style = MaterialTheme.typography.bodySmall)
         }
@@ -320,11 +339,14 @@ fun JobCard(job: Job, onClick: () -> Unit) {
 
 // Alumni post
 @Composable
-fun AlumniPost(post: Post) {
+fun AlumniPost(post: AlumniStory,
+     onClick: () -> Unit
+
+) {
     Card(
-        modifier = Modifier.fillMaxWidth()
-            .height(120.dp),
-            //.clickable(onClick = onClick),
+        modifier = Modifier.width(250.dp)
+            .height(120.dp)
+            .clickable{onClick()},
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFFFF4F1)
         ),
@@ -332,27 +354,34 @@ fun AlumniPost(post: Post) {
 
         elevation = CardDefaults.cardElevation(8.dp),
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
-            Image(
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            post.imageRes?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = "avatar",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                )
+            } ?: Image(
                 painter = painterResource(id = R.drawable.girl),
                 contentDescription = "avatar",
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(60.dp)
                     .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(post.name, color = Color.Black,  style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(post.name, color = Color.Black,  style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(post.timeAgo,  style = MaterialTheme.typography.titleMedium,)
                 }
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(post.content,color=Color.Black, style = MaterialTheme.typography.titleMedium)
-                post.imageUrl?.let { url ->
-                    Spacer(modifier = Modifier.height(8.dp))
-                    AsyncImage(model = url, contentDescription = null, modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.Crop)
-                }
+                Text(post.title,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(post.companyOrStartup, color = Color.Black, style = MaterialTheme.typography.bodySmall,)
+
 
             }
         }
@@ -409,8 +438,6 @@ fun BottomAppBarWithNav(
 
 // Sample models + data
 data class Event(val id: String, val title: String, val date: String, val location: String)
-data class Job(val id: String, val title: String, val company: String, val location: String,val experience:String,val salary:String)
-data class Post(val id: String, val name: String, val timeAgo: String, val content: String, val imageUrl: String?)
 
 private fun sampleEvents() = listOf(
     Event("1", "MCA Almuni Meet 2026", "Feb 22, 2026", "Delhi/NCR"),
@@ -418,15 +445,9 @@ private fun sampleEvents() = listOf(
     Event("3", "Regional Chapter: Delhi", "Mar 12, 2026", "Delhi")
 )
 
-private fun sampleJobs() = listOf(
-    Job("1", "Senior Android Engineer", "Acme Corp", "Remote","",""),
-    Job("2", "Product Manager", "Beta Inc.", "Bengaluru","",""),
-    Job("3", "UI/UX Designer", "DesignCo", "Hyderabad","","")
-)
 
-private fun samplePosts() = listOf(
-    Post("1", "Amit Kumar Gupta ", "2h", "Excited to announce our alumni meetup next month!", null),
-)
+
+
 private fun sampleNews(): List<UniversityNews> {
     return listOf(
         UniversityNews(
@@ -562,6 +583,9 @@ fun AlumniNews(post: UniversityNews,
             .height(120.dp)
             .clickable{onClick()},
         shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFF4F1)
+        ),
 
         elevation = CardDefaults.cardElevation(8.dp),
     ) {

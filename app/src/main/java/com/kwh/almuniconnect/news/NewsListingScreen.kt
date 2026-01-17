@@ -31,6 +31,8 @@ import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
+import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.utils.CommonEmptyState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,17 +75,13 @@ fun NewsListingScreen(navController: NavController) {
             }
 
             is NewsState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = (state as NewsState.Error).message,
-                        color = Color.Red
-                    )
-                }
+                CommonEmptyState(
+                    title = "No Upcoming Events",
+                    message = "There are no upcoming events right now.\nPlease check back later.",
+                    lottieRes = R.raw.no_events,
+                    actionText = "Refresh",
+                    onActionClick = { viewModel.loadNews() }
+                )
             }
 
             is NewsState.Success -> {

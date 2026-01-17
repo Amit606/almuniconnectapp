@@ -24,7 +24,7 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun JobDetailScreen(job: JobDetail,navController: NavController) {
+fun JobDetailScreen(navController: NavController,job: JobAPost) {
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -37,7 +37,7 @@ fun JobDetailScreen(job: JobDetail,navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-              //  .background(Color(0xFF0E1420))
+                .background(Color.White)
                 .padding(16.dp)
         ) {
 
@@ -47,26 +47,18 @@ fun JobDetailScreen(job: JobDetail,navController: NavController) {
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Text(job.company,  style = MaterialTheme.typography.titleMedium)
+                Text(job.description,  style = MaterialTheme.typography.titleMedium)
 
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
             item {
                 InfoRow("📍 Location", job.location)
-                InfoRow("💼 Experience", job.experience)
+                InfoRow("💼 Experience", job.totalExperience)
                 InfoRow("💰 Salary", job.salary)
-                InfoRow("🕒 Job Type", job.jobType)
+                InfoRow("🕒 Job Type", job.employmentType)
             }
 
-//            item {
-//                SectionTitle("Skills Required")
-//                FlowRow {
-//                    job.skills.forEach {
-//                        SkillChip(it)
-//                    }
-//                }
-//            }
 
             item {
                 SectionTitle("Job Description")
@@ -74,13 +66,13 @@ fun JobDetailScreen(job: JobDetail,navController: NavController) {
                 )
             }
 
-            item {
-                SectionTitle("Responsibilities")
-                job.responsibilities.forEach {
-                    Text("• $it",  style = MaterialTheme.typography.labelSmall,
-                    )
-                }
-            }
+//            item {
+//                SectionTitle("Responsibilities")
+//                job..forEach {
+//                    Text("• $it",  style = MaterialTheme.typography.labelSmall,
+//                    )
+//                }
+//            }
 
             item {
                 Spacer(modifier = Modifier.height(24.dp))

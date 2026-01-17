@@ -78,7 +78,7 @@ fun SectionTitle(
     }
 }
 @Composable
-fun AlumniPostCard(post: AlumniPost) {
+fun AlumniPostCard(post: AlumniStory) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -106,7 +106,7 @@ fun AlumniPostCard(post: AlumniPost) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = post.message,  color = Color.DarkGray,
+            Text(text = post.name,  color = Color.DarkGray,
             )
         }
     }

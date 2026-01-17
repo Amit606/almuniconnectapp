@@ -32,6 +32,7 @@ import com.google.common.math.LinearTransformation.horizontal
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.utils.CommonEmptyState
+import com.kwh.almuniconnect.utils.encodeRoute
 
 sealed class EventsUiState {
     object Loading : EventsUiState()
@@ -108,7 +109,7 @@ fun EventsScreen(
                     items(events) { event ->
                         EventCard(event) {
                             navController.navigate(
-                                "${Routes.EVENT_DETAILS}/${event.title}/${event.location}"
+                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&location=${event.location.encodeRoute()}"
                             )
                         }
                     }

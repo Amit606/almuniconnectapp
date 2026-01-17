@@ -1,5 +1,7 @@
 package com.kwh.almuniconnect.jobposting
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
@@ -27,26 +29,15 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.kwh.almuniconnect.home.Job
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.PostAdd
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -58,6 +49,7 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.runtime.getValue
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.utils.CommonEmptyState
+import com.kwh.almuniconnect.utils.encodeRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +75,7 @@ fun JobListingScreen(navController: NavController) {
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Job Details",
+                title = "Job Listings",
                 navController = navController
             )
         }
@@ -172,11 +164,17 @@ fun JobCard(job:JobAPost ,navController: NavController) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
-                onClick = { navController.navigate(Routes.JOB_DETAILS_Full) },
+                onClick = {
+                    Log.e("JobCard", "Navigating to job details for ID: ${job.jobId}")
+                    val encodedJobId = Uri.encode(job.jobId)
+                    Log.e("encodedJobId", "Navigating to job details for ID: ${encodedJobId}")
+
+                    navController.navigate("job_details/${encodedJobId}"
+                    ) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Show Full Details", style = MaterialTheme.typography.titleMedium)
+                Text("Show Full Details", style = MaterialTheme.typography.labelSmall)
             }
         }
     }
