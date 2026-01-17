@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.api
 
+import com.kwh.almuniconnect.evetns.EventsResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -26,19 +27,34 @@ data class MasterItem(
     val shortName: String
 )
 data class SignupRequest(
-    val firstName: String,
-    val lastName: String,
+    val name: String,
     val mobileNo: String,
     val email: String,
-    val dateOfBirth: String,    // e.g. "1989-06-18"
-    val dateOfMarriage: String, // e.g. "2017-12-10"
+    val dateOfBirth: String,
+    val passoutYear: Int,
     val courseId: Int,
-    val PassoutYear: Int,
+    val countryId: Int,
     val companyName: String,
     val title: String,
-    val countryId: Int,
+    val totalExperience: Int,
+    val linkedinUrl: String,
     val loggedFrom: String,
-    val deviceToken: String
+    val deviceId: String,
+    val fcmToken: String,
+    val appVersion: String,
+    val advertisementId: String,
+    val userAgent: String
+)
+data class SignupResponse(
+    val success: Boolean,
+    val data: UserData?,
+    val message: String,
+    val correlationId: String?,
+    val errors: Any?
+)
+
+data class UserData(
+    val userId: String
 )
 
 // Generic ApiResponse (adjust fields if actual API differs)
@@ -73,10 +89,16 @@ interface ApiService {
     suspend fun getBatches(): Response<MasterResponse>
 
 
+    @GET("events")
+    suspend fun getEvents(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int
+    ): EventsResponse
+
     @GET("masters/roles")
     suspend fun getRoles(): Response<MasterResponse>
     @Headers("Content-Type: application/json")
     @POST("auth/signup")
-    suspend fun signup(@Body body: SignupRequest): Response<ApiResponse<Any>>
+    suspend fun signup(@Body body: SignupRequest): Response<SignupResponse>
 }
 

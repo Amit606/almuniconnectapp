@@ -8,23 +8,26 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
+import com.kwh.almuniconnect.api.SignupRequest
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
+import com.kwh.almuniconnect.login.AuthRepository
+import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
@@ -36,6 +39,24 @@ import java.util.*
 fun ProfileScreen(navController: NavController) {
 
     val context = LocalContext.current
+    // 1️⃣ Create ApiService
+    val apiService = remember {
+        NetworkClient.createService(ApiService::class.java)
+    }
+
+    // 2️⃣ Repository
+    val repository = remember {
+        AuthRepository(apiService)
+    }
+
+    // 3️⃣ ViewModel WITH FACTORY (CRITICAL)
+    val viewModel: ProfileViewModel = viewModel(
+        factory = ProfileViewModelFactory(repository)
+    )
+
+    val apiState by viewModel.state.collectAsState()
+
+
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val userPrefs = remember { UserPreferences(context) }
@@ -54,7 +75,10 @@ fun ProfileScreen(navController: NavController) {
     var birthday by remember(user.birthday) { mutableStateOf(user.birthday) }
     var linkedin by remember(user.linkedin) { mutableStateOf(user.linkedin) }
     var error by remember { mutableStateOf<String?>(null) }
-
+    var fcmToken by remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        fcmToken = FcmPrefs.getToken(context) ?: ""
+    }
 
 
     val branches = listOf(
@@ -140,6 +164,7 @@ fun ProfileScreen(navController: NavController) {
 
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
+                                enabled = apiState !is ProfileState.Loading,
                                 onClick = {
                                     error = validateProfile(
                                         name, email, mobile, branch, year,
@@ -147,38 +172,81 @@ fun ProfileScreen(navController: NavController) {
                                     )
 
                                     if (error == null) {
-                                        scope.launch {
-                                            userPrefs.saveProfile(
-                                                user.copy(
-                                                    name = name,
-                                                    email = email,
-                                                    mobile = mobile,
-                                                    branch = branch,
-                                                    year = year,
-                                                    job = job,
-                                                    location = location,
-                                                    birthday = birthday,
-                                                    linkedin = linkedin
-                                                )
+                                        val deviceId = DeviceUtils.getDeviceId(context)
+
+                                        viewModel.submitProfile(
+
+                                            SignupRequest(
+                                                name = name,
+                                                mobileNo = mobile,
+                                                email = email,
+                                                dateOfBirth = uiDateToApi(birthday),
+                                                passoutYear = year.toInt(),
+                                                courseId = 1,
+                                                countryId = 1,
+                                                companyName = job,
+                                                title = job,
+                                                totalExperience = 0,
+                                                linkedinUrl = linkedin,
+                                                loggedFrom = "android",
+                                                deviceId = deviceId,
+                                                fcmToken = fcmToken,
+                                                appVersion = "1.0.1",
+                                                advertisementId = "",
+                                                userAgent = "android"
                                             )
-                                            UserSession.saveLogin(context)
-
-
-                                            navController.navigate("home") {
-                                                popUpTo("profile") { inclusive = true }
-                                            }
-                                        }
+                                        )
                                     }
                                 }
                             ) {
-                                Text("Update Profile")
+                                if (apiState is ProfileState.Loading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text("Update Profile")
+                                }
                             }
+                        }
+                    }
+
+                    LaunchedEffect(apiState) {
+                        when (apiState) {
+                            is ProfileState.Success -> {
+                                userPrefs.saveProfile(
+                                    user.copy(
+                                        name = name,
+                                        email = email,
+                                        mobile = mobile,
+                                        branch = branch,
+                                        year = year,
+                                        job = job,
+                                        location = location,
+                                        birthday = birthday,
+                                        linkedin = linkedin
+                                    )
+                                )
+                                UserSession.saveLogin(context)
+
+                                navController.navigate("home") {
+                                    popUpTo("profile") { inclusive = true }
+                                }
+                            }
+
+                            is ProfileState.Error -> {
+                                error = (apiState as ProfileState.Error).message
+                            }
+
+                            else -> Unit
                         }
                     }
                 }
             }
         }
     }
+
 }
 
 /* ---------------- HELPERS ---------------- */
@@ -247,4 +315,7 @@ fun BirthdayPicker(
         )
     }
 }
-
+fun uiDateToApi(date: String): String {
+    val (d, m, y) = date.split("/")
+    return "$y-$m-$d"
+}

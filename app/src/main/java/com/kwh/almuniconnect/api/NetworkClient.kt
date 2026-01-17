@@ -10,7 +10,8 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object NetworkClient {
 
-    private const val BASE_URL = "https://hbtu-alumni-api.azurewebsites.net/api/v1-stage/"  // 🔁 Replace with your backend base URL
+    //https://hbtu-alumni-api.azurewebsites.net/api/v1/auth/signup
+    private const val BASE_URL = "https://hbtu-alumni-apii.azurewebsites.net/api/v1/"  // 🔁 Replace with your backend base URL
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY  // shows request/response in Logcat

@@ -3,10 +3,11 @@ package com.kwh.almuniconnect.login
 import com.kwh.almuniconnect.api.ApiResponse
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.SignupRequest
+import com.kwh.almuniconnect.api.SignupResponse
 
 // AuthRepository.kt
 class AuthRepository(private val api: ApiService) {
-    suspend fun signup(request: SignupRequest): Result<ApiResponse<Any>> {
+    suspend fun signup(request: SignupRequest): Result<SignupResponse> {
         return try {
             val resp = api.signup(request)
             if (resp.isSuccessful) {

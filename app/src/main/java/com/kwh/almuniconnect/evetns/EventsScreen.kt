@@ -26,98 +26,34 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.graphics.Brush
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.common.math.LinearTransformation.horizontal
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import com.kwh.almuniconnect.utils.CommonEmptyState
 
-// ✅ SINGLE DATA MODEL
-data class Event(
-    val title: String,
-    val location: String,
-    val date: String,
-    val price: String,
-    val image: Int
-)
+sealed class EventsUiState {
+    object Loading : EventsUiState()
+    data class Success(val events: List<Event>) : EventsUiState()
+    data class Error(val message: String) : EventsUiState()
+}
 
-// ✅ SAMPLE DATA
-val events = listOf(
-    Event(
-        "Harcourtian  MCA Alumni Meet 2026",
-        "AAIOI, Safdarjung, Delhi",
-        "Feb 22, 11:00 AM - 5 PM",
-        "Registration Free : 1500 INR",
-        R.drawable.first
-    ),
-    Event(
-        "Alumni Networking Lunch",
-        "HBTU Main Hall",
-        "Mar 05, 01:00 PM",
-        "",
-        R.drawable.second
-    ),
-    Event(
-        "Career Guidance by Seniors",
-        "HBTU Auditorium",
-        "Mar 10, 10:30 AM",
-        "",
-        R.drawable.third
-    ),
-    Event(
-        "Tech Talk: Android Development",
-        "Computer Center",
-        "Mar 15, 11:00 AM",
-        "",
-        R.drawable.hbtu
-    ),
-    Event(
-        "Campus Placement Drive",
-        "HBTU Placement Cell",
-        "Mar 20, 09:00 AM",
-        "",
-        R.drawable.hbtu
-    ),
-    Event(
-        "MCA Cultural Fest",
-        "College Open Ground",
-        "Mar 25, 05:00 PM",
-        "",
-        R.drawable.hbtu
-    ),
-    Event(
-        "Startup & Entrepreneurship Meet",
-        "Innovation Hub",
-        "Apr 02, 11:00 AM",
-        "",
-        R.drawable.hbtu
-    ),
-    Event(
-        "Silver Jubilee Alumni Celebration",
-        "HBTU Convention Hall",
-        "Apr 10, 06:00 PM",
-        "",
-        R.drawable.hbtu
-    ),
-    Event(
-        "Workshop on Resume & Interview",
-        "Training Hall",
-        "Apr 15, 10:00 AM",
-        "",
-        R.drawable.hbtu
-    ),
-    Event(
-        "Annual HBTU Alumni Get-Together",
-        "HBTU Campus Lawn",
-        "Apr 20, 05:30 PM",
-        "",
-        R.drawable.hbtu
-    )
-)
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventsScreen(navController: NavController) {
+fun EventsScreen(
+    navController: NavController,
+    viewModel: EventsViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadEvents()
+    }
+
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -127,31 +63,62 @@ fun EventsScreen(navController: NavController) {
         }
     ) { paddingValues ->
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            item { EventBanner() }
+        when (uiState) {
 
-            item {
-                Text(
-                    "Upcoming Events",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
+            is EventsUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is EventsUiState.Error -> {
+                CommonEmptyState(
+                    title = "No Upcoming Events",
+                    message = "There are no upcoming events right now.\nPlease check back later.",
+                    lottieRes = R.raw.no_events,
+                    actionText = "Refresh",
+                    onActionClick = { viewModel.loadEvents() }
                 )
             }
 
-            items(events) { event ->
-                EventCard(event) {
-                    navController.navigate(
-                        "${Routes.EVENT_DETAILS}/${event.title}/${event.location}/${event.date}/${event.price}"
-                    )
+            is EventsUiState.Success -> {
+                val events = (uiState as EventsUiState.Success).events
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+
+                    item { EventBanner() }
+
+                    item {
+                        Text(
+                            "Upcoming Events",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+
+                    items(events) { event ->
+                        EventCard(event) {
+                            navController.navigate(
+                                "${Routes.EVENT_DETAILS}/${event.title}/${event.location}"
+                            )
+                        }
+                    }
                 }
             }
+
         }
     }
 }
+
 
 
 

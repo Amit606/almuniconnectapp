@@ -93,7 +93,7 @@ private fun tokenGeneration( activity: MainActivity) {
             val savedToken = FcmPrefs.getToken(activity)
 
             if (savedToken == newToken) {
-                Log.d("FCM", "Token unchanged → skip upload")
+                Log.d("FCM", "Token unchanged →"+newToken)
                 return@launch
             }
 
