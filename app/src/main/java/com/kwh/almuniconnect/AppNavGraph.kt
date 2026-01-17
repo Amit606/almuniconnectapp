@@ -41,6 +41,7 @@ import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.kwh.almuniconnect.news.NewsListingScreen
 
 @Composable
 fun AppNavGraph(
@@ -81,6 +82,10 @@ fun AppNavGraph(
         composable(Routes.SPLASH) {
              SplashScreen(navController)
 
+
+        }
+        composable(Routes.NEWS) {
+            NewsListingScreen(navController)
 
         }
         composable(Routes.Internet_Splash) {

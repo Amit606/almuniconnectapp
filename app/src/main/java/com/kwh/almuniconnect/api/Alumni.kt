@@ -1,6 +1,8 @@
 package com.kwh.almuniconnect.api
 
 import com.kwh.almuniconnect.evetns.EventsResponse
+import com.kwh.almuniconnect.jobposting.JobPostResponse
+import com.kwh.almuniconnect.news.NewsResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -94,6 +96,18 @@ interface ApiService {
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
     ): EventsResponse
+
+    @GET("job-posts")
+    suspend fun getJobPosts(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int
+    ): Response<JobPostResponse>
+
+    @GET("news")
+    suspend fun getNews(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int
+    ): Response<NewsResponse>
 
     @GET("masters/roles")
     suspend fun getRoles(): Response<MasterResponse>

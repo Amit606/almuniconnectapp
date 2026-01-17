@@ -44,50 +44,42 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import androidx.compose.runtime.getValue
+import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.utils.CommonEmptyState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobListingScreen(navController: NavController) {
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("Job Openings") },
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(
-//                            imageVector = Icons.Default.ArrowBack,
-//                            contentDescription = "Back",
-//                            tint = Color.White
-//
-//                        )
-//                    }
-//                },
-//                actions = {
-//                    IconButton(
-//                        onClick = {
-//                            navController.navigate(Routes.JOB_POST)
-//                        }
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.PostAdd,
-//                            contentDescription = "Post Job",
-//                            tint = Color.White
-//
-//                        )
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = Color(0xFF0E1420),
-//                    titleContentColor = Color.White
-//                )
-//            )
-//        },
-//        contentColor = Color(0xFF0E1420)
-//    ) { padding ->
+
+    // 🔹 Create API & ViewModel (correct)
+    val apiService = remember {
+        NetworkClient.createService(ApiService::class.java)
+    }
+    val repository = remember { JobRepository(apiService) }
+    val viewModel: JobViewModel = viewModel(
+        factory = JobViewModelFactory(repository)
+    )
+
+    // 🔹 Collect state from ViewModel
+    val state by viewModel.state.collectAsState()
+
+    // 🔹 Load jobs once
+    LaunchedEffect(Unit) {
+        viewModel.loadJobs()
+    }
+
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -95,29 +87,57 @@ fun JobListingScreen(navController: NavController) {
                 navController = navController
             )
         }
-
-
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-              //  .background(Color(0xFF0E1420)),
-            contentPadding = paddingValues
-        ) {
-            items(jobList) { job ->
-                JobCard(job,navController)
+
+        when (state) {
+
+            is JobState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is JobState.Error -> {
+                CommonEmptyState(
+                    title = "No Upcoming Events",
+                    message = "There are no upcoming events right now.\nPlease check back later.",
+                    lottieRes = R.raw.no_events,
+                    actionText = "Refresh",
+                    onActionClick = { viewModel.loadJobs() }
+                )
+            }
+
+            is JobState.Success -> {
+                val jobList = (state as JobState.Success).jobs
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    contentPadding = paddingValues
+                ) {
+                    items(jobList) { job ->
+                        JobCard(job, navController)
+                    }
+                }
             }
         }
     }
 }
+
 @Composable
-fun JobCard(job: Job,navController: NavController) {
+fun JobCard(job:JobAPost ,navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
+            containerColor = Color.White
         ),
         shape = RoundedCornerShape(12.dp),
 
@@ -133,7 +153,7 @@ fun JobCard(job: Job,navController: NavController) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = job.company,  style = MaterialTheme.typography.titleMedium)
+            Text(text = job.description,  style = MaterialTheme.typography.labelMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -141,13 +161,13 @@ fun JobCard(job: Job,navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("📍 ${job.location}", style = MaterialTheme.typography.titleMedium)
-                Text("💼 ${job.experience}", style = MaterialTheme.typography.titleMedium)
+                Text("📍 ${job.location}", style = MaterialTheme.typography.labelSmall)
+                Text("💼 ${job.totalExperience}", style = MaterialTheme.typography.labelSmall)
             }
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Text("💰 ${job.salary}",  style = MaterialTheme.typography.titleMedium)
+            Text("💰 ${job.salary}",  style = MaterialTheme.typography.labelSmall)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -161,9 +181,4 @@ fun JobCard(job: Job,navController: NavController) {
         }
     }
 }
-val jobList = listOf(
-    Job("1", "Android Developer", "Google", "Bangalore", "2–5 Years", "₹15–25 LPA"),
-    Job("2", "Backend Developer", "Amazon", "Hyderabad", "3–6 Years", "₹18–30 LPA"),
-    Job("3", "UI/UX Designer", "Flipkart", "Remote", "1–3 Years", "₹8–15 LPA"),
-    Job("4", "Flutter Developer", "Startup", "Noida", "1–4 Years", "₹6–12 LPA")
-)
+

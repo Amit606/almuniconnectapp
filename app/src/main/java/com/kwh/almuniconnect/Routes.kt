@@ -44,5 +44,6 @@ object Routes {
     const val TERMS_URL = "https://alumniconnect.com/terms"
     const val WHATSUP_CHANNEL ="whatsup_channel"
     const val Internet_Splash = "internet_splash"
+    const val NEWS = "news"
 
 }

@@ -249,7 +249,7 @@ fun HomeScreen(
             }
 
             items(sampleNews()) { post ->
-                AlumniNews(post = post)
+                AlumniNews(post = post,onClick = {navController.navigate(Routes.NEWS)})
             }
 
 
@@ -554,15 +554,13 @@ fun getDummyProducts() = listOf(
 )
 
 @Composable
-fun AlumniNews(post: UniversityNews) {
+fun AlumniNews(post: UniversityNews,
+               onClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier.fillMaxWidth()
-
-            .height(120.dp),
-           // .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
+            .height(120.dp)
+            .clickable{onClick()},
         shape = RoundedCornerShape(14.dp),
 
         elevation = CardDefaults.cardElevation(8.dp),

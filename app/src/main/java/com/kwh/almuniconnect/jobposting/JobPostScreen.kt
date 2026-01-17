@@ -84,21 +84,21 @@ fun JobPostScreen(
 
             Button(
                 onClick = {
-                    onSubmit(
-                        JobPost(
-                            title,
-                            company,
-                            location,
-                            experience,
-                            salary,
-                            jobType,
-                            skills,
-                            description,
-                            applyEmail,
-                            websiteUrl,
-                            linkedinUrl
-                        )
-                    )
+//                    onSubmit(
+//                        JobPost(
+//                            title,
+//                            company,
+//                            location,
+//                            experience,
+//                            salary,
+//                            jobType,
+//                            skills,
+//                            description,
+//                            applyEmail,
+//                            websiteUrl,
+//                            linkedinUrl
+//                        )
+//                    )
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
