@@ -85,7 +85,8 @@ fun HomeScreen(
                     Text(
                         "Home",
                         color = Color.Black,
-                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleMedium,
                         )
                 },
                 actions = {
@@ -269,7 +270,10 @@ fun HomeScreen(
 
             items(sampleNews()) { post ->
                 AlumniNews(post = post,onClick = {navController.navigate(Routes.NEWS)})
+                Spacer(modifier = Modifier.height(8.dp)) // 👈 space below title
+
             }
+
 
 
         }
@@ -330,7 +334,10 @@ fun JobCard(job: JobAPost, onClick: () -> Unit) {
     ){
         Column(modifier = Modifier.padding(12.dp)) {
             Text(job.title,color=Color.Black, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(job.description,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+            Text(job.totalExperience,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+            Text(job.salary,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+            Text(job.employmentType,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+
             Spacer(modifier = Modifier.weight(1f))
             Text(job.location,color=Color.Black, style = MaterialTheme.typography.bodySmall)
         }
@@ -633,10 +640,14 @@ fun ProductCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .height(180.dp)
+           // .padding(horizontal = 6.dp, vertical = 8.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFF4F1)
+        ),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

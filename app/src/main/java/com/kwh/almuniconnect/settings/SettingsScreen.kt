@@ -71,6 +71,12 @@ fun SettingsScreen(
                     subtitle = "Manage notification settings",
                     onClick = { /* navigate */ }
                 )
+                SettingItem(
+                    icon = Icons.Default.Delete,
+                    title = "Delete All Data",
+                    subtitle = "Permanently remove all saved information from this device",
+                    onClick = { /* navigate */ }
+                )
             }
 
             item {

@@ -47,7 +47,7 @@ fun JobDetailScreen(navController: NavController,job: JobAPost) {
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Text(job.description,  style = MaterialTheme.typography.titleMedium)
+                Text(job.description,  style = MaterialTheme.typography.labelMedium)
 
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -65,14 +65,14 @@ fun JobDetailScreen(navController: NavController,job: JobAPost) {
                 Text(job.description,  style = MaterialTheme.typography.labelSmall,
                 )
             }
+            item {
+                SectionTitle("Job Referer by")
+                Text("Amit Kumar Gupta",  style = MaterialTheme.typography.labelSmall,)
+                Text("Datability Technology",  style = MaterialTheme.typography.labelSmall,)
 
-//            item {
-//                SectionTitle("Responsibilities")
-//                job..forEach {
-//                    Text("• $it",  style = MaterialTheme.typography.labelSmall,
-//                    )
-//                }
-//            }
+            }
+
+
 
             item {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -87,8 +87,8 @@ fun InfoRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.titleMedium)
-        Text(value,  style = MaterialTheme.typography.titleMedium)
+        Text(label, style = MaterialTheme.typography.bodySmall)
+        Text(value,  style = MaterialTheme.typography.bodySmall)
     }
     Spacer(modifier = Modifier.height(8.dp))
 }
@@ -97,7 +97,7 @@ fun SectionTitle(title: String) {
     Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = title,
-        style = MaterialTheme.typography.titleMedium
+        style = MaterialTheme.typography.bodySmall
     )
     Spacer(modifier = Modifier.height(8.dp))
 }
@@ -112,6 +112,6 @@ fun ApplyButton() {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text("Apply Now", style = MaterialTheme.typography.titleMedium)
+        Text("Apply Now", style = MaterialTheme.typography.bodyMedium)
     }
 }
