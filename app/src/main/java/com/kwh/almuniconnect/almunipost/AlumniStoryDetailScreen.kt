@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.kwh.almuniconnect.analytics.TrackScreen
 
 @Composable
 fun AlumniStoryDetailScreen(
@@ -33,6 +34,8 @@ fun AlumniStoryDetailScreen(
     story: AlumniStory
 
 ) {
+    TrackScreen("alumni_story_detail_screen")
+
     Scaffold(
         topBar = {
             HBTUTopBar(

@@ -34,6 +34,8 @@ object Routes {
     const val SETTINGS = "SETTINGS"
     const val USER_PROFILE = "user_profile"
     const val EVENT_DETAILS = "event_details"
+    const val SERVICE_DETAILS = "service_details"
+
     const val HELP_SUPPORTS = "help_supports"
     const val ABOUT_US = "about_us"
     const val APP_VERSION = "1.0.2"
@@ -46,5 +48,5 @@ object Routes {
     const val Internet_Splash = "internet_splash"
     const val NEWS = "news"
     fun ALUMNI_STORY_DETAIL(storyName: String) = "alumni_story_details/$storyName"
-
+   const val SUBSCRIPTION = "premium_subscription"
 }

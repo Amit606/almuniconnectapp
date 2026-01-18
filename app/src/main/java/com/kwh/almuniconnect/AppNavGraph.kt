@@ -1,6 +1,8 @@
 package com.kwh.almuniconnect
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +17,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kwh.almuniconnect.almunipost.AlumniFeedScreen
-import com.kwh.almuniconnect.branding.MasterTabsScreen
 import com.kwh.almuniconnect.evetns.EventDetailsScreen
 import com.kwh.almuniconnect.evetns.EventsScreen
 import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
@@ -33,11 +34,8 @@ import com.kwh.almuniconnect.jobposting.JobPostScreen
 import com.kwh.almuniconnect.jobposting.sampleJob
 import com.kwh.almuniconnect.login.AuthViewModel
 import com.kwh.almuniconnect.login.LoginRoute
-import com.kwh.almuniconnect.login.PasswordLoginScreen
-import com.kwh.almuniconnect.login.RegistrationContainer
 import com.kwh.almuniconnect.network.NetworkScreen
 import com.kwh.almuniconnect.network.sampleAlumniProfiles
-import com.kwh.almuniconnect.otpscreen.OtpVerificationScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
@@ -46,9 +44,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
 import com.kwh.almuniconnect.almunipost.dummyAlumniStories
+import com.kwh.almuniconnect.branding.ProductDetailsScreen
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.news.NewsListingScreen
+import com.kwh.almuniconnect.subscription.PremiumScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
@@ -198,23 +199,9 @@ fun AppNavGraph(
 
         // 🟩 Login
 //
-        composable(Routes.COUTNRYLIST) {
-            MasterTabsScreen(onItemClick = { masterItem ->
-                // handle selection: navigate back, open edit screen, etc.
-            })
-        }
 
-        // 🟨 Registration
-        composable(Routes.REGISTER) {
-            RegistrationContainer()
-//            RegistrationScreen(
-//                onRegister = {
-//                    navController.navigate(Routes.HOME) {
-//                        popUpTo(Routes.REGISTER) { inclusive = true }
-//                    }
-//                }
-//            )
-        }
+
+
 
         // 🟧 Home
         composable(Routes.HOME) {
@@ -264,10 +251,26 @@ fun AppNavGraph(
 
             EventDetailsScreen(navController,title, location,"","")
         }
+        composable(
+            route = "${Routes.SERVICE_DETAILS}?title={title}&location={location}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("location") { type = NavType.StringType }
+            )
+        ) { entry ->
+            val title = entry.arguments?.getString("title").orEmpty()
+            val location = entry.arguments?.getString("location").orEmpty()
+
+            ProductDetailsScreen(navController,title, location,"","")
+        }
 
         composable(Routes.JOB_DETAILS){
             JobListingScreen(navController)
         }
+        composable(Routes.SUBSCRIPTION){
+            PremiumScreen(navController)
+        }
+
 
         composable(
             route = "job_details/{jobId}",

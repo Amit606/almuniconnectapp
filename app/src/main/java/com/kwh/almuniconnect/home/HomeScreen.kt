@@ -43,6 +43,9 @@ import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.almunipost.AlumniStory
 import com.kwh.almuniconnect.almunipost.alumniFeed
+import com.kwh.almuniconnect.analytics.AnalyticsEvent
+import com.kwh.almuniconnect.analytics.AnalyticsManager
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.jobposting.JobAPost
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.NetworkScreen
@@ -64,12 +67,13 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    TrackScreen("home_screen")
 
     val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
     val userPrefs = remember { UserPreferences(context) }
-//    val user by userPrefs.getUser().collectAsState(
-//        initial = UserLocalModel()
-//    )
+    val user by userPrefs.getUser().collectAsState(
+        initial = UserLocalModel()
+    )
     RequestNotificationPermission(
         onPermissionGranted = {
             // 🔔 Notifications enabled
@@ -98,20 +102,27 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
+                    IconButton(onClick = { navController.navigate(Routes.SUBSCRIPTION) }) {
+                        Icon(
+                            Icons.Default.WorkspacePremium,
+                            tint = Color(0xFFF5B700), // Gold highlight
+                            contentDescription = "Premium Access"
+                        )
+                    }
 
                     IconButton(onClick = {
                         navController.navigate(Routes.USER_PROFILE)
                     }) {
-//                        if (user.photo.isNotEmpty()) {
-//                            AsyncImage(
-//                                model = user.photo,
-//                                contentDescription = "Profile photo",
-//                                modifier = Modifier
-//                                    .size(36.dp)
-//                                    .clip(CircleShape),
-//                                contentScale = ContentScale.Crop
-//                            )
-//                        } else {
+                        if (user.photo.isNotEmpty()) {
+                            AsyncImage(
+                                model = user.photo,
+                                contentDescription = "Profile photo",
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
                             Image(
                                 painter = painterResource(id = R.drawable.girl),
                                 contentDescription = "Profile",
@@ -120,7 +131,7 @@ fun HomeScreen(
                                     .clip(CircleShape),
                                 contentScale = ContentScale.Crop
                             )
-                       // }
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -189,6 +200,10 @@ fun HomeScreen(
                     title = "Upcoming Events",
                     actionText = "View All",
                     onAction = {
+                        AnalyticsManager.logEvent(
+                            AnalyticsEvent.ScreenView("events_view_all")
+                        )
+
                         navController.navigate(Routes.EVENTS)
                     }
                 )
@@ -198,7 +213,11 @@ fun HomeScreen(
                 val sampleEvents = sampleEvents()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(sampleEvents) { event ->
-                        EventCard(event = event, onClick = {   navController.navigate(
+                        EventCard(event = event, onClick = {
+                            AnalyticsManager.logEvent(
+                                AnalyticsEvent.ScreenView("events_clicked_${event.id}")
+                            )
+                            navController.navigate(
                             "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&location=${event.location.encodeRoute()}"
                         ) })
                     }
@@ -211,7 +230,10 @@ fun HomeScreen(
                     title = "Products & Services",
                     actionText = "View All",
                     onAction = {
-                        navController.navigate(Routes.EVENTS)
+                        AnalyticsManager.logEvent(
+                            AnalyticsEvent.ScreenView("Services_view_all")
+                        )
+                        navController.navigate(Routes.SERVICE_DETAILS)
                     }
                 )
             }
@@ -220,7 +242,15 @@ fun HomeScreen(
                 val sampleEvents = getDummyProducts()
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(sampleEvents) { event ->
-                        ProductCard(event = event, onClick = {  navController.navigate(Routes.EVENTS) })
+                        ProductCard(event = event, onClick = {
+                            AnalyticsManager.logEvent(
+                                AnalyticsEvent.ScreenView("services_clicked_${event.productName}")
+                            )
+                            navController.navigate(
+                                "${Routes.SERVICE_DETAILS}?title=${event.productName.encodeRoute()}&location=${event.location.encodeRoute()}")
+
+
+                        })
                     }
                 }
             }
@@ -228,6 +258,9 @@ fun HomeScreen(
             // Jobs section
             item {
                 SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
+                    AnalyticsManager.logEvent(
+                        AnalyticsEvent.ScreenView("jobs_view_all")
+                    )
                     navController.navigate(Routes.JOB_DETAILS)
                 })
             }
@@ -236,6 +269,9 @@ fun HomeScreen(
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(dummyJobPosts) { job ->
                         JobMiniCard(job = job, onClick = {
+                            AnalyticsManager.logEvent(
+                                AnalyticsEvent.ScreenView("jobs_clicked_${job.title}")
+                            )
                             navController.navigate("job_details/${job.jobId}")
                         })
                     }
@@ -245,7 +281,11 @@ fun HomeScreen(
             // Feed
             item {
                 SectionTitle(title = "Alumni Stories & Achievements", actionText = "View All", onAction = {
+                    AnalyticsManager.logEvent(
+                        AnalyticsEvent.ScreenView("alumni_posts_view_all")
+                    )
                     navController.navigate(Routes.ALMUNI_POST)
+
                 })
             }
 
@@ -253,6 +293,9 @@ fun HomeScreen(
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(alumniFeed) { post ->
                         AlumniPost(post = post, onClick={
+                            AnalyticsManager.logEvent(
+                                AnalyticsEvent.ScreenView("story_clicked_${post.name}")
+                            )
                             navController.navigate("story_detail/${post.name}")
 
                         })
@@ -606,11 +649,11 @@ enum class ProductCategory {
 fun getDummyProducts() = listOf(
     HProduct(
         id = "1",
-        productName = "Harcourtian Connect",
+        productName = "HBTU Alumni Mart",
         category = ProductCategory.ALUMNI,
-        tagline = "Connecting alumni across generations",
-        founderName = "Harcourtian Labs",
-        location = "Kanpur"
+        tagline = "Discover, connect, and grow with HBTU alumni worldwide",
+        founderName = "HBTU Alumni Association",
+        location = "Kanpur, Uttar Pradesh, India • Global Network"
     ),
     HProduct(
         id = "2",

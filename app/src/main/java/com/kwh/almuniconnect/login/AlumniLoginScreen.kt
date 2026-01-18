@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +29,7 @@ fun AlumniLoginScreen(
     onGoogleLogin: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
+    TrackScreen("alumni_login_screen")
 
     Scaffold(
 //
@@ -64,18 +66,13 @@ fun AlumniLoginScreen(
             Spacer(Modifier.height(6.dp))
 
             Text(
-                text = "to continue to HBTU Alumni Network",
+                text = "to continue to Harcourtian Alumni Network",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
 
             Spacer(Modifier.height(32.dp))
-
-
-
-
-
 
             // ─── OR ───
             Row(

@@ -15,6 +15,7 @@ import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.items
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.analytics.TrackScreen
 
 @Composable
 fun AlumniStoriesScreen(
@@ -22,6 +23,8 @@ fun AlumniStoriesScreen(
 
 ) {
     val displayedStories = dummyAlumniStories
+    TrackScreen("alumni_stories_screen")
+
     Scaffold(
         topBar = {
             HBTUTopBar(

@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 import kotlinx.coroutines.launch
 import kotlin.collections.lastIndex
 
@@ -70,6 +71,8 @@ fun IntroScreen(
     pages: List<IntroPage>,
     onFinish: () -> Unit
 ) {
+    TrackScreen("intro_screen")
+
     val pagerState = rememberPagerState { pages.size }
     val scope = rememberCoroutineScope()
     Column(
@@ -196,90 +199,6 @@ fun DotsIndicator(
 
 
 
-@Composable
-fun FullScreenIntroPageWithBg(
-    page: IntroPage,
-    pageIndex: Int,
-    pageCount: Int,
-    isLast: Boolean,
-    onFinish: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-
-        // 🔹 Background Image (FrameLayout background)
-        Image(
-            painter = painterResource(page.image),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // 🔹 Soft overlay (IMPORTANT for readability)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xAAFFFFFF))
-        )
-
-        // 🔹 Foreground Content
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 📝 Title & Description
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    page.title,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    page.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            // 🔽 Bottom Controls
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                PagerIndicator(
-                    size = pageCount,
-                    current = pageIndex
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        if (isLast) onFinish()
-                    },
-                    enabled = isLast,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(26.dp)
-                ) {
-                    Text(
-                        if (isLast) "Get Started" else "Swipe →"
-                    )
-                }
-            }
-        }
-    }
-}
 
 
 
@@ -287,28 +206,6 @@ fun FullScreenIntroPageWithBg(
 
 
 
-@Composable
-fun PagerIndicator(
-    size: Int,
-    current: Int
-) {
-    Row(
-        horizontalArrangement = Arrangement.Center
-    ) {
-        repeat(size) { index ->
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .size(if (index == current) 10.dp else 8.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (index == current)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.outline
-                    )
-            )
-        }
-    }
-}
+
+
 

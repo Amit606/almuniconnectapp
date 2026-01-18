@@ -32,6 +32,7 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.utils.CommonEmptyState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +48,7 @@ fun NewsListingScreen(navController: NavController) {
     )
 
     val state by viewModel.state.collectAsState()
+    TrackScreen("news_listing_screen")
 
     LaunchedEffect(Unit) {
         viewModel.loadNews()

@@ -19,12 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun JobDetailScreen(navController: NavController,job: JobAPost) {
+
+    TrackScreen("job_detail_screen")
+
     Scaffold(
         topBar = {
             HBTUTopBar(

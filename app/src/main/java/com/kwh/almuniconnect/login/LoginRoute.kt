@@ -15,6 +15,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.analytics.AnalyticsEvent
+import com.kwh.almuniconnect.analytics.AnalyticsManager
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +34,7 @@ fun LoginRoute(
 
     // 🔹 Create UserPreferences ONCE
 
+    TrackScreen("login_screen")
 
     // 🔹 Inject ViewModel with factory
 
@@ -63,7 +67,11 @@ fun LoginRoute(
                         viewModel.onGoogleLoginSuccess(
                             firebaseUser = firebaseUser,
                             onNavigate = {
+                                AnalyticsManager.logEvent(
+                                    AnalyticsEvent.ScreenView("user_profile_screen")
+                                )
                                 navController.navigate(Routes.USER_PROFILE) {
+
                                     popUpTo(Routes.LOGIN) { inclusive = true }
                                 }
                             }

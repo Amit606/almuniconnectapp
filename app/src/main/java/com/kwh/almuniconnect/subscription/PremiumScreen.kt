@@ -1,22 +1,25 @@
 package com.kwh.almuniconnect.subscription
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,23 +27,12 @@ fun PremiumScreen(
     navController: NavController,
     onUpgradeClick: () -> Unit = {}
 ) {
+    TrackScreen("premium_screen")
     Scaffold(
-        containerColor = Color(0xFF0E1420),
         topBar = {
-            TopAppBar(
-                title = { Text("Premium", color = Color.White) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0E1420)
-                )
+            HBTUTopBar(
+                title = "Premium",
+                navController = navController
             )
         }
     ) { paddingValues ->
@@ -48,129 +40,232 @@ fun PremiumScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)              // prevents overlap
-               // .systemBarsPadding()                // handles notch & gesture bars
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .background(Color(0xFFF7F9FC))
         ) {
 
-            Text(
-                text = "Alumni Connect Premium",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-
-            Spacer(Modifier.height(6.dp))
-
-            Text(
-                text = "Lifetime Access – Pay once, use forever",
-                fontSize = 14.sp,
-                color = Color(0xFFB0B0B0)
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            // Price Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF142338))
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()                               // centers horizontally
-                        .wrapContentHeight(Alignment.CenterVertically) // centers vertically
-                        .padding(vertical = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Only",
-                        color = Color.White
+            // 🌈 Premium Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color(0xFF1E3C72),
+                                Color(0xFF2A5298)
+                            )
+                        )
                     )
-
+                    .padding(24.dp)
+            ) {
+                Column {
                     Text(
-                        text = "₹199",
-                        fontSize = 36.sp,
+                        text = "Alumni Connect Premium",
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
-
+                    Spacer(Modifier.height(6.dp))
                     Text(
-                        text = "One-time payment",
-                        color = Color(0xFFB0B0B0)
+                        text = "Lifetime access • One-time payment",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.85f)
                     )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // 💳 Centered Price Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier.width(320.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Text(
+                            text = "ONLY",
+                            fontSize = 12.sp,
+                            letterSpacing = 1.sp,
+                            color = Color.Gray
+                        )
+
+                        Spacer(Modifier.height(6.dp))
+
+                        Text(
+                            text = "₹199",
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF1E88E5)
+                        )
+
+                        Spacer(Modifier.height(4.dp))
+
+                        Text(
+                            text = "Pay once • Use forever",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
 
 
             Spacer(Modifier.height(24.dp))
 
+            // 🏷 Features
             Text(
-                "What you get",
+                text = "What you get",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(Modifier.height(12.dp))
 
-            PremiumFeature("Direct chat with alumni")
-            PremiumFeature("View phone & email")
-            PremiumFeature("Job referrals & opportunities")
-            PremiumFeature("Profile visibility boost")
-            PremiumFeature("Alumni events access")
-            PremiumFeature("Ad-free experience")
+            FeatureCard {
+                PremiumFeature("Direct chat with verified alumni")
+                PremiumFeature("View phone number & email")
+                PremiumFeature("Job referrals & hiring access")
+                PremiumFeature("Higher profile visibility")
+                PremiumFeature("Exclusive alumni events")
+                PremiumFeature("Completely ad-free experience")
+            }
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(24.dp))
 
+            AlumniSupportMessage()
+
+            Spacer(Modifier.height(24.dp))
+
+            // 🚀 CTA
             Button(
                 onClick = onUpgradeClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 52.dp),     // prevents small-screen cut
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+                    .padding(horizontal = 16.dp)
+                    .height(54.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF1E88E5)
+                )
             ) {
-                Text("Upgrade to Premium – ₹199", fontSize = 16.sp)
+                Text(
+                    text = "Support Alumni Network – ₹199",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(8.dp))
 
             Text(
-                "Secure payment powered by Google Play",
+                text = "Secure payment via Google Play",
                 fontSize = 12.sp,
-                color = Color(0xFF9E9E9E),
+                color = Color.Gray,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(Modifier.height(5.dp)) // safe bottom space
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
 
+@Composable
+fun FeatureCard(content: @Composable ColumnScope.() -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            content = content
+        )
+    }
+}
 
 @Composable
 fun PremiumFeature(title: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = null,
             tint = Color(0xFF4CAF50),
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(22.dp)
         )
         Spacer(Modifier.width(12.dp))
         Text(
             text = title,
-            fontSize = 14.sp,
-            color = Color.White
+            fontSize = 15.sp,
+            color = Color(0xFF333333)
         )
     }
 }
 
+@Composable
+fun AlumniSupportMessage() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF1F6FF)
+        ),
+        border = BorderStroke(1.dp, Color(0xFFD6E4FF))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = "Built by Alumni, for Alumni",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1E3C72)
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "This platform is sustained by alumni support. " +
+                        "A small one-time contribution helps us maintain the app, " +
+                        "improve features, and keep the HBTU alumni network strong.",
+                fontSize = 14.sp,
+                color = Color(0xFF444444),
+                lineHeight = 20.sp
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            Text(
+                text = "₹199 • Pay once • Support forever",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF1E88E5)
+            )
+        }
+    }
+}

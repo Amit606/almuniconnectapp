@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.Routes.PRIVACY_POLICY_URL
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.help.openLink
 
@@ -26,6 +27,8 @@ fun SettingsScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+    TrackScreen("settings_screen")
+
     Scaffold(
         topBar = {
             HBTUTopBar(

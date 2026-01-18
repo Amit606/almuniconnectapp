@@ -61,6 +61,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.utils.CommonEmptyState
 import com.kwh.almuniconnect.utils.encodeRoute
 import com.kwh.almuniconnect.utils.getTimeAgo
@@ -78,6 +79,7 @@ fun JobListingScreen(navController: NavController) {
     val viewModel: JobViewModel = viewModel(
         factory = JobViewModelFactory(repository)
     )
+    TrackScreen("job_listing_screen")
 
     // 🔹 Collect state from ViewModel
     val state by viewModel.state.collectAsState()
@@ -207,19 +209,6 @@ fun JobCard(job:JobAPost,navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Tags
-//            FlowRow(
-//                horizontalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//                SkillChip("Jetpack Compose")
-//                SkillChip("Android")
-//                SkillChip("Kotlin")
-//                SkillChip("Development")
-//                SkillChip("Jetpack")
-//            }
-//
-//            Spacer(modifier = Modifier.height(12.dp))
-            // Skills
             InfoItem(Icons.Default.Person, " Job Posted By Amit Kumar Gupta")
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -240,7 +229,7 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 )
 
                 Button(
-                    onClick = { /* TODO: Apply action */ },
+                    onClick = { navController.navigate(Routes.EVENTS) },
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
                 ) {

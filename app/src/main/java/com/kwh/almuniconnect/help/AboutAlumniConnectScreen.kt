@@ -54,11 +54,14 @@ import com.kwh.almuniconnect.Routes.DEVELOPER_EMAIL
 import com.kwh.almuniconnect.Routes.DEVELOPER_NAME
 import com.kwh.almuniconnect.Routes.PRIVACY_POLICY_URL
 import com.kwh.almuniconnect.Routes.TERMS_URL
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AboutAlumniConnectScreen(navController: NavController) {
+
+    TrackScreen("about_alumni_connect_screen")
 
     Scaffold(
         topBar = {

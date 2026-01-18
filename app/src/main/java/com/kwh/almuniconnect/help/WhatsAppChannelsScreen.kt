@@ -48,6 +48,7 @@ import com.kwh.almuniconnect.R
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.style.TextOverflow
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 data class WhatsAppChannel(
@@ -84,6 +85,7 @@ val channels = listOf(
 fun WhatsAppChannelsScreen(navController: NavController) {
 
     val context = LocalContext.current
+    TrackScreen("whatsapp_channels_screen")
 
     Scaffold(
         topBar = {

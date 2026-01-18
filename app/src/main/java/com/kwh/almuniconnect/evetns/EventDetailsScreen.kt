@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -63,6 +64,7 @@ fun EventDetailsScreen(
     price: String
 ) {
     val context = LocalContext.current
+    TrackScreen("event_details_screen")
 
     Scaffold(
         topBar = {
@@ -236,12 +238,12 @@ fun shareLocationOnWhatsApp(context: Context, location: String) {
 @Composable
 fun StreetMapViewOSM(address: String) {
 
-    val context = LocalContext.current
 
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
+            .padding(20.dp)
             .clip(RoundedCornerShape(16.dp)),
         factory = {
 

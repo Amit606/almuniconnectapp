@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1014208687214-3mc9cnans61pg4b6hgar50pi2otc1jbv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kwh.almuniconnect",
+            "certificate_hash": "802c20f340c84cdc5ef23ce609f4ff88b8fd9902"
+          }
+        },
+        {
           "client_id": "1014208687214-40mqb2mnpqmsgp5ptb7ragmb9ba75u6m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

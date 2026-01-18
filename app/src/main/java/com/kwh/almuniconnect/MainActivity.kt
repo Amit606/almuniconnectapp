@@ -1,17 +1,20 @@
 package com.kwh.almuniconnect
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.ui.theme.LinkedTheme
@@ -23,6 +26,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var updateHelper: InAppUpdateHelper
     private var notificationIntent by mutableStateOf<Intent?>(null)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,17 +34,8 @@ class MainActivity : ComponentActivity() {
 
         updateHelper = InAppUpdateHelper(this)
         updateHelper.checkUpdate(this)
-
-
-
         // get cold-start notification
         notificationIntent = intent
-
-
-
-
-
-
 
         setContent {
             LinkedTheme {
@@ -116,32 +111,57 @@ private fun handleNotificationIntent(
     val fromNotification = intent.getBooleanExtra("from_notification", false)
     if (!fromNotification) return
 
-    when (intent.getStringExtra("destination")) {
-        Routes.JOB_DETAILS_Full   -> {
-            navController.navigate(Routes.JOB_DETAILS_Full) {
-                popUpTo("home") { inclusive = false }
-            }
+    val destination = intent.getStringExtra("destination")
+
+    when (destination) {
+
+        Routes.JOB_DETAILS_Full -> {
+            navController.safeNavigate(Routes.JOB_DETAILS_Full)
         }
 
-        Routes.ALMUNI_POST  -> {
-            navController.navigate(Routes.ALMUNI_POST) {
-                popUpTo("home") { inclusive = false }
-            }
+        Routes.ALMUNI_POST -> {
+            navController.safeNavigate(Routes.ALMUNI_POST)
         }
+
         Routes.EVENTS -> {
-            navController.navigate(Routes.EVENTS) {
-                popUpTo("home") { inclusive = false }
-            }
+            navController.safeNavigate(Routes.EVENTS)
         }
+
         Routes.WHATSUP_CHANNEL -> {
-            navController.navigate(Routes.WHATSUP_CHANNEL) {
-                popUpTo("home") { inclusive = false }
-            }
+            navController.safeNavigate(Routes.WHATSUP_CHANNEL)
         }
 
+        Routes.HOME, null -> {
+            navController.safeNavigate(Routes.HOME)
+        }
 
-        // Add more destinations in future if needed
-        "home" -> navController.navigate(Routes.HOME)
+        // 🔥 UNKNOWN ROUTE → HOME
+        else -> {
+            FirebaseCrashlytics.getInstance().log(
+                "Unknown notification route: $destination"
+            )
+            navController.safeNavigate(Routes.HOME)
+        }
     }
-
 }
+
+fun NavHostController.safeNavigate(
+    route: String,
+    fallbackRoute: String = Routes.HOME
+) {
+    try {
+        navigate(route) {
+            popUpTo(fallbackRoute) { inclusive = false }
+            launchSingleTop = true
+        }
+    } catch (e: IllegalArgumentException) {
+        // 🔥 Log crash but don't crash app
+        FirebaseCrashlytics.getInstance().recordException(e)
+
+        navigate(fallbackRoute) {
+            popUpTo(fallbackRoute) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+}
+

@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.common.math.LinearTransformation.horizontal
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.utils.CommonEmptyState
 import com.kwh.almuniconnect.utils.encodeRoute
@@ -50,6 +51,7 @@ fun EventsScreen(
     viewModel: EventsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    TrackScreen("events_screen")
 
     LaunchedEffect(Unit) {
         viewModel.loadEvents()

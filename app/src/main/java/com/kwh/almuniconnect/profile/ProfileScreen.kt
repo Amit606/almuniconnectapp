@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.api.SignupRequest
@@ -43,6 +44,7 @@ fun ProfileScreen(navController: NavController) {
     val apiService = remember {
         NetworkClient.createService(ApiService::class.java)
     }
+    TrackScreen("profile_screen")
 
     // 2️⃣ Repository
     val repository = remember {

@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.firebase.crashlytics")
+
     id("com.google.gms.google-services") // ✅ MUST
 
 }
@@ -112,7 +114,11 @@ dependencies {
 
     implementation ("com.google.android.play:app-update:2.1.0")
     implementation("com.airbnb.android:lottie-compose:6.3.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-perf")
     implementation ("com.github.bumptech.glide:glide:5.0.5")
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }

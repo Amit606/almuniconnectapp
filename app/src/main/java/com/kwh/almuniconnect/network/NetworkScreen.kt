@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +53,7 @@ fun NetworkScreen(
         (selectedYear == "All" || it.passingYear == selectedYear) &&
         (searchQuery.isBlank() || it.name.contains(searchQuery, ignoreCase = true))
     }
+    TrackScreen("alumni_network_screen")
 
     Scaffold(
         topBar = {
