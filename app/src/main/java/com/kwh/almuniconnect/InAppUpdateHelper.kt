@@ -28,9 +28,6 @@ class InAppUpdateHelper(private val context: Context) {
         task.addOnSuccessListener { info ->
             if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
                 when {
-                    info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
-                        startUpdate(activity, info, AppUpdateType.IMMEDIATE)
-                    }
                     info.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) -> {
                         appUpdateManager.registerListener(updateListener)
                         startUpdate(activity, info, AppUpdateType.FLEXIBLE)

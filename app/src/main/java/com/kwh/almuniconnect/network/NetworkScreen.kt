@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.network
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -162,12 +163,9 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier
@@ -188,8 +186,10 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(alumni.name,  style = MaterialTheme.typography.titleMedium)
-                Text("${alumni.branch} - Batch of ${alumni.passingYear}",  style = MaterialTheme.typography.titleMedium)
-                Text(alumni.company, style = MaterialTheme.typography.bodySmall,color = Color.Gray)
+                Text("${alumni.branch} - ${alumni.passingYear}",    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194))
+                Text(alumni.company,    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194))
             }
 
             Button(

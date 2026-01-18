@@ -2,6 +2,7 @@ package com.kwh.almuniconnect.help
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import com.kwh.almuniconnect.R
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.style.TextOverflow
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 data class WhatsAppChannel(
@@ -122,11 +124,9 @@ fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(channel.link))
                 context.startActivity(intent)
             },
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-      //  colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2033)),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -143,8 +143,14 @@ fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(channel.title,  style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                Text(channel.description,  style = MaterialTheme.typography.labelSmall)
+                Text(channel.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis)
+                Text(channel.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194))
             }
 
             Row(

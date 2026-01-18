@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -234,10 +235,9 @@ fun HomeScreen(
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(dummyJobPosts) { job ->
-                        JobCard(job = job, onClick = {
+                        JobMiniCard(job = job, onClick = {
                             navController.navigate("job_details/${job.jobId}")
-                        }
-                        )
+                        })
                     }
                 }
             }
@@ -301,48 +301,144 @@ fun EventCard(event: Event, onClick: () -> Unit) {
             .width(220.dp)
             .height(120.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+
        // Soft premium border
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(event.title, style = MaterialTheme.typography.titleMedium, color =Color.Black,fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(event.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(event.date, color =Color.Black,style = MaterialTheme.typography.titleMedium)
+            Text(event.date,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF4A4F5A)
+            )
             Spacer(modifier = Modifier.weight(1f))
-            Text(event.location,color =Color.Black,style = MaterialTheme.typography.bodySmall)
+            // Location
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = Color(0xFF7A8194),
+                    modifier = Modifier.size(16.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = event.location,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194)
+                )
+            }
         }
     }
 }
 
-// Job card
+
 @Composable
-fun JobCard(job: JobAPost, onClick: () -> Unit) {
+fun JobMiniCard(job: JobAPost, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(220.dp)
-            .height(120.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-        shape = RoundedCornerShape(14.dp),
+           // .padding(8.dp),
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
 
-        elevation = CardDefaults.cardElevation(8.dp),
-    ){
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(job.title,color=Color.Black, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(job.totalExperience,color=Color.Black, style = MaterialTheme.typography.bodySmall)
-            Text(job.salary,color=Color.Black, style = MaterialTheme.typography.bodySmall)
-            Text(job.employmentType,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+            // Top Row: Logo + Time
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.playstore),
+                    contentDescription = "Company Logo",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
 
-            Spacer(modifier = Modifier.weight(1f))
-            Text(job.location,color=Color.Black, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = "3d ago",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Job Title
+            Text(
+                text = job.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Company + Rating
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = job.employmentType,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF4A4F5A)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color(0xFFFFB300),
+                    modifier = Modifier.size(16.dp)
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Text(
+                    text = job.totalExperience,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF4A4F5A)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Location
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    tint = Color(0xFF7A8194),
+                    modifier = Modifier.size(16.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = job.location,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194)
+                )
+            }
         }
     }
 }
+
 
 // Alumni post
 @Composable
@@ -354,12 +450,9 @@ fun AlumniPost(post: AlumniStory,
         modifier = Modifier.width(250.dp)
             .height(120.dp)
             .clickable{onClick()},
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-        shape = RoundedCornerShape(14.dp),
-
-        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             post.imageRes?.let { url ->
@@ -418,7 +511,7 @@ fun BottomAppBarWithNav(
             selected = selected == BottomNavItem.Network,
             onClick = { onSelect(BottomNavItem.Network) },
             icon = { Icon(Icons.Default.Group, contentDescription = null) },
-            label = { Text("Network") }
+            label = { Text("Alumni") }
         )
 
         NavigationBarItem(
@@ -474,6 +567,18 @@ private fun sampleNews(): List<UniversityNews> {
             title = "HBTU Ranked Among Top Technical Universities",
             description = "HBTU has been ranked among the top engineering institutions in India for academic excellence.",
             date = "15 Dec 2025"
+        ),
+        UniversityNews(
+            id = "4",
+            title = "MCA Placement Drive 2026 Begins",
+            description = "The MCA placement drive for the 2026 batch has started with multiple reputed IT companies participating.",
+            date = "10 Dec 2025"
+        ),
+        UniversityNews(
+            id = "5",
+            title = "HBTU Hosts National Tech Fest",
+            description = "HBTU successfully hosted a national-level technical fest with participation from colleges across India.",
+            date = "02 Dec 2025"
         )
     )
 }
@@ -582,54 +687,74 @@ fun getDummyProducts() = listOf(
 )
 
 @Composable
-fun AlumniNews(post: UniversityNews,
-               onClick: () -> Unit = {}
+fun AlumniNews(
+    post: UniversityNews,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth()
-            .height(120.dp)
-            .clickable{onClick()},
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-
-        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
 
+            // Title
             Text(
                 text = post.title,
-                color = Color.Black,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                text = post.description,
-                color = Color.DarkGray,
-
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF1C1C1E),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Description
+            Text(
+                text = post.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF5A5A5A),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Divider(color = Color(0xFFE6E9F0))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Date Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
+                Icon(
+                    imageVector = Icons.Outlined.CalendarToday,
+                    contentDescription = null,
+                    tint = Color(0xFF8E8E93),
+                    modifier = Modifier.size(14.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
                 Text(
                     text = post.date,
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall
-                    )
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF8E8E93)
+                )
             }
         }
     }
 }
+
 
 @Composable
 fun ProductCard(
@@ -643,11 +768,9 @@ fun ProductCard(
             .height(180.dp)
            // .padding(horizontal = 6.dp, vertical = 8.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4F1)
-        ),
-        shape = RoundedCornerShape(14.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
