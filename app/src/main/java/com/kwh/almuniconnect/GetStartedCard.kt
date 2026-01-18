@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 
+
+
 @Composable
 fun GetStartedCard(
     modifier: Modifier = Modifier,
@@ -30,12 +32,12 @@ fun GetStartedCard(
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(Color(0xFF0E1420))
-            .windowInsetsPadding(WindowInsets.statusBars) // 👈 adds padding at top
+            .windowInsetsPadding(WindowInsets.systemBars) // ✅ handles notch + status + nav bar
     ) {
-        // Decorative large rounded shapes (light blue blobs)
+
+        // 🔵 Decorative blobs
         Box(
             modifier = Modifier
                 .size(160.dp)
@@ -47,7 +49,7 @@ fun GetStartedCard(
                         colors = listOf(Color(0xFFE6F0FF), Color.Transparent)
                     )
                 )
-        ) {}
+        )
 
         Box(
             modifier = Modifier
@@ -60,12 +62,12 @@ fun GetStartedCard(
                         colors = listOf(Color(0xFFEFF6FF), Color.Transparent)
                     )
                 )
-        ) {}
+        )
 
-        // Small top avatar
+        // 👩 Top avatar
         Image(
             painter = painterResource(id = R.drawable.girl),
-            contentDescription = "avatar",
+            contentDescription = null,
             modifier = Modifier
                 .size(44.dp)
                 .align(Alignment.TopEnd)
@@ -74,10 +76,10 @@ fun GetStartedCard(
             contentScale = ContentScale.Crop
         )
 
-        // Larger center avatar overlapping
+        // 👨 Main avatar
         Image(
             painter = painterResource(id = R.drawable.man),
-            contentDescription = "avatar",
+            contentDescription = null,
             modifier = Modifier
                 .size(88.dp)
                 .align(Alignment.TopEnd)
@@ -87,62 +89,48 @@ fun GetStartedCard(
             contentScale = ContentScale.Crop
         )
 
-        // Text content
+        // 📝 Text
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 20.dp, bottom = 80.dp)
+                .padding(start = 20.dp, bottom = 100.dp) // leave space for button
         ) {
             Text(
                 text = "Let's Get",
                 fontSize = 28.sp,
-                color = Color.White,
                 fontWeight = FontWeight.Bold,
+                color = Color.White
             )
+
             Text(
                 text = "Started",
                 fontSize = 36.sp,
-                color = Color.White,
-
                 fontWeight = FontWeight.Bold,
+                color = Color.White
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Grow Together",
                 fontSize = 12.sp,
-                color = Color.White,
+                color = Color.White
             )
         }
 
-        // Join Now button
+        // 🔘 JOIN NOW button (100% safe on all phones)
         Button(
             onClick = onJoinNow,
             shape = RoundedCornerShape(24.dp),
             colors = ButtonDefaults.buttonColors(Color(0xFF142338)),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 18.dp)
-                .width(140.dp)
-                .height(40.dp)
+                .navigationBarsPadding()   // ✅ keeps above gesture bar
+                .padding(bottom = 16.dp)
+                .width(160.dp)
+                .height(44.dp)
         ) {
-            Text(text = "JOIN NOW", color = Color.White)
+            Text("JOIN NOW", color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GetStartedCardPreview() {
-    Surface(modifier = Modifier.padding(16.dp)) {
-        GetStartedCard()
-    }
-}
-
-/*
-USAGE NOTES:
-- Replace R.drawable.avatar_small and R.drawable.avatar_large with your drawable resources.
-- Tweak sizes, offsets and colors to precisely match the screenshot for your device density.
-- If you want the card full screen (like the screenshot where it looks vertical and centered), place this composable inside a Box with padding and center alignment in your screen composable.
-*/

@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.kwh.almuniconnect" />
+                  <option name="mobileSdkAppId" value="1:1014208687214:android:fa54fede0f58c0b4368a7f" />
+                  <option name="projectId" value="almuniconnect" />
+                  <option name="projectNumber" value="1014208687214" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

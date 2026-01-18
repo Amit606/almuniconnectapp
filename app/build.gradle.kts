@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.firebase.crashlytics")
+
+    id("com.google.gms.google-services") // ✅ MUST
+
 }
 
 android {
@@ -12,8 +16,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -100,4 +104,21 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14")
+
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("com.google.firebase:firebase-messaging:25.0.1")
+
+    implementation ("org.osmdroid:osmdroid-android:6.1.16")
+
+    implementation ("com.google.android.play:app-update:2.1.0")
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-perf")
+    implementation ("com.github.bumptech.glide:glide:5.0.5")
+    //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }

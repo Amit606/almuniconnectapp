@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.intro
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,6 +26,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -40,168 +46,166 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.TrackScreen
 import kotlinx.coroutines.launch
+import kotlin.collections.lastIndex
 
 data class IntroPage(
-    val imageRes: Int,
-    @StringRes val title: Int,
-    @StringRes val description: Int
+    val title: String,
+    val description: String,
+    val image: Int
 )
 
-val introPages = listOf(
-    IntroPage(R.drawable.hbtu, R.string.welcome_msg, R.string.welcome_des),
-    IntroPage(R.drawable.hbtu, R.string.whats_up_saver, R.string.whats_up_saver_des),
-    IntroPage(R.drawable.hbtu, R.string.smart_cleaner_title, R.string.smart_cleaner_desc),
-    IntroPage(R.drawable.hbtu, R.string.secure_fast_title, R.string.secure_fast_desc),
-    IntroPage(R.drawable.hbtu, R.string.stay_organized_title, R.string.stay_organized_desc),
-    IntroPage(R.drawable.hbtu, R.string.get_started_title, R.string.get_started_desc)
-)
+
+
 
 /**
  * IntroScreen now accepts a callback that's invoked when user finishes/skips the intro.
  * This keeps navigation inside the NavGraph.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun IntroScreen(onContinue: () -> Unit) {
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { introPages.size })
+fun IntroScreen(
+    pages: List<IntroPage>,
+    onFinish: () -> Unit
+) {
+    TrackScreen("intro_screen")
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .background(color = Color(0xFF142338), shape = RoundedCornerShape(0.dp))
-            ) { page ->
-                IntroPageContent(page = introPages[page])
-            }
-
-            BottomControls(pagerState = pagerState, onContinue = onContinue)
-        }
-    }
-}
-
-@Composable
-fun IntroPageContent(page: IntroPage) {
+    val pagerState = rememberPagerState { pages.size }
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(Color.White) // same green background
+            .padding(horizontal = 16.dp)
     ) {
-        Box(
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { page ->
+            OnboardingPageUI(pages[page])
+        }
+
+        DotsIndicator(
+            totalDots = pages.size,
+            selectedIndex = pagerState.currentPage
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                scope.launch {
+                    if (pagerState.currentPage == pages.lastIndex) {
+                        onFinish()
+                    } else {
+                        pagerState.animateScrollToPage(
+                            pagerState.currentPage + 1
+                        )
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.55f),
-            contentAlignment = Alignment.Center
+                .height(54.dp),
+            shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFD86A3A)
+            )
         ) {
-            Image(
-                painter = painterResource(id = page.imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
+            Text(
+                text = if (pagerState.currentPage == pages.lastIndex)
+                    "Get Started"
+                else
+                    "Next",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = stringResource(id = page.title),
-            color = Color.White,
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = stringResource(id = page.description),
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-        )
+        Spacer(modifier = Modifier.height(54.dp))
     }
 }
 
 @Composable
-fun BottomControls(pagerState: PagerState, onContinue: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF142338)) // ✅ set your background color here
-
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+fun OnboardingPageUI(page: IntroPage) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Left: Skip Button
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-            if (pagerState.currentPage < introPages.size - 1) {
-                TextButton(onClick = onContinue) {
-                    Text(text = stringResource(id = R.string.skip), color = Color.White,)
-                }
-            } else {
-                Spacer(modifier = Modifier.width(1.dp))
-            }
-        }
 
-        // Center: Dots Indicator
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            PageIndicator(pageCount = introPages.size, currentPage = pagerState.currentPage)
-        }
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Right: Next or Get Started Button
-        Box(modifier = Modifier.weight(1f),
+        Image(
+            painter = painterResource(id = page.image),
+            contentDescription = null,
+            modifier = Modifier
+                .size(280.dp),
+            contentScale = ContentScale.Fit
+        )
 
-            contentAlignment = Alignment.CenterEnd) {
-            if (pagerState.currentPage < introPages.size - 1) {
-                Button(onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                }) {
-                    Text(text = stringResource(id = R.string.next),color = Color.White,)
-                }
-            } else {
-                Button(onClick = onContinue) {
-                    Text(text = stringResource(id = R.string.get_started),color = Color.White,)
-                }
-            }
-        }
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            text = page.title,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1F2A44),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = page.description,
+            fontSize = 15.sp,
+            color = Color(0xFF6B7280),
+            textAlign = TextAlign.Center,
+            lineHeight = 22.sp,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+
+        Spacer(modifier = Modifier.weight(1.2f))
     }
 }
 
 @Composable
-fun PageIndicator(pageCount: Int, currentPage: Int) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        repeat(pageCount) { index ->
-            val color = if (index == currentPage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+fun DotsIndicator(
+    totalDots: Int,
+    selectedIndex: Int
+) {
+    Row {
+        repeat(totalDots) { index ->
             Box(
                 modifier = Modifier
-                    .size(if (index == currentPage) 14.dp else 10.dp)
-                    .clip(CircleShape)
-                    .background(color)
+                    .padding(end = 6.dp)
+                    .height(8.dp)
+                    .width(if (index == selectedIndex) 22.dp else 8.dp)
+                    .background(
+                        if (index == selectedIndex)
+                            Color.Black
+                        else
+                            Color.LightGray,
+                        RoundedCornerShape(4.dp)
+                    )
             )
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,15 +1,15 @@
 <resources>
     <string name="app_name">Almuniconnect</string>
-    <string name="welcome_msg">Welcome to HBTU Almuni Connect </string>
-    <string name="welcome_des">Your all-in-one utility hub — smart tools, daily essentials, and productivity features combined in one clean experience.</string>
-    <string name="whats_up_saver">WhatsApp Status Saver</string>
-    <string name="whats_up_saver_des">Easily save and organize WhatsApp photos and videos you love — quick, simple, and secure.</string>
+    <string name="welcome_msg">Welcome to Alumni Connect </string>
+    <string name="welcome_des">Reconnect with your college family, anytime, anywhere. A trusted space to relive memories, build networks, and grow together.</string>
+    <string name="whats_up_saver">Build Strong Alumni Connections</string>
+    <string name="whats_up_saver_des">Find seniors, juniors, and batch-mates across the globe.Chat, call, and stay connected with your alumni network.</string>
 
-    <string name="smart_cleaner_title">Smart Cleaner</string>
-    <string name="smart_cleaner_desc">Optimize your phone’s performance by removing unnecessary files and freeing up space safely.</string>
+    <string name="smart_cleaner_title">Grow Together Professionally</string>
+    <string name="smart_cleaner_desc">Jobs • Mentorship • College News Get referrals, career guidance, and official college updates in one place.</string>
 
-    <string name="secure_fast_title">Secure &amp; Fast</string>
-    <string name="secure_fast_desc">Protect your privacy, lock sensitive apps, and check your internet speed — all in one place.</string>
+    <string name="secure_fast_title">Celebrate Memories  Moments</string>
+    <string name="secure_fast_desc">Reunions, Meets  Alumni Events  Never miss alumni meets, reunions, and special college events.</string>
 
     <string name="stay_organized_title">Stay Organized</string>
     <string name="stay_organized_desc">Manage your notes, scan documents, and access all your tools effortlessly within one app.</string>

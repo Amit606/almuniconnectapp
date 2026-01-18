@@ -1,133 +1,167 @@
 package com.kwh.almuniconnect
 
-import RegistrationScreen
-import android.net.Uri
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.kwh.almuniconnect.branding.CountryListScreen
-import com.kwh.almuniconnect.intro.IntroScreen
-import com.kwh.almuniconnect.login.LoginScreen
-import com.kwh.almuniconnect.navigation.AppNavGraph
-import com.kwh.almuniconnect.ui.theme.AlmuniconnectTheme
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.messaging.FirebaseMessaging
+import com.kwh.almuniconnect.storage.FcmPrefs
+import com.kwh.almuniconnect.ui.theme.LinkedTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private lateinit var updateHelper: InAppUpdateHelper
+    private var notificationIntent by mutableStateOf<Intent?>(null)
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        tokenGeneration(this)
+
+        updateHelper = InAppUpdateHelper(this)
+        updateHelper.checkUpdate(this)
+        // get cold-start notification
+        notificationIntent = intent
+
         setContent {
-            AlmuniconnectTheme {
-                AppNavGraph(startDestination = Routes.SPLASH)
+            LinkedTheme {
 
-//                val navController = rememberNavController()
-//
-//                NavHost(navController = navController, startDestination = "splash") {
-//                    composable("splash") { SplashScreen(navController) }
-//                    composable("intro") { IntroScreen(navController) }
-//                    composable("login") {
-//                        LoginScreen(
-//                            onLogin = { email, password ->
-//                                // Handle login logic here (via ViewModel)
-//                                // Example: authViewModel.login(email, password)
-//                                // On success:
-//                                navController.navigate("home") {
-//                                    popUpTo("login") { inclusive = true }
-//                                }
-//                            },
-//                            onGoogleSignIn = {
-//                                // Launch Google sign-in
-//                                // e.g. googleSignInLauncher.launch(googleSignInClient.signInIntent)
-//                            },
-//                            onForgotPassword = {
-//                                // Navigate to forgot password screen if exists
-//                                navController.navigate("forgot_password")
-//                            },
-//                            onCreateAccount = {
-//                                // Navigate to sign-up screen
-//                                navController.navigate("register")
-//                            }
-//                        )
-//                    }
-//                    composable ("started",){
-//                        GetStartedCard(
-//                            onJoinNow = {
-//                                navController.navigate("login")   // 👈 Navigate to LoginScreen
-//                            }
-//                        )
-//                    }
-//                    composable("register") {
-//                        RegistrationScreen(
-//                            onRegister = { registrationData ->
-//                                // Handle registration logic here (ViewModel or backend call)
-//                                println("User Registered: $registrationData")
-//
-//                                // After registration success, navigate to home
-//                                navController.navigate("home") {
-//                                    popUpTo("register") { inclusive = true }
-//                                }
-//                            }
-//                        )
-//                    }
-
-                    // Optional: other screens
-                  //  composable("register") { RegisterScreen(navController) }
-                  //  composable("forgot_password") { ForgotPasswordScreen(navController) }
-                  //  composable("home") { HomeScreen(navController) }
-                  //  composable("login",{LoginScreen(onLogin = { _, _ -> }, onGoogleSignIn = { }})
-//                    composable("language") { LanguageSelectionScreen(navController) }
-//                    composable("home") { HomeScreen(navController) }
-//                    composable("cleaner") { CleanerScreen(navController) }
-//                    composable("shareFiles") { ShareFilesScreen(navController) }
-//                    composable("appLock") { AppLockScreen(navController) }
-//                    composable("calendar") { CalendarScreen(navController ) }
-//                    composable("scanner") { ScannerScreen(navController) }
-//                    composable("statusSaver") { StatusSaverComposeScreen(navController) }
+                val navController = rememberNavController()
 
 
-//                    composable("speedTest") { InternetSpeedTestScreen(navController) }
-//                    composable("storageInfo") { StorageInfoScreen(navController) }
-//
-//
-//// Compose:
-//
-//                    composable("recycleBin") { RecycleBinScreen(navController = navController, viewModel = viewModel) }
-//                    composable("batteryInfo") { BatteryInfoScreen(navController) }
-//                    composable("more") { PromoteNavGraph(navController.toString(),"promote_list") }
-//                    composable("subscription") { SubscriptionScreen(navController) }
-//                    composable  ("settings"){SettingsScreen(navController)}
-//                    composable  ("about"){ AboutUsScreen(navController) }
 
+                // Handle FCM click safely
+
+                LaunchedEffect(notificationIntent) {
+                    notificationIntent?.let {
+                        handleNotificationIntent(it, navController)
+                        notificationIntent = null   // prevent repeat
+                    }
                 }
+                AppNavGraph(
+                    navController = navController,
+                    startDestination = Routes.SPLASH
+                )
+
+
             }
         }
     }
 
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AlmuniconnectTheme {
-        Greeting("Android")
+    override fun onResume() {
+        super.onResume()
+        updateHelper.onResume(this)
+    }
+    // When app is already running and notification is clicked
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notificationIntent = intent
     }
 }
+private fun tokenGeneration( activity: MainActivity) {
+    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+
+        if (!task.isSuccessful) {
+            Log.w("FCM", "Token fetch failed", task.exception)
+            return@addOnCompleteListener
+        }
+
+        val newToken = task.result ?: return@addOnCompleteListener
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val savedToken = FcmPrefs.getToken(activity)
+
+            if (savedToken == newToken) {
+                Log.d("FCM", "Token unchanged →"+newToken)
+                return@launch
+            }
+
+            // 🔥 Token changed → update backend
+          //  uploadTokenToServer(newToken)
+
+            // Save locally
+            FcmPrefs.saveToken(activity, newToken)
+
+            Log.d("FCM", "Token updated: $newToken")
+        }
+    }
+}
+private fun handleNotificationIntent(
+    intent: Intent?,
+    navController: NavHostController
+) {
+    if (intent == null) return
+
+    val fromNotification = intent.getBooleanExtra("from_notification", false)
+    if (!fromNotification) return
+
+    val destination = intent.getStringExtra("destination")
+
+    when (destination) {
+
+        Routes.JOB_DETAILS_Full -> {
+            navController.safeNavigate(Routes.JOB_DETAILS_Full)
+        }
+
+        Routes.ALMUNI_POST -> {
+            navController.safeNavigate(Routes.ALMUNI_POST)
+        }
+
+        Routes.EVENTS -> {
+            navController.safeNavigate(Routes.EVENTS)
+        }
+
+        Routes.WHATSUP_CHANNEL -> {
+            navController.safeNavigate(Routes.WHATSUP_CHANNEL)
+        }
+
+        Routes.HOME, null -> {
+            navController.safeNavigate(Routes.HOME)
+        }
+
+        // 🔥 UNKNOWN ROUTE → HOME
+        else -> {
+            FirebaseCrashlytics.getInstance().log(
+                "Unknown notification route: $destination"
+            )
+            navController.safeNavigate(Routes.HOME)
+        }
+    }
+}
+
+fun NavHostController.safeNavigate(
+    route: String,
+    fallbackRoute: String = Routes.HOME
+) {
+    try {
+        navigate(route) {
+            popUpTo(fallbackRoute) { inclusive = false }
+            launchSingleTop = true
+        }
+    } catch (e: IllegalArgumentException) {
+        // 🔥 Log crash but don't crash app
+        FirebaseCrashlytics.getInstance().recordException(e)
+
+        navigate(fallbackRoute) {
+            popUpTo(fallbackRoute) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+}
+

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1014208687214",
+    "project_id": "almuniconnect",
+    "storage_bucket": "almuniconnect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014208687214:android:fa54fede0f58c0b4368a7f",
+        "android_client_info": {
+          "package_name": "com.kwh.almuniconnect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1014208687214-3mc9cnans61pg4b6hgar50pi2otc1jbv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kwh.almuniconnect",
+            "certificate_hash": "802c20f340c84cdc5ef23ce609f4ff88b8fd9902"
+          }
+        },
+        {
+          "client_id": "1014208687214-40mqb2mnpqmsgp5ptb7ragmb9ba75u6m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kwh.almuniconnect",
+            "certificate_hash": "26958c54c8bb20c86340a0897d29d962af59a065"
+          }
+        },
+        {
+          "client_id": "1014208687214-877se1lepl48iik3mk413m0jc5hphnlc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpEUay8VKVQJDplsc8Z69KRevjyO45Fm8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1014208687214-877se1lepl48iik3mk413m0jc5hphnlc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
