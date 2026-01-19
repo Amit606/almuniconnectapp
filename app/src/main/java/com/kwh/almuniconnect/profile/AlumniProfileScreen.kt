@@ -27,12 +27,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
-import com.kwh.almuniconnect.network.AlumniProfile
+import com.kwh.almuniconnect.network.AlumniDto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlumniProfileScreen(
-    alumni: AlumniProfile,
+    alumni: AlumniDto,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -58,7 +58,7 @@ fun AlumniProfileScreen(
 
             // 🔵 Profile Image
             AsyncImage(
-                model = alumni.imageUrl,
+                model = alumni.photoUrl,
                 contentDescription = "Profile photo",
                 modifier = Modifier
                     .size(128.dp)
@@ -83,14 +83,14 @@ fun AlumniProfileScreen(
 
             // 💼 Position & Company
             Text(
-                text = "${alumni.position} • ${alumni.company}",
+                text = "${alumni.srNo} • ${alumni.companyName}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
 
             // 🎓 Branch & Year
             Text(
-                text = "${alumni.branch} | ${alumni.passingYear}",
+                text = "${alumni.courseName} | ${alumni.batch}",
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.Gray
             )
@@ -115,8 +115,8 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.Phone,
                         label = "Mobile",
-                        value = alumni.phone,
-                        onClick = { callPhone(context, alumni.phone) }
+                        value = alumni.mobileNo.toString(),
+                        onClick = { callPhone(context, alumni.mobileNo.toString()) }
                     )
 
                     Divider()
@@ -124,8 +124,8 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.Email,
                         label = "Email",
-                        value = alumni.email,
-                        onClick = { sendEmail(context, alumni.email) }
+                        value = alumni.email.toString(),
+                        onClick = { sendEmail(context, alumni.email.toString()) }
                     )
 
                     Divider()
@@ -133,8 +133,8 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.LocationOn,
                         label = "Location",
-                        value = alumni.location,
-                        onClick = { openLocation(context, alumni.location) }
+                        value = alumni.countryName.toString(),
+                        onClick = { openLocation(context, alumni.countryName.toString()) }
                     )
 
                     Divider()
@@ -142,9 +142,9 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.Whatsapp,
                         label = "WhatsApp",
-                        value = alumni.phone,
+                        value = alumni.mobileNo.toString(),
                         iconTint = Color(0xFF25D366),
-                        onClick = { openWhatsApp(context, alumni.phone) }
+                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
                     )
                 }
             }
@@ -157,7 +157,7 @@ fun AlumniProfileScreen(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse(alumni.profileUrl)
+                            Uri.parse(alumni.linkedinUrl.toString())
                         )
                     )
                 },

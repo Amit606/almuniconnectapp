@@ -2,6 +2,8 @@ package com.kwh.almuniconnect.api
 
 import com.kwh.almuniconnect.evetns.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
+import com.kwh.almuniconnect.network.AlumniApiResponse
+import com.kwh.almuniconnect.network.AlumniListResponse
 import com.kwh.almuniconnect.news.NewsResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -114,5 +116,13 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("auth/signup")
     suspend fun signup(@Body body: SignupRequest): Response<SignupResponse>
+
+
+    @GET("alumni/alumni-list")
+    suspend fun getAlumniList(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int,
+        @Query("ascending") ascending: Boolean = false
+    ): Response<AlumniApiResponse>
 }
 

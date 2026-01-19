@@ -35,7 +35,6 @@ import com.kwh.almuniconnect.jobposting.sampleJob
 import com.kwh.almuniconnect.login.AuthViewModel
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.network.NetworkScreen
-import com.kwh.almuniconnect.network.sampleAlumniProfiles
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
@@ -108,7 +107,7 @@ fun AppNavGraph(
                 navController = navController,
                 onOpenProfile = { alumni ->
                     navController.navigate(
-                        Routes.profileRoute(alumni.id)
+                        Routes.profileRoute(alumni.alumniId)
                     )
                 }
             )
@@ -118,24 +117,21 @@ fun AppNavGraph(
             ProfileScreen(navController)
         }
 
-        composable(
-            route = Routes.PROFILE,
-            arguments = listOf(
-                navArgument("id") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-
-            val id = backStackEntry.arguments?.getString("id") ?: return@composable
-
-            val alumni = sampleAlumniProfiles()
-                .firstOrNull { it.id == id }
-                ?: return@composable   // 👈 prevents crash
-
-            AlumniProfileScreen(
-                alumni = alumni,
-                navController = navController
-            )
-        }
+//        composable(
+//            route = Routes.PROFILE_ROUTE,
+//            arguments = listOf(
+//                navArgument("id") { type = NavType.StringType }
+//            )
+//        ) { backStackEntry ->
+//
+//            val id = backStackEntry.arguments?.getString("id")
+//                ?: return@composable
+//
+//            AlumniProfileScreen(
+//                alumniId = id,
+//                navController = navController
+//            )
+//        }
 
 
         composable(Routes.SPLASH_HOME)

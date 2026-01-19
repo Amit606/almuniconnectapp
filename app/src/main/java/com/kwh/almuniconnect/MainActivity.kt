@@ -16,6 +16,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.ui.theme.LinkedTheme
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +38,9 @@ class MainActivity : ComponentActivity() {
         updateHelper.checkUpdate(this)
         // get cold-start notification
         notificationIntent = intent
+
+
+
 
         setContent {
             LinkedTheme {

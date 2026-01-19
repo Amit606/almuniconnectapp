@@ -11,8 +11,12 @@ object Routes {
     const val NETWORK = "network"
     const val COUTNRYLIST = "countrylist"
 
-    const val PROFILE = "profile/{id}"
-    fun profileRoute(id: String) = "profile/$id"
+    const val PROFILE = "profile"
+    const val PROFILE_ROUTE = "profile/{id}"
+    fun profileRoute(id: String): String {
+        return "profile/$id"
+    }
+
 
     const val MESSAGES = "messages"
     const val CREATE_POST = "create_post"
