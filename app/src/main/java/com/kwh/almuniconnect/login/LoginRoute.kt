@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.login
 
+import android.app.Application
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,8 @@ import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.analytics.AnalyticsEvent
 import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.CoroutineScope
@@ -28,17 +31,24 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginRoute(
     navController: NavController,
-    viewModel: AuthViewModel = viewModel() // ⬅️ THIS LINE
 ) {
     val context = LocalContext.current
+    val apiService = remember {
+        NetworkClient.createService(ApiService::class.java)
+    }
+    val repository = remember { AuthRepository(apiService) }
 
-    // 🔹 Create UserPreferences ONCE
+
+    val viewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(
+            application = context.applicationContext as Application,
+            repository = repository
+        )
+    )
 
     TrackScreen("login_screen")
 
-    // 🔹 Inject ViewModel with factory
-
-    // 🔹 Google Sign-In config
+    // Google Sign-In config
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(context.getString(R.string.default_web_client_id))
         .requestEmail()
@@ -46,7 +56,6 @@ fun LoginRoute(
 
     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
-    // 🔹 Activity result launcher
     val launcher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
@@ -57,38 +66,48 @@ fun LoginRoute(
                 val account = task.getResult(ApiException::class.java)
                 val idToken = account.idToken ?: return@rememberLauncherForActivityResult
 
+                // ✅ STEP 1: Firebase Authentication
                 viewModel.firebaseAuthWithGoogle(
                     idToken = idToken,
+
                     onSuccess = {
                         val firebaseUser =
-                            FirebaseAuth.getInstance().currentUser ?: return@firebaseAuthWithGoogle
+                            FirebaseAuth.getInstance().currentUser
+                                ?: return@firebaseAuthWithGoogle
 
-                        // 🔥 HAND OVER TO VIEWMODEL
+                        // ✅ STEP 2: Backend email check
                         viewModel.onGoogleLoginSuccess(
                             firebaseUser = firebaseUser,
-                            onNavigate = {
-                                AnalyticsManager.logEvent(
-                                    AnalyticsEvent.ScreenView("user_profile_screen")
-                                )
-                                navController.navigate(Routes.USER_PROFILE) {
 
+                            onGoHome = {
+                                navController.navigate(Routes.HOME) {
                                     popUpTo(Routes.LOGIN) { inclusive = true }
                                 }
+                            },
+
+                            onGoProfileUpdate = {
+                                navController.navigate(Routes.USER_PROFILE) {
+                                    popUpTo(Routes.LOGIN) { inclusive = true }
+                                }
+                            },
+
+                            onError = {
+                                Log.e("GoogleLogin", it)
                             }
                         )
                     },
+
                     onError = {
                         Log.e("GoogleLogin", it)
                     }
                 )
+
             } catch (e: ApiException) {
                 Log.e("GoogleLogin", e.localizedMessage ?: "Google Sign-In failed")
             }
         }
 
-    // 🔹 UI
     AlumniLoginScreen(
-
         onGoogleLogin = {
             launcher.launch(googleSignInClient.signInIntent)
         }

@@ -4,6 +4,7 @@ package com.kwh.almuniconnect.login
 import android.app.Activity
 import android.app.Application
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,16 +23,10 @@ import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.delay
 
-
-
 class AuthViewModel(
-    application: Application
+    application: Application,
+    private val repository: AuthRepository
 ) : AndroidViewModel(application) {
-
-    private val userPrefs =
-        UserPreferences(application.applicationContext)
-
-    private val auth = FirebaseAuth.getInstance()
 
     fun firebaseAuthWithGoogle(
         idToken: String,
@@ -40,30 +35,41 @@ class AuthViewModel(
     ) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
 
-        auth.signInWithCredential(credential)
+        FirebaseAuth.getInstance()
+            .signInWithCredential(credential)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) onSuccess()
-                else onError(task.exception?.message ?: "Auth failed")
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onError(task.exception?.localizedMessage ?: "Firebase auth failed")
+                }
             }
     }
 
     fun onGoogleLoginSuccess(
         firebaseUser: FirebaseUser,
-        onNavigate: () -> Unit
+        onGoHome: () -> Unit,
+        onGoProfileUpdate: () -> Unit,
+        onError: (String) -> Unit
     ) {
+        val email = firebaseUser.email ?: return onError("Email not found")
+
         viewModelScope.launch {
-            userPrefs.saveUser(
-                uid = firebaseUser.uid,
-                name = firebaseUser.displayName,
-                email = firebaseUser.email,
-                photo = firebaseUser.photoUrl?.toString()
-            )
-
-          //  UserSession.saveLogin(firebaseUser.uid)
-
-            delay(300)
-            onNavigate()
+            repository.checkEmailAndGetUser(email)
+                .onSuccess { user ->
+                    if (user != null) {
+                        // ✅ NOW THIS WORKS
+                        UserSession.saveLogin(getApplication())
+                        onGoHome()
+                    } else {
+                        onGoProfileUpdate()
+                    }
+                }
+                .onFailure {
+                    onError(it.message ?: "Login failed")
+                }
         }
     }
 }
+
 

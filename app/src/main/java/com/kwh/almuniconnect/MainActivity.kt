@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -22,6 +23,7 @@ import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.ui.theme.LinkedTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -78,35 +80,44 @@ class MainActivity : ComponentActivity() {
         notificationIntent = intent
     }
 }
-private fun tokenGeneration( activity: MainActivity) {
-    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+private fun tokenGeneration(context: Context) {
 
-        if (!task.isSuccessful) {
-            Log.w("FCM", "Token fetch failed", task.exception)
-            return@addOnCompleteListener
-        }
+    val appContext = context.applicationContext
 
-        val newToken = task.result ?: return@addOnCompleteListener
+    FirebaseMessaging.getInstance().token
+        .addOnSuccessListener { newToken ->
 
-        CoroutineScope(Dispatchers.IO).launch {
+            if (newToken.isNullOrBlank()) return@addOnSuccessListener
 
-            val savedToken = FcmPrefs.getToken(activity)
+            // ✅ Lifecycle-safe background work
+            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
 
-            if (savedToken == newToken) {
-                Log.d("FCM", "Token unchanged →"+newToken)
-                return@launch
+                try {
+                    val savedToken = FcmPrefs.getToken(appContext)
+
+                    if (savedToken == newToken) {
+                        Log.d("FCM", "Token unchanged → $newToken")
+                        return@launch
+                    }
+
+                    // 🔥 Optional backend update
+                    // uploadTokenToServer(newToken)
+
+                    FcmPrefs.saveToken(appContext, newToken)
+
+                    Log.d("FCM", "Token updated → $newToken")
+
+                } catch (e: Exception) {
+                    Log.w("FCM", "Token save failed", e)
+                }
             }
-
-            // 🔥 Token changed → update backend
-          //  uploadTokenToServer(newToken)
-
-            // Save locally
-            FcmPrefs.saveToken(activity, newToken)
-
-            Log.d("FCM", "Token updated: $newToken")
         }
-    }
+        .addOnFailureListener { e ->
+            // ✅ NO CRASH
+            Log.w("FCM", "FCM token fetch failed (safe to ignore)", e)
+        }
 }
+
 private fun handleNotificationIntent(
     intent: Intent?,
     navController: NavHostController

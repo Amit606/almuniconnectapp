@@ -2,6 +2,7 @@ package com.kwh.almuniconnect.api
 
 import com.kwh.almuniconnect.evetns.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
+import com.kwh.almuniconnect.login.EmailCheckApiResponse
 import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.network.AlumniListResponse
 import com.kwh.almuniconnect.news.NewsResponse
@@ -124,5 +125,11 @@ interface ApiService {
         @Query("pageSize") pageSize: Int,
         @Query("ascending") ascending: Boolean = false
     ): Response<AlumniApiResponse>
+
+    @GET("auth/{email}/is-email-exist")
+    suspend fun checkEmailExist(
+        @Path(value = "email", encoded = true) email: String
+    ): Response<EmailCheckApiResponse>
+
 }
 

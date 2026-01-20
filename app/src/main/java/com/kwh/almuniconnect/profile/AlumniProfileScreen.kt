@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.profile
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,11 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.network.AlumniDto
@@ -58,32 +61,47 @@ fun AlumniProfileScreen(
 
             // 🔵 Profile Image
             AsyncImage(
-                model = alumni.photoUrl,
-                contentDescription = "Profile photo",
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(alumni.photoUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(128.dp)
+                    .size(120.dp)
                     .clip(CircleShape)
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                        CircleShape
-                    )
-                    .padding(4.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                placeholder = painterResource(R.drawable.man),
+                error = painterResource(R.drawable.man),
+                fallback = painterResource(R.drawable.man)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 👤 Name
-            Text(
-                text = alumni.name,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = alumni.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (alumni.isVerified) {
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Icon(
+                        imageVector = Icons.Default.Verified,
+                        contentDescription = "Verified Alumni",
+                        tint = Color(0xFF1DA1F2),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
 
             // 💼 Position & Company
             Text(
-                text = "${alumni.srNo} • ${alumni.companyName}",
+                text = "${alumni.companyName} | ${alumni.totalExperience} yrs",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -136,6 +154,7 @@ fun AlumniProfileScreen(
                         value = alumni.countryName.toString(),
                         onClick = { openLocation(context, alumni.countryName.toString()) }
                     )
+                    Log.e("AlumniProfileScreen", "Rendering WhatsApp row for number: ${alumni.countryName.toString()}")
 
                     Divider()
 

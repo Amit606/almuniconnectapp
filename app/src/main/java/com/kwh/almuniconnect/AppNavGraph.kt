@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect
 
+import AlumniViewModel
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -43,9 +44,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
 import com.kwh.almuniconnect.almunipost.dummyAlumniStories
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
+import com.kwh.almuniconnect.network.AlumniRepository
+import com.kwh.almuniconnect.network.AlumniViewModelFactory
 import com.kwh.almuniconnect.news.NewsListingScreen
+import com.kwh.almuniconnect.profile.AlumniProfileRoute
 import com.kwh.almuniconnect.subscription.PremiumScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -102,7 +108,21 @@ fun AppNavGraph(
 
         }
 
+
+        composable(Routes.USER_PROFILE)
+        {
+            ProfileScreen(navController)
+        }
         composable(Routes.NETWORK) {
+            val apiService = remember {
+                NetworkClient.createService(ApiService::class.java)
+            }
+            val repository = remember { AlumniRepository(apiService) }
+
+            val alumniViewModel: AlumniViewModel = viewModel(
+                factory = AlumniViewModelFactory(repository)
+            )
+
             NetworkScreen(
                 navController = navController,
                 onOpenProfile = { alumni ->
@@ -112,11 +132,43 @@ fun AppNavGraph(
                 }
             )
         }
-        composable(Routes.USER_PROFILE)
-        {
-            ProfileScreen(navController)
+
+        composable(
+            route = Routes.PROFILE_ROUTE,
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { entry ->
+
+            val id = entry.arguments?.getString("id")
+                ?: return@composable
+
+            // 🔥 SAME VIEWMODEL INSTANCE
+            val alumniViewModel: AlumniViewModel = viewModel(
+                factory = AlumniViewModelFactory(
+                    AlumniRepository(
+                        NetworkClient.createService(ApiService::class.java)
+                    )
+                )
+            )
+
+            AlumniProfileRoute(
+                alumniId = id,
+                navController = navController,
+                viewModel = alumniViewModel
+            )
         }
 
+//        composable(Routes.NETWORK) {
+//            NetworkScreen(
+//                navController = navController,
+//                onOpenProfile = { alumni ->
+//                    navController.navigate(
+//                        Routes.profileRoute(alumni.alumniId)
+//                    )
+//                }
+//            )
+//        }
 //        composable(
 //            route = Routes.PROFILE_ROUTE,
 //            arguments = listOf(
