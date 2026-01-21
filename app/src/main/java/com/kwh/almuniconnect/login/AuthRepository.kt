@@ -45,7 +45,6 @@ class AuthRepository(private val api: ApiService) {
             // ✅ NOW data EXISTS
             val rawData = body.data
                 ?: return Result.success(null)
-Log.e("AuthRepository", "rawData: $rawData")
             val jsonObject = Gson()
                 .toJsonTree(rawData)
                 .asJsonObject

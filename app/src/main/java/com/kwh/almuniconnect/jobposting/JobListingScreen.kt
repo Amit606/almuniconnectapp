@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.network.openUrl
 import com.kwh.almuniconnect.utils.CommonEmptyState
 import com.kwh.almuniconnect.utils.encodeRoute
 import com.kwh.almuniconnect.utils.getTimeAgo
@@ -142,6 +143,7 @@ fun JobListingScreen(navController: NavController) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun JobCard(job:JobAPost,navController: NavController) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -229,7 +231,7 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 )
 
                 Button(
-                    onClick = { navController.navigate(Routes.EVENTS) },
+                    onClick = { openUrl(context,"https://www.google.com") },
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
                 ) {

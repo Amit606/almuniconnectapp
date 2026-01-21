@@ -28,6 +28,12 @@ class AuthViewModel(
     private val repository: AuthRepository
 ) : AndroidViewModel(application) {
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
+
+    private fun setLoading(value: Boolean) {
+        _loading.value = value
+    }
     fun firebaseAuthWithGoogle(
         idToken: String,
         onSuccess: () -> Unit,
@@ -39,8 +45,12 @@ class AuthViewModel(
             .signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    setLoading(false)
+
                     onSuccess()
                 } else {
+                    setLoading(false)
+
                     onError(task.exception?.localizedMessage ?: "Firebase auth failed")
                 }
             }
@@ -53,15 +63,20 @@ class AuthViewModel(
         onError: (String) -> Unit
     ) {
         val email = firebaseUser.email ?: return onError("Email not found")
+        setLoading(true)
 
         viewModelScope.launch {
             repository.checkEmailAndGetUser(email)
                 .onSuccess { user ->
                     if (user != null) {
+                        setLoading(false)
+
                         // ✅ NOW THIS WORKS
                         UserSession.saveLogin(getApplication())
                         onGoHome()
                     } else {
+                        setLoading(false)
+
                         onGoProfileUpdate()
                     }
                 }

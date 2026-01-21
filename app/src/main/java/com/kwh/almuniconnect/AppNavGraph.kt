@@ -47,6 +47,7 @@ import com.kwh.almuniconnect.almunipost.dummyAlumniStories
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
+import com.kwh.almuniconnect.branding.ProductServiceDummyScreen
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
@@ -345,6 +346,9 @@ fun AppNavGraph(
 
         composable(Routes.JOB_POST){
             JobPostScreen(navController)
+        }
+        composable(Routes.PRODUCT_SCREEN){
+            ProductServiceDummyScreen(navController)
         }
         composable(Routes.ALMUNI_POST){
             AlumniStoriesScreen(navController)

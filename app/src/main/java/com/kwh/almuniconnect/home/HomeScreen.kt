@@ -3,6 +3,17 @@
 // Features: top app bar with search & notifications, banner, horizontal lists (Events, Jobs), feed (alumni posts), FAB, and bottom navigation.
 
 package com.kwh.almuniconnect.home
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 import android.R.attr.background
 import android.R.attr.onClick
@@ -16,19 +27,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.almunipost.AlumniStory
@@ -66,6 +75,14 @@ fun HomeScreen(
     onCreatePost: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val bannerImages = listOf(
+        "https://hbtu.ac.in/wp-content/uploads/2024/07/esummit2.jpg",
+        "https://www.instagram.com/p/C_LjJeYSY4E/",
+        "https://yourcdn.com/images/banner3.jpg",
+        "https://yourcdn.com/images/banner4.jpg",
+        "https://yourcdn.com/images/banner5.jpg"
+    )
+
     val context = LocalContext.current
     TrackScreen("home_screen")
 
@@ -91,7 +108,9 @@ fun HomeScreen(
                         "Home",
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = 20.sp   // 👈 change size here
+                        )
                         )
                 },
                 actions = {
@@ -167,32 +186,52 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-
             item {
-                // Banner / Welcome card
-                Card(
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
+
+                val pagerState = rememberPagerState(pageCount = { bannerImages.size })
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        AsyncImage(
-                            model = R.drawable.hbtu,
-                            contentDescription = "Banner",
-                            contentScale = ContentScale.Crop,
+
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        pageSpacing = 12.dp
+                    ) { page ->
+
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxSize()
-                        )
-                        Column(
-                            modifier = Modifier
-                                .align(Alignment.CenterStart)
-                                .padding(16.dp)
                         ) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(bannerImages[page])
+                                    .crossfade(true)
+                                    .error(R.drawable.newggg)        // ❌ broken URL
+                                    .placeholder(R.drawable.newggg) // ⏳ loading
+                                    .fallback(R.drawable.newggg)    // ❓ null data
+                                    .build(),
+                                contentDescription = "Banner",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    PagerDotsIndicator(
+                        pagerState = pagerState,
+                        activeColor = Color.Black,
+                        inactiveColor = Color.Gray
+                    )
                 }
             }
+
 
             // Events section
             item {
@@ -246,11 +285,11 @@ fun HomeScreen(
                             AnalyticsManager.logEvent(
                                 AnalyticsEvent.ScreenView("services_clicked_${event.productName}")
                             )
-                            navController.navigate(
-                                "${Routes.SERVICE_DETAILS}?title=${event.productName.encodeRoute()}&location=${event.location.encodeRoute()}")
+                           navController.navigate(Routes.PRODUCT_SCREEN)
 
 
-                        })
+                        }
+                        )
                     }
                 }
             }
@@ -321,6 +360,33 @@ fun HomeScreen(
 
         }
 
+    }
+}
+@Composable
+fun PagerDotsIndicator(
+    pagerState: PagerState,
+    modifier: Modifier = Modifier,
+    activeColor: Color = Color.Black,
+    inactiveColor: Color = Color.LightGray
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(pagerState.pageCount) { index ->
+            val isSelected = pagerState.currentPage == index
+
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(if (isSelected) 10.dp else 8.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = if (isSelected) activeColor else inactiveColor
+                    )
+            )
+        }
     }
 }
 

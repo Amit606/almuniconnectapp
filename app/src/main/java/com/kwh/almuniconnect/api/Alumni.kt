@@ -110,7 +110,7 @@ interface ApiService {
     suspend fun getNews(
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
-    ): Response<NewsResponse>
+    ): Response<ApiResponse<NewsResponse>>
 
     @GET("masters/roles")
     suspend fun getRoles(): Response<MasterResponse>
@@ -130,6 +130,8 @@ interface ApiService {
     suspend fun checkEmailExist(
         @Path(value = "email", encoded = true) email: String
     ): Response<EmailCheckApiResponse>
+
+
 
 }
 

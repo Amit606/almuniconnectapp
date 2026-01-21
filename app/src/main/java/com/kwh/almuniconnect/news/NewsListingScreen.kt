@@ -1,8 +1,11 @@
 package com.kwh.almuniconnect.news
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,9 +33,19 @@ import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.jobposting.JobCard
 import com.kwh.almuniconnect.utils.CommonEmptyState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,49 +105,90 @@ fun NewsListingScreen(navController: NavController) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
-                    contentPadding = paddingValues
+                        .padding(10.dp)
+                        .background(Color.White),
+                    contentPadding = paddingValues,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(newsList) { news ->
-                        NewsCard(news)
+                    items(newsList) { job ->
+                        NewsCard(job, onClick = {
+
+
+                        })
                     }
                 }
             }
         }
     }
 }
-
 @Composable
-fun NewsCard(news: NewsItem) {
-
+fun NewsCard(
+    news: NewsItem,
+    onClick: (NewsItem) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .padding(5.dp)
+            .clickable { onClick(news) },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(Modifier.padding(12.dp)) {
+        Column {
 
-            Text(
-                text = news.title,
-                style = MaterialTheme.typography.titleMedium
+            // 🖼️ Image
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(news.imageUrl)
+                    .crossfade(true)
+                    .placeholder(R.drawable.newggg)
+                    .error(R.drawable.newggg)
+                    .fallback(R.drawable.newggg)
+                    .build(),
+                contentDescription = news.title,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             )
 
-            Spacer(Modifier.height(6.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(
-                text = news.content,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3
-            )
+                // 🗓️ Date Chip
+                Text(
+                    text = news.publishedAt,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
 
-            Spacer(Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-            Text(
-                text = "Published: ${news.publishedAt}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
+                // 📰 Title
+                Text(
+                    text = news.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // ✍️ Content Preview
+                Text(
+                    text = news.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.DarkGray
+                )
+            }
         }
     }
 }
+
+

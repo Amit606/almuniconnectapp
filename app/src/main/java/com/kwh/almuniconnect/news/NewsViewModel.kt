@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.news
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ class NewsViewModel(
     private val _state = MutableStateFlow<NewsState>(NewsState.Loading)
     val state: StateFlow<NewsState> = _state
 
-    private var pageNumber = 1
+    private var pageNumber = 0          // ✅ START FROM 0
     private val pageSize = 10
     private val newsList = mutableListOf<NewsItem>()
 
@@ -30,26 +31,25 @@ class NewsViewModel(
         viewModelScope.launch {
 
             if (reset) {
-                pageNumber = 1
+                pageNumber = 0
                 newsList.clear()
             }
 
             _state.value = NewsState.Loading
 
-            repository.getNews(pageNumber, pageSize)
-                .onSuccess { response ->
+            repository.fetchNews(pageNumber, pageSize)
+                .onSuccess { (items, totalCount) ->
 
-                    // ✅ SAFE: handle null items
-                    val safeItems = response.items ?: emptyList()
+                    Log.d("NEWS_VM", "Loaded ${items.size} items")
 
-                    newsList.addAll(safeItems)
+                    newsList.addAll(items)
 
                     _state.value = NewsState.Success(
-                        news = newsList.toList(),   // immutable copy
-                        totalCount = response.totalCount
+                        news = newsList.toList(),
+                        totalCount = totalCount
                     )
 
-                    pageNumber++
+                    pageNumber++   // ✅ increment AFTER success
                 }
                 .onFailure {
                     _state.value = NewsState.Error(
@@ -59,4 +59,3 @@ class NewsViewModel(
         }
     }
 }
-

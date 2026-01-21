@@ -4,10 +4,18 @@ import android.app.Application
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -38,6 +46,7 @@ fun LoginRoute(
     }
     val repository = remember { AuthRepository(apiService) }
 
+    val isLoading = viewModel.loading.collectAsState()
 
     val viewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
@@ -107,9 +116,29 @@ fun LoginRoute(
             }
         }
 
-    AlumniLoginScreen(
-        onGoogleLogin = {
-            launcher.launch(googleSignInClient.signInIntent)
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        AlumniLoginScreen(
+            onGoogleLogin = {
+                launcher.launch(googleSignInClient.signInIntent)
+            }
+        )
+
+        if (isLoading) {
+            LoadingOverlay()
         }
-    )
+    }
+}
+@Composable
+fun LoadingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.4f)),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            strokeWidth = 4.dp
+        )
+    }
 }

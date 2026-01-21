@@ -53,4 +53,8 @@ object Routes {
     const val NEWS = "news"
     fun ALUMNI_STORY_DETAIL(storyName: String) = "alumni_story_details/$storyName"
    const val SUBSCRIPTION = "premium_subscription"
+
+    const val PRODUCT_SCREEN = "product_screen"
+
+
 }
