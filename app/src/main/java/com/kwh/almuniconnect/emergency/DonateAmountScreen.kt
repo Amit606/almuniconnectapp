@@ -46,19 +46,18 @@ import androidx.navigation.NavController
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 @Composable
 fun DonateAmountScreen(
-    navController : NavController,
     onContinue: (Int) -> Unit
 ) {
     val amounts = listOf(100, 500, 1000)
     var selected by remember { mutableStateOf<Int?>(null) }
     var custom by remember { mutableStateOf("") }
     Scaffold(
-        topBar = {
-            HBTUTopBar(
-                title = "Emergency Feed",
-                navController = navController
-            )
-        }
+//        topBar = {
+//            HBTUTopBar(
+//                title = "Emergency Feed",
+//                navController = navController
+//            )
+//        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -113,7 +112,15 @@ fun DonateAmountScreen(
 
             Button(
                 onClick = {
-                    onContinue(selected ?: custom.toInt())
+                    val amount = selected ?: custom.toIntOrNull()
+
+                    if (amount == null || amount <= 0) {
+                        // You can show a Toast / Snackbar here
+                        return@Button
+                    }
+
+                    onContinue(amount)
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()

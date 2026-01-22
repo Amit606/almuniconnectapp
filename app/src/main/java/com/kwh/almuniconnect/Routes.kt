@@ -57,9 +57,10 @@ object Routes {
     const val PRODUCT_SCREEN = "product_screen"
     const val ENTRY = "emergency_entry"
     const val REQUEST = "emergency_request"
-    const val DONATION_SUCCESS = "donation_success/{amount}"
+    const val SUCCESS = "donation_success/{amount}/{id}"
     const val FEED = "emergency_feed"
     const val DETAIL = "emergency_detail/{id}"
     const val DONATE = "emergency_donate/{id}"
-    const val SUCCESS = "donation_success/{amount}"
+    const val THANK_YOU = "emergency_thank_you/{amount}"
+
 }

@@ -30,16 +30,10 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @Composable
 fun EmergencyFeedScreen(
-    navController: NavController,
     onItemClick: (EmergencyDemo) -> Unit
 ) {
     Scaffold(
-        topBar = {
-            HBTUTopBar(
-                title = "Emergency Feed",
-                navController = navController
-            )
-        }
+
     ) { paddingValues ->
 
         Column(

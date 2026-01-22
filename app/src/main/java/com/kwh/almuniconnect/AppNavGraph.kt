@@ -423,15 +423,18 @@ fun AppNavGraph(
 
         /* ---------- DONATE ---------- */
         composable(
-            route = Routes.DONATE,
+            Routes.DONATE,
             arguments = listOf(
                 navArgument("id") { type = NavType.StringType }
             )
-        ) {
+        ) { backStackEntry ->
+
+            val emergencyId =
+                backStackEntry.arguments?.getString("id") ?: ""
+
             DonateAmountScreen { amount ->
-                navController
                 navController.navigate(
-                    "donation_success/$amount"
+                    "donation_success/$amount/$emergencyId"
                 ) {
                     popUpTo(Routes.FEED)
                 }
@@ -442,47 +445,35 @@ fun AppNavGraph(
         composable(
             route = Routes.SUCCESS,
             arguments = listOf(
-                navArgument("amount") { type = NavType.IntType }
+                navArgument("amount") { type = NavType.IntType },
+                navArgument("id") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
             val amount =
                 backStackEntry.arguments?.getInt("amount") ?: 0
 
+            val emergencyId =
+                backStackEntry.arguments?.getString("id") ?: ""
+
             DonationSuccessScreen(
                 amount = amount,
+
                 onGoHome = {
                     navController.navigate(Routes.FEED) {
                         popUpTo(0)
                     }
                 },
+
                 onViewEmergency = {
-                    navController.popBackStack()
+                    navController.navigate(
+                        "emergency_detail/$emergencyId"
+                    )
                 }
             )
         }
-        composable(
-            route = Routes.DONATION_SUCCESS,
-            arguments = listOf(
-                navArgument("amount") { type = NavType.IntType }
-            )
-        ) { backStackEntry ->
 
-            val amount =
-                backStackEntry.arguments?.getInt("amount") ?: 0
 
-            DonationSuccessScreen(
-                amount = amount,
-                onGoHome = {
-                    navController.navigate("home") {
-                        popUpTo(0)
-                    }
-                },
-                onViewEmergency = {
-                    navController.popBackStack()
-                }
-            )
-        }
 
 
     }
