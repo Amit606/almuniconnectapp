@@ -42,7 +42,7 @@ object Routes {
 
     const val HELP_SUPPORTS = "help_supports"
     const val ABOUT_US = "about_us"
-    const val APP_VERSION = "1.0.2"
+    const val APP_VERSION = "1.0.3"
     const val DEVELOPER_NAME = "Apps Chance"
     const val DEVELOPER_EMAIL = "support@alumniconnect.com"
 
@@ -55,6 +55,11 @@ object Routes {
    const val SUBSCRIPTION = "premium_subscription"
 
     const val PRODUCT_SCREEN = "product_screen"
-
-
+    const val ENTRY = "emergency_entry"
+    const val REQUEST = "emergency_request"
+    const val DONATION_SUCCESS = "donation_success/{amount}"
+    const val FEED = "emergency_feed"
+    const val DETAIL = "emergency_detail/{id}"
+    const val DONATE = "emergency_donate/{id}"
+    const val SUCCESS = "donation_success/{amount}"
 }

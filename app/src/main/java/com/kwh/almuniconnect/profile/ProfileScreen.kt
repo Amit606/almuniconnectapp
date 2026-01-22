@@ -4,11 +4,14 @@ import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,9 +35,9 @@ import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
-import kotlinx.coroutines.launch
 import java.util.*
-
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -104,6 +107,13 @@ fun ProfileScreen(navController: NavController) {
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(paddingValues)
+                .imePadding() // ✅ keyboard resize
+                .clickable( // ✅ dismiss keyboard on outside tap
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    focusManager.clearFocus()
+                }
         ) {
             LazyColumn {
 
@@ -133,15 +143,19 @@ fun ProfileScreen(navController: NavController) {
                     ) {
                         Column(Modifier.padding(12.dp)) {
 
-                            AppTextField("Name", name) { name = it }
-                            AppTextField("Email", email) { email = it }
+                            AppTextField("Name", name, onValueChange =  { name = it })
+                            AppTextField("Email", email,onValueChange =  { email = it })
 
                             AppTextField(
                                 label = "Mobile",
                                 value = mobile,
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next,
+                                onDone = { focusManager.clearFocus() },
                                 onValueChange = {
-                                    if (it.all(Char::isDigit) && it.length <= 10)
+                                    if (it.all(Char::isDigit) && it.length <= 10) {
                                         mobile = it
+                                    }
                                 }
                             )
 
@@ -149,14 +163,15 @@ fun ProfileScreen(navController: NavController) {
                             DropdownField("Branch", safeBranch, branches) { branch = it }
                             Spacer(Modifier.height(8.dp))
                             DropdownField("Year", safeYear, years) { year = it }
-                            AppTextField("Job / Company", job) { job = it }
-                            AppTextField("Location", location) { location = it }
+                            AppTextField("Job / Company", job,onValueChange =   { job = it })
+                            AppTextField("Location", location,onValueChange =  {  location = it })
 
                             BirthdayPicker(birthday) { birthday = it }
 
                             AppTextField(
                                 label = "LinkedIn URL",
                                 value = linkedin,
+                                imeAction = ImeAction.Done,
                                 onValueChange = { linkedin = it }
                             )
 

@@ -78,7 +78,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Delete,
                     title = "Delete All Data",
                     subtitle = "Permanently remove all saved information from this device",
-                    onClick = { /* navigate */ }
+                    onClick = {  }
                 )
             }
 
@@ -88,7 +88,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Lock,
                     title = "Privacy Policy",
                     subtitle = "Read our privacy policy",
-                    onClick = {                 openLink(context, PRIVACY_POLICY_URL)
+                    onClick = {openLink(context, PRIVACY_POLICY_URL)
                     }
                 )
 

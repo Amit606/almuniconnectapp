@@ -117,14 +117,21 @@ fun HomeScreen(
                     IconButton(onClick = { /* open notifications */ }) {
                         Icon(
                             Icons.Default.Notifications,
-                            tint = Color(0xFFF5B700), // Gold highlight
+                            tint = Color.Blue, // Gold highlight
                             contentDescription = "Notifications"
+                        )
+                    }
+                    IconButton(onClick = {  navController.navigate(Routes.FEED) }) {
+                        Icon(
+                            Icons.Default.Emergency,
+                            tint = Color.Red, // Gold highlight
+                            contentDescription = "Emergency Help"
                         )
                     }
                     IconButton(onClick = { navController.navigate(Routes.SUBSCRIPTION) }) {
                         Icon(
                             Icons.Default.WorkspacePremium,
-                            tint = Color(0xFFF5B700), // Gold highlight
+                            tint = Color.Blue, // Gold highlight
                             contentDescription = "Premium Access"
                         )
                     }

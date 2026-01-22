@@ -2,6 +2,8 @@ package com.kwh.almuniconnect.jobposting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -11,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -53,12 +57,18 @@ fun JobPostScreen(
         ) {
 
             SectionHeader("Job Information")
-            AppTextField("Job Title", title) { title = it }
-            AppTextField("Company Name", company) { company = it }
-            AppTextField("Location", location) { location = it }
-            AppTextField("Experience (e.g. 2–5 Years)", experience) { experience = it }
-            AppTextField("Salary (e.g. ₹10–15 LPA)", salary) { salary = it }
-            AppTextField("Job Type (Full-time / Remote)", jobType) { jobType = it }
+            AppTextField(
+                label = "Job Title",
+                value = title,
+                onValueChange = { title = it }
+            )
+            AppTextField("Company Name", company, onValueChange = {
+                    company = it
+            })
+            AppTextField("Location", location, onValueChange =  { location = it })
+            AppTextField("Experience (e.g. 2–5 Years)", experience,onValueChange =  { experience = it })
+            AppTextField("Salary (e.g. ₹10–15 LPA)", salary, onValueChange =  { salary = it })
+            AppTextField("Job Type (Full-time / Remote)", jobType,onValueChange =  { jobType = it })
 
             SectionHeader("Skills & Description")
 
@@ -76,9 +86,9 @@ fun JobPostScreen(
 
             SectionHeader("Apply Details")
 
-            AppTextField("Apply Email", applyEmail) { applyEmail = it }
-            AppTextField("Company Website URL", websiteUrl) { websiteUrl = it }
-            AppTextField("LinkedIn Job URL", linkedinUrl) { linkedinUrl = it }
+            AppTextField("Apply Email", applyEmail,onValueChange =  { applyEmail = it })
+            AppTextField("Company Website URL", websiteUrl, onValueChange =  { websiteUrl = it })
+            AppTextField("LinkedIn Job URL", linkedinUrl,onValueChange =   { linkedinUrl = it })
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -125,16 +135,34 @@ fun AppTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
+    onDone: (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label,color=Color.Black,  style = MaterialTheme.typography.titleMedium) },   // ✅ correct
+        label = {
+            Text(
+                label,
+                color = Color.Black,
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
         maxLines = 1,
-        textStyle = TextStyle(color=Color.Black),
+        textStyle = TextStyle(color = Color.Black),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = imeAction
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onDone?.invoke()
+            }
+        ),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color(0xFF6A5AE0),
             unfocusedBorderColor = Color.Gray,
@@ -144,4 +172,5 @@ fun AppTextField(
         )
     )
 }
+
 

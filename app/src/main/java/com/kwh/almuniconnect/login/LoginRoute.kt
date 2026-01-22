@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,17 +23,12 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
-import com.kwh.almuniconnect.analytics.AnalyticsEvent
-import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
-import com.kwh.almuniconnect.storage.UserPreferences
-import com.kwh.almuniconnect.storage.UserSession
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+
 
 @Composable
 fun LoginRoute(
@@ -46,7 +40,6 @@ fun LoginRoute(
     }
     val repository = remember { AuthRepository(apiService) }
 
-    val isLoading = viewModel.loading.collectAsState()
 
     val viewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
@@ -54,6 +47,7 @@ fun LoginRoute(
             repository = repository
         )
     )
+    val isLoading by viewModel.loading.collectAsState()
 
     TrackScreen("login_screen")
 

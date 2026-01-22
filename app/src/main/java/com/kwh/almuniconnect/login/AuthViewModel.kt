@@ -63,6 +63,9 @@ class AuthViewModel(
         onError: (String) -> Unit
     ) {
         val email = firebaseUser.email ?: return onError("Email not found")
+         val userPrefs =
+            UserPreferences(getApplication())
+
         setLoading(true)
 
         viewModelScope.launch {
@@ -73,6 +76,12 @@ class AuthViewModel(
 
                         // ✅ NOW THIS WORKS
                         UserSession.saveLogin(getApplication())
+                        userPrefs.saveUser(
+                            uid = firebaseUser.uid,
+                            name = firebaseUser.displayName,
+                            email = firebaseUser.email,
+                            photo = firebaseUser.photoUrl?.toString()
+                        )
                         onGoHome()
                     } else {
                         setLoading(false)

@@ -48,6 +48,12 @@ import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
 import com.kwh.almuniconnect.branding.ProductServiceDummyScreen
+import com.kwh.almuniconnect.emergency.DonateAmountScreen
+import com.kwh.almuniconnect.emergency.DonationSuccessScreen
+import com.kwh.almuniconnect.emergency.EmergencyDetailScreen
+import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
+import com.kwh.almuniconnect.emergency.EmergencyRequestForm
+import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
@@ -94,7 +100,7 @@ fun AppNavGraph(
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
              SplashScreen(navController)
-
+           // EmergencyFeedScreen(navController)
 
         }
         composable(Routes.NEWS) {
@@ -366,6 +372,118 @@ fun AppNavGraph(
                 story = story,
             )
         }
+//        composable(Routes.ENTRY) {
+//            EmergencyFeedScreen {
+//                navController.navigate(Routes.REQUEST)
+//            }
+//        }
+
+        composable(Routes.REQUEST) {
+            EmergencyRequestForm {
+                // API call → submit emergency
+                navController.navigate(Routes.FEED) {
+                    popUpTo(Routes.ENTRY) { inclusive = true }
+                }
+            }
+        }
+
+        /* ---------- FEED ---------- */
+        composable(Routes.FEED) {
+            EmergencyFeedScreen { emergency ->
+                navController.navigate(
+                    "emergency_detail/${emergency.id}"
+                )
+            }
+        }
+
+        /* ---------- DETAIL ---------- */
+        composable(
+            route = Routes.DETAIL,
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val id =
+                backStackEntry.arguments?.getString("id") ?: ""
+
+            val emergency =
+                demoEmergencyList.first { it.id == id }
+
+            EmergencyDetailScreen(
+                navController,
+                emergency = emergency,
+                onDonateClick = {
+                    navController.navigate(
+                        "emergency_donate/${emergency.id}"
+                    )
+                }
+            )
+        }
+
+        /* ---------- DONATE ---------- */
+        composable(
+            route = Routes.DONATE,
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) {
+            DonateAmountScreen { amount ->
+                navController
+                navController.navigate(
+                    "donation_success/$amount"
+                ) {
+                    popUpTo(Routes.FEED)
+                }
+            }
+        }
+
+        /* ---------- SUCCESS ---------- */
+        composable(
+            route = Routes.SUCCESS,
+            arguments = listOf(
+                navArgument("amount") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+
+            val amount =
+                backStackEntry.arguments?.getInt("amount") ?: 0
+
+            DonationSuccessScreen(
+                amount = amount,
+                onGoHome = {
+                    navController.navigate(Routes.FEED) {
+                        popUpTo(0)
+                    }
+                },
+                onViewEmergency = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = Routes.DONATION_SUCCESS,
+            arguments = listOf(
+                navArgument("amount") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+
+            val amount =
+                backStackEntry.arguments?.getInt("amount") ?: 0
+
+            DonationSuccessScreen(
+                amount = amount,
+                onGoHome = {
+                    navController.navigate("home") {
+                        popUpTo(0)
+                    }
+                },
+                onViewEmergency = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
 
     }
 }
