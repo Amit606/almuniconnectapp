@@ -37,6 +37,7 @@ class AlumniViewModel(
     private val alumniList = mutableListOf<AlumniDto>()
     private var isLastPage = false
     private var isLoading = false
+    private var originalList: List<AlumniDto> = emptyList()
 
     fun loadAlumni(reset: Boolean = false) {
         if (isLoading || isLastPage) return
@@ -54,29 +55,53 @@ class AlumniViewModel(
             repository.getAlumniList(pageNumber, pageSize)
                 .onSuccess { response ->
 
-                    // ✅ SAFE: handle null list from backend
                     val safeItems = response.items ?: emptyList()
-
                     alumniList.addAll(safeItems)
+
+                    originalList = alumniList.toList()
 
                     isLastPage = alumniList.size >= response.totalCount
 
                     _state.value = AlumniState.Success(
-                        alumni = alumniList.toList(), // immutable copy
+                        alumni = alumniList.toList(),
                         totalCount = response.totalCount,
                         pageNumber = pageNumber
                     )
 
                     pageNumber++
                 }
-                .onFailure { error ->
+                .onFailure {
                     _state.value = AlumniState.Error(
-                        error.message ?: "Failed to load alumni"
+                        it.message ?: "Failed to load alumni"
                     )
                 }
 
             isLoading = false
         }
     }
+
+    fun applyFilter(branch: String?, year: String?) {
+        val yearInt = year?.toIntOrNull()
+
+        val filtered = originalList.filter {
+            (branch == null || it.courseName == branch) &&
+                    (yearInt == null || it.batch == yearInt)
+        }
+
+        _state.value = AlumniState.Success(
+            alumni = filtered,
+            totalCount = filtered.size,
+            pageNumber = pageNumber
+        )
+    }
+
+    fun clearFilter() {
+        _state.value = AlumniState.Success(
+            alumni = originalList,
+            totalCount = originalList.size,
+            pageNumber = pageNumber
+        )
+    }
 }
+
 

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -99,7 +100,9 @@ fun PremiumScreen(
                             text = "ONLY",
                             fontSize = 12.sp,
                             letterSpacing = 1.sp,
-                            color = Color.Gray
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
 
                         Spacer(Modifier.height(6.dp))
@@ -108,7 +111,9 @@ fun PremiumScreen(
                             text = "₹199",
                             fontSize = 40.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF1E88E5)
+                            color = Color(0xFF1E88E5),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
 
                         Spacer(Modifier.height(4.dp))
@@ -116,11 +121,14 @@ fun PremiumScreen(
                         Text(
                             text = "Pay once • Use forever",
                             fontSize = 14.sp,
-                            color = Color.Gray
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
             }
+
 
 
             Spacer(Modifier.height(24.dp))

@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -48,6 +49,7 @@ fun NetworkScreen(
     val viewModel: AlumniViewModel = viewModel(
         factory = AlumniViewModelFactory(repository)
     )
+    var showFilter by remember { mutableStateOf(false) }
 
     val state by viewModel.state.collectAsState()
 
@@ -61,7 +63,9 @@ fun NetworkScreen(
         topBar = {
             HBTUTopBar(
                 title = "Alumni Networks",
-                navController = navController
+                navController = navController,
+                onFilterClick = { showFilter = true }   // 👈 filter icon
+
             )
         }
     ) { paddingValues ->
@@ -120,8 +124,28 @@ fun NetworkScreen(
                 }
             }
         }
+        // 🔽 Filter Bottom Sheet
+        if (showFilter) {
+            ModalBottomSheet(
+                onDismissRequest = { showFilter = false },
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            ) {
+                AlumniFilterSheet(
+                    onApply = { branch, year ->
+                        viewModel.applyFilter(branch, year)
+                        showFilter = false
+                    },
+                    onClear = {
+                        viewModel.clearFilter()
+                        showFilter = false
+                    }
+                )
+            }
+        }
     }
+
 }
+
 
 
 
@@ -191,5 +215,87 @@ fun openUrl(context: Context, url: String) {
 }
 
 
+@Composable
+fun AlumniFilterSheet(
+    onApply: (String?, String?) -> Unit,
+    onClear: () -> Unit
+) {
+    var selectedBranch by remember { mutableStateOf<String?>(null) }
+    var selectedYear by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+
+        Text(
+            text = "Filter Alumni Network",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        // Branch Filter
+        Text("Branch", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
+
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("CSE", "IT", "ECE", "ME", "CE", "MCA").forEach { branch ->
+                FilterChip(
+                    selected = selectedBranch == branch,
+                    onClick = {
+                        selectedBranch =
+                            if (selectedBranch == branch) null else branch
+                    },
+                    label = { Text(branch) }
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Year Filter
+        Text("Batch Year", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
+
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("2010", "2012", "2014", "2016", "2018", "2020").forEach { year ->
+                FilterChip(
+                    selected = selectedYear == year,
+                    onClick = {
+                        selectedYear =
+                            if (selectedYear == year) null else year
+                    },
+                    label = { Text(year) }
+                )
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            OutlinedButton(
+                onClick = onClear,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Clear")
+            }
+
+            Button(
+                onClick = { onApply(selectedBranch, selectedYear) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Apply")
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+    }
+}
 
 

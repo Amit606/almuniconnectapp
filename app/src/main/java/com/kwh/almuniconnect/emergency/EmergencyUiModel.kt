@@ -15,17 +15,7 @@ data class EmergencyDemo(
 val demoEmergencyList = listOf(
 
     // 1️⃣ Medical
-    EmergencyDemo(
-        id = "1",
-        name = "Amit Gupta",
-        batch = "2014",
-        department = "MCA",
-        title = "Medical Emergency",
-        description = "Urgent funds required for heart surgery scheduled this week.",
-        raised = 60000,
-        target = 100000,
-        verified = true
-    ),
+
 
     // 2️⃣ Job Loss
     EmergencyDemo(
