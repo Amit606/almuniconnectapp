@@ -173,4 +173,22 @@ fun AppTextField(
     )
 }
 
+@Composable
+fun AppTextField1(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    imeAction: ImeAction = ImeAction.Next,
+    trailingIcon: (@Composable () -> Unit)? = null
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        trailingIcon = trailingIcon,   // 👈 optional
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(imeAction = imeAction),
+        singleLine = true
+    )
+}
 

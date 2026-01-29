@@ -41,13 +41,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CurrencyRupee
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -94,7 +97,20 @@ fun JobListingScreen(navController: NavController) {
         topBar = {
             HBTUTopBar(
                 title = "Job Listings",
-                navController = navController
+                navController = navController,
+
+                rightAction = {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Routes.JOB_POST)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PostAdd,
+                            contentDescription = "Add Job"
+                        )
+                    }
+                }
             )
         }
     ) { paddingValues ->

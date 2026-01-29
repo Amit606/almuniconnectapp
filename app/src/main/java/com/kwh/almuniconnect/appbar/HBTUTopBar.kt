@@ -18,24 +18,14 @@ fun HBTUTopBar(
     title: String,
     navController: NavController,
     showBack: Boolean = true,
-    onFilterClick: (() -> Unit)? = null
-
+    onFilterClick: (() -> Unit)? = null,
+    rightAction: (@Composable () -> Unit)? = null   // 👈 NEW (optional)
 ) {
     var isNavigating by remember { mutableStateOf(false) }
 
     TopAppBar(
         title = {
             Text(text = title, fontWeight = FontWeight.SemiBold)
-        },
-        actions = {
-            if (onFilterClick != null) {
-                IconButton(onClick = onFilterClick) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter"
-                    )
-                }
-            }
         },
         navigationIcon = {
             if (showBack && navController.previousBackStackEntry != null) {
@@ -52,8 +42,22 @@ fun HBTUTopBar(
                     )
                 }
             }
+        },
+        actions = {
+            // 🔹 Existing filter (unchanged)
+            if (onFilterClick != null) {
+                IconButton(onClick = onFilterClick) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = "Filter"
+                    )
+                }
+            }
 
+            // 🔹 New optional right action (Add Job, etc.)
+            rightAction?.invoke()
         }
     )
 }
+
 

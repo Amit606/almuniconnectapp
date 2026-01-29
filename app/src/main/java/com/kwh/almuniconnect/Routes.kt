@@ -42,7 +42,7 @@ object Routes {
 
     const val HELP_SUPPORTS = "help_supports"
     const val ABOUT_US = "about_us"
-    const val APP_VERSION = "1.0.3"
+    const val APP_VERSION = "1.0.4"
     const val DEVELOPER_NAME = "Apps Chance"
     const val DEVELOPER_EMAIL = "support@alumniconnect.com"
 

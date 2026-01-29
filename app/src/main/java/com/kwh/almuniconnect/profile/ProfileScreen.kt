@@ -1,6 +1,10 @@
 package com.kwh.almuniconnect.profile
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,9 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -38,6 +41,8 @@ import com.kwh.almuniconnect.storage.UserSession
 import java.util.*
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
+import com.kwh.almuniconnect.jobposting.AppTextField1
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -69,6 +74,19 @@ fun ProfileScreen(navController: NavController) {
     val user by userPrefs.getUser().collectAsState(
         initial = UserLocalModel()
     )
+    val branchOptions = listOf(
+        DropdownOption(1, "MCA"),
+        DropdownOption(2, "B.Tech – CSE"),
+        DropdownOption(3, "B.Tech – IT"),
+        DropdownOption(4, "B.Tech – ECE"),
+        DropdownOption(5, "B.Tech – EE"),
+        DropdownOption(6, "B.Tech – ME"),
+        DropdownOption(7, "B.Tech – CE"),
+        DropdownOption(8, "M.Tech"),
+        DropdownOption(9, "MBA"),
+        DropdownOption(10, "BCA")
+    )
+    var selectedBranch by remember { mutableStateOf<DropdownOption?>(null) }
 
     var name by remember(user.name) { mutableStateOf(user.name) }
     var email by remember(user.email) { mutableStateOf(user.email) }
@@ -81,17 +99,16 @@ fun ProfileScreen(navController: NavController) {
     var linkedin by remember(user.linkedin) { mutableStateOf(user.linkedin) }
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
     }
 
 
-    val branches = listOf(
-        "B.Tech – CSE","B.Tech – IT","B.Tech – ECE","B.Tech – EE",
-        "B.Tech – ME","B.Tech – CE","M.Tech","MCA","MBA","BCA"
-    )
+    var expanded by remember { mutableStateOf(false) }
+ //   var selectedBranch by remember { mutableStateOf<Branch?>(null) }
     val years = (1972..2026).map { it.toString() }
-    val safeBranch = if (branch in branches) branch else ""
+   // val safeBranch = if (branch in branches) branch else ""
     val safeYear = if (year in years) year else ""
     Scaffold(
         topBar = {
@@ -160,24 +177,52 @@ fun ProfileScreen(navController: NavController) {
                             )
 
                             Spacer(Modifier.height(8.dp))
-                            DropdownField("Branch", safeBranch, branches) { branch = it }
+
+                            DropdownField(
+                                label = "Branch",
+                                selected = selectedBranch,
+                                items = branchOptions,
+                                onSelect = { selectedBranch = it }
+                            )
                             Spacer(Modifier.height(8.dp))
-                            DropdownField("Year", safeYear, years) { year = it }
+                            DropdownFieldYear("Year", safeYear, years) { year = it }
                             AppTextField("Job / Company", job,onValueChange =   { job = it })
                             AppTextField("Location", location,onValueChange =  {  location = it })
 
                             BirthdayPicker(birthday) { birthday = it }
 
-                            AppTextField(
+//                            AppTextField(
+//                                label = "LinkedIn URL",
+//                                value = linkedin,
+//                                imeAction = ImeAction.Done,
+//                                onValueChange = { linkedin = it }
+//                            )
+                            AppTextField1(
                                 label = "LinkedIn URL",
                                 value = linkedin,
                                 imeAction = ImeAction.Done,
-                                onValueChange = { linkedin = it }
+                                onValueChange = { linkedin = it },
+                                trailingIcon = if (linkedin.isNotBlank()) {
+                                    {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_linkedin),
+                                            contentDescription = "Open LinkedIn",
+                                            tint = Color.Unspecified,   // 🔥 THIS is the fix
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .clickable {
+                                                    openLinkedIn(context, linkedin)
+                                                }
+                                        )
+                                    }
+                                } else null
                             )
+
 
                             error?.let {
                                 Text(it, color = Color.Red)
                             }
+                            val courseId: Int? = selectedBranch?.id
 
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
@@ -190,6 +235,7 @@ fun ProfileScreen(navController: NavController) {
 
                                     if (error == null) {
                                         val deviceId = DeviceUtils.getDeviceId(context)
+                                        val courseId: Int? = selectedBranch?.id
 
                                         viewModel.submitProfile(
 
@@ -199,8 +245,8 @@ fun ProfileScreen(navController: NavController) {
                                                 email = email,
                                                 dateOfBirth = uiDateToApi(birthday),
                                                 passoutYear = year.toInt(),
-                                                courseId = 1,
-                                                countryId = 1,
+                                                courseId = courseId,
+                                                countryId = 81,
                                                 companyName = job,
                                                 title = job,
                                                 totalExperience = 0,
@@ -208,7 +254,7 @@ fun ProfileScreen(navController: NavController) {
                                                 loggedFrom = "android",
                                                 deviceId = deviceId,
                                                 fcmToken = fcmToken,
-                                                appVersion = "1.0.1",
+                                                appVersion = "1.0.5",
                                                 advertisementId = "",
                                                 userAgent = "android"
                                             )
@@ -265,7 +311,20 @@ fun ProfileScreen(navController: NavController) {
     }
 
 }
+fun openLinkedIn(context: Context, url: String) {
+    val fixedUrl = if (url.startsWith("http")) url
+    else "https://www.linkedin.com/in/$url"
 
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(fixedUrl))
+        intent.setPackage("com.linkedin.android")
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse(fixedUrl))
+        )
+    }
+}
 /* ---------------- HELPERS ---------------- */
 
 fun validateProfile(

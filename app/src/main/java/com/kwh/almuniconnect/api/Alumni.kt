@@ -4,7 +4,6 @@ import com.kwh.almuniconnect.evetns.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
 import com.kwh.almuniconnect.login.EmailCheckApiResponse
 import com.kwh.almuniconnect.network.AlumniApiResponse
-import com.kwh.almuniconnect.network.AlumniListResponse
 import com.kwh.almuniconnect.news.NewsResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -37,7 +36,7 @@ data class SignupRequest(
     val email: String,
     val dateOfBirth: String,
     val passoutYear: Int,
-    val courseId: Int,
+    val courseId: Int?,
     val countryId: Int,
     val companyName: String,
     val title: String,
