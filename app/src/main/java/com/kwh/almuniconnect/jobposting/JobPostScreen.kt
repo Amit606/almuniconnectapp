@@ -1,4 +1,5 @@
 package com.kwh.almuniconnect.jobposting
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +27,8 @@ fun JobPostScreen(
     navController: NavController,
     onSubmit: (JobPost) -> Unit = {}
 ) {
+    val jobTypes = listOf("Full-time", "Part-time", "Remote", "Hybrid", "Internship", "Contract")
+
     var title by remember { mutableStateOf("") }
     var company by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
@@ -38,87 +41,170 @@ fun JobPostScreen(
     var websiteUrl by remember { mutableStateOf("") }
     var linkedinUrl by remember { mutableStateOf("") }
 
+    var showErrors by remember { mutableStateOf(false) }
+
+    val isFormValid =
+        title.isNotBlank() &&
+                company.isNotBlank() &&
+                location.isNotBlank() &&
+                experience.isNotBlank() &&
+                jobType.isNotBlank() &&
+                skills.isNotBlank() &&
+                description.isNotBlank() &&
+                isValidEmail(applyEmail) &&
+                isValidUrl(websiteUrl) &&
+                isValidUrl(linkedinUrl)
+
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Job Post",
+                title = "Post a Job",
                 navController = navController
             )
-        }
+        },
+        contentColor = Color.White
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
-                .fillMaxSize()                       // 🔥 IMPORTANT
-              //  .background(Color(0xFF0E1420))
+                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
 
             SectionHeader("Job Information")
+
             AppTextField(
-                label = "Job Title",
-                value = title,
-                onValueChange = { title = it }
+                "Job Title",
+                title,
+                { title = it },
+                isError = showErrors && title.isBlank(),
+                errorText = "Job title required"
             )
-            AppTextField("Company Name", company, onValueChange = {
-                    company = it
-            })
-            AppTextField("Location", location, onValueChange =  { location = it })
-            AppTextField("Experience (e.g. 2–5 Years)", experience,onValueChange =  { experience = it })
-            AppTextField("Salary (e.g. ₹10–15 LPA)", salary, onValueChange =  { salary = it })
-            AppTextField("Job Type (Full-time / Remote)", jobType,onValueChange =  { jobType = it })
+
+            AppTextField(
+                "Company Name",
+                company,
+                { company = it },
+                isError = showErrors && company.isBlank(),
+                errorText = "Company name required"
+            )
+
+            AppTextField(
+                "Location",
+                location,
+                { location = it },
+                isError = showErrors && location.isBlank(),
+                errorText = "Location required"
+            )
+
+            AppTextField(
+                "Experience (e.g. 2–5 Years)",
+                experience,
+                { experience = it },
+                isError = showErrors && experience.isBlank(),
+                errorText = "Experience required"
+            )
+
+            AppTextField("Salary (Optional)", salary, { salary = it })
+
+            AppTextField(
+                "Job Type (Full-time / Remote)",
+                jobType,
+                { jobType = it },
+                isError = showErrors && jobType.isBlank(),
+                errorText = "Job type required"
+            )
 
             SectionHeader("Skills & Description")
 
             AppTextField(
-                label = "Skills (comma separated)",
-                value = skills,
-                onValueChange = { skills = it }
+                "Skills (comma separated)",
+                skills,
+                { skills = it },
+                isError = showErrors && skills.isBlank(),
+                errorText = "Skills required"
             )
 
             AppTextField(
-                label = "Job Description",
-                value = description,
-                onValueChange = { description = it },
+                "Job Description",
+                description,
+                { description = it },
+                isError = showErrors && description.isBlank(),
+                errorText = "Description required",
+                maxLines = 4
             )
 
             SectionHeader("Apply Details")
 
-            AppTextField("Apply Email", applyEmail,onValueChange =  { applyEmail = it })
-            AppTextField("Company Website URL", websiteUrl, onValueChange =  { websiteUrl = it })
-            AppTextField("LinkedIn Job URL", linkedinUrl,onValueChange =   { linkedinUrl = it })
+            AppTextField(
+                "Apply Email",
+                applyEmail,
+                { applyEmail = it },
+                keyboardType = KeyboardType.Email,
+                isError = showErrors && !isValidEmail(applyEmail),
+                errorText = "Valid email required"
+            )
+
+            AppTextField(
+                "Company Website URL",
+                websiteUrl,
+                { websiteUrl = it },
+                keyboardType = KeyboardType.Uri,
+                isError = showErrors && !isValidUrl(websiteUrl),
+                errorText = "Invalid website URL"
+            )
+
+            AppTextField(
+                "LinkedIn Job URL",
+                linkedinUrl,
+                { linkedinUrl = it },
+                keyboardType = KeyboardType.Uri,
+                isError = showErrors && !isValidUrl(linkedinUrl),
+                errorText = "Invalid LinkedIn URL"
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
-//                    onSubmit(
-//                        JobPost(
-//                            title,
-//                            company,
-//                            location,
-//                            experience,
-//                            salary,
-//                            jobType,
-//                            skills,
-//                            description,
-//                            applyEmail,
-//                            websiteUrl,
-//                            linkedinUrl
-//                        )
-//                    )
+                    showErrors = true
+                    if (isFormValid) {
+                        onSubmit(
+                            JobPost(
+                                title,
+                                company,
+                                location,
+                                experience,
+                                salary,
+                                jobType,
+                                skills,
+                                description,
+                                applyEmail,
+                                websiteUrl,
+                                linkedinUrl
+                            )
+                        )
+                        Toast.makeText(
+                            navController.context,
+                            "Job posted successfully!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        navController.popBackStack()
+                    }
                 },
+                enabled = isFormValid,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Publish Job")
+                Text("Publish Job", fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
+
 
 @Composable
 fun SectionHeader(text: String) {
@@ -174,21 +260,50 @@ fun AppTextField(
 }
 
 @Composable
-fun AppTextField1(
+fun AppTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
-    trailingIcon: (@Composable () -> Unit)? = null
+    isError: Boolean = false,
+    errorText: String = "",
+    maxLines: Int = 1
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        trailingIcon = trailingIcon,   // 👈 optional
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(imeAction = imeAction),
-        singleLine = true
-    )
+    Column {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = maxLines,
+            isError = isError,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction
+            )
+        )
+
+        if (isError) {
+            Text(
+                text = errorText,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp, top = 2.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+    }
 }
+
+private fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+private fun isValidUrl(url: String): Boolean {
+    if (url.isBlank()) return true
+    return android.util.Patterns.WEB_URL.matcher(url).matches()
+}
+
 

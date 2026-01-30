@@ -41,7 +41,7 @@ import com.kwh.almuniconnect.storage.UserSession
 import java.util.*
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
-import com.kwh.almuniconnect.jobposting.AppTextField1
+import com.kwh.almuniconnect.jobposting.AppTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,15 +76,27 @@ fun ProfileScreen(navController: NavController) {
     )
     val branchOptions = listOf(
         DropdownOption(1, "MCA"),
-        DropdownOption(2, "B.Tech – CSE"),
-        DropdownOption(3, "B.Tech – IT"),
-        DropdownOption(4, "B.Tech – ECE"),
-        DropdownOption(5, "B.Tech – EE"),
-        DropdownOption(6, "B.Tech – ME"),
-        DropdownOption(7, "B.Tech – CE"),
-        DropdownOption(8, "M.Tech"),
-        DropdownOption(9, "MBA"),
-        DropdownOption(10, "BCA")
+        DropdownOption(2, "BTech COMPUTER SCIENCE"),
+        DropdownOption(3, "BTech INFORMATION TECHNOLOGY"),
+        DropdownOption(4, "BTech ELECTRONICS & COMMUNICATION"),
+        DropdownOption(5, "BTech ELECTRICAL"),
+        DropdownOption(6, "BTech MECHANICAL"),
+        DropdownOption(7, "BTech CIVIL"),
+        DropdownOption(8, "BTech CHEMICAL"),
+        DropdownOption(9, "BTech PAINT"),
+        DropdownOption(10, "BTech LEATHER"),
+        DropdownOption(11, "BTech Oil"),
+        DropdownOption(12, "BTech PLASTIC"),
+        DropdownOption(13, "BTech FOOD"),
+        DropdownOption(14, "BTech BIOTECHNOLOGY"),
+       // DropdownOption(15, "BTech LEATHER"),
+       // DropdownOption(15, "BTech LEATHER")
+
+
+
+
+
+
     )
     var selectedBranch by remember { mutableStateOf<DropdownOption?>(null) }
 
@@ -197,32 +209,31 @@ fun ProfileScreen(navController: NavController) {
 //                                imeAction = ImeAction.Done,
 //                                onValueChange = { linkedin = it }
 //                            )
-                            AppTextField1(
-                                label = "LinkedIn URL",
-                                value = linkedin,
-                                imeAction = ImeAction.Done,
-                                onValueChange = { linkedin = it },
-                                trailingIcon = if (linkedin.isNotBlank()) {
-                                    {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_linkedin),
-                                            contentDescription = "Open LinkedIn",
-                                            tint = Color.Unspecified,   // 🔥 THIS is the fix
-                                            modifier = Modifier
-                                                .size(20.dp)
-                                                .clickable {
-                                                    openLinkedIn(context, linkedin)
-                                                }
-                                        )
-                                    }
-                                } else null
-                            )
+//                            AppTextField1(
+//                                label = "LinkedIn URL",
+//                                value = linkedin,
+//                                imeAction = ImeAction.Done,
+//                                onValueChange = { linkedin = it },
+//                                trailingIcon = if (linkedin.isNotBlank()) {
+//                                    {
+//                                        Icon(
+//                                            painter = painterResource(id = R.drawable.ic_linkedin),
+//                                            contentDescription = "Open LinkedIn",
+//                                            tint = Color.Unspecified,   // 🔥 THIS is the fix
+//                                            modifier = Modifier
+//                                                .size(20.dp)
+//                                                .clickable {
+//                                                    openLinkedIn(context, linkedin)
+//                                                }
+//                                        )
+//                                    }
+//                                } else null
+//                            )
 
 
                             error?.let {
                                 Text(it, color = Color.Red)
                             }
-                            val courseId: Int? = selectedBranch?.id
 
                             Button(
                                 modifier = Modifier.fillMaxWidth(),

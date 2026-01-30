@@ -194,11 +194,17 @@ fun AlumniCard(alumni: AlumniDto, onClick: () -> Unit) {
                     color = Color(0xFF7A8194))
             }
 
-            Button(
-
-
-                onClick = { openUrl(context, alumni.linkedinUrl.toString()) }) {
-                Text("Connect", style = MaterialTheme.typography.titleMedium)
+            IconButton(
+                onClick = { openUrl(context, alumni.linkedinUrl.toString()) },
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.Transparent, CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_linkedin),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
             }
         }
     }
