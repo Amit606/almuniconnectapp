@@ -32,11 +32,8 @@ import com.kwh.almuniconnect.intro.NetworkUtils
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
 import com.kwh.almuniconnect.jobposting.JobPostScreen
-import com.kwh.almuniconnect.jobposting.sampleJob
-import com.kwh.almuniconnect.login.AuthViewModel
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.network.NetworkScreen
-import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue

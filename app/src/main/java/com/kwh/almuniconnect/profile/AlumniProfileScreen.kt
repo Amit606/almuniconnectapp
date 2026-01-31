@@ -165,6 +165,15 @@ fun AlumniProfileScreen(
                         iconTint = Color(0xFF25D366),
                         onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
                     )
+                    Divider()
+
+                    ProfileRow(
+                        icon = Icons.Default.Countertops,
+                        label = "Job Referral ",
+                        value = "Job Posted 3",
+                        iconTint = Color(0xFF25D366),
+                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
+                    )
                 }
             }
 

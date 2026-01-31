@@ -18,13 +18,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.kwh.almuniconnect.api.JobPostRequest
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobPostScreen(
     navController: NavController,
+    viewModel: JobPostViewModel = viewModel(),
     onSubmit: (JobPost) -> Unit = {}
 ) {
     val jobTypes = listOf("Full-time", "Part-time", "Remote", "Hybrid", "Internship", "Contract")
@@ -171,35 +174,51 @@ fun JobPostScreen(
                 onClick = {
                     showErrors = true
                     if (isFormValid) {
-                        onSubmit(
-                            JobPost(
-                                title,
-                                company,
-                                location,
-                                experience,
-                                salary,
-                                jobType,
-                                skills,
-                                description,
-                                applyEmail,
-                                websiteUrl,
-                                linkedinUrl
+                        viewModel.postJob(
+                            JobPostRequest(
+                                title = title,
+                                description = description,
+                                company = company,
+                                location = location,
+                                employmentType = jobType,
+                                totalExperience = experience,
+                                salary = salary,
+                                expiresAt = "2026-01-31" // TODO: DatePicker later
                             )
                         )
-                        Toast.makeText(
-                            navController.context,
-                            "Job posted successfully!",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        navController.popBackStack()
                     }
                 },
-                enabled = isFormValid,
+                enabled = isFormValid && !viewModel.loading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Publish Job", fontSize = 16.sp)
+                if (viewModel.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White
+                    )
+                } else {
+                    Text("Publish Job", fontSize = 16.sp)
+                }
+            }
+            LaunchedEffect(viewModel.success) {
+                if (viewModel.success) {
+                    Toast.makeText(
+                        navController.context,
+                        "Job posted successfully!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navController.popBackStack()
+                }
             }
 
+            viewModel.error?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
             Spacer(modifier = Modifier.height(24.dp))
         }
     }

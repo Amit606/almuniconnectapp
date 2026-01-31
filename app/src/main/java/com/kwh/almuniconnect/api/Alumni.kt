@@ -60,6 +60,21 @@ data class SignupResponse(
 data class UserData(
     val userId: String
 )
+data class JobPostRequest(
+    val title: String,
+    val description: String,
+    val company: String,
+    val location: String,
+    val employmentType: String,
+    val totalExperience: String,
+    val salary: String,
+    val expiresAt: String // yyyy-MM-dd
+)
+data class JobPostResponse(
+    val success: Boolean,
+    val message: String
+)
+
 
 // Generic ApiResponse (adjust fields if actual API differs)
 data class ApiResponse<T>(
@@ -130,7 +145,10 @@ interface ApiService {
         @Path(value = "email", encoded = true) email: String
     ): Response<EmailCheckApiResponse>
 
-
+    @POST("job-posts")
+    suspend fun createJobPost(
+        @Body request: JobPostRequest
+    ): Response<JobPostResponse>
 
 }
 
