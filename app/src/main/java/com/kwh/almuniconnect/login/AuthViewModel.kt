@@ -76,17 +76,60 @@ class AuthViewModel(
 
                         // ✅ NOW THIS WORKS
                         UserSession.saveLogin(getApplication())
-                        userPrefs.saveUser(
-                            uid = firebaseUser.uid,
-                            name = firebaseUser.displayName,
-                            email = firebaseUser.email,
-                            photo = firebaseUser.photoUrl?.toString()
+                        userPrefs.saveProfile(
+                            profile = com.kwh.almuniconnect.storage.UserLocalModel(
+                                name = firebaseUser.displayName.toString(),
+                                email = firebaseUser.email.toString(),
+                                photo = firebaseUser.photoUrl.toString(),
+                                mobile = "",
+                                branch = "",
+                                year = "",
+                                job = "",
+                                location = "",
+                                birthday = "",
+                                linkedin = ""
+                            )
                         )
+                        Log.e("AuthViewModel", "User logged in and profile saved."+
+                            " UID: ${firebaseUser.uid}, " +
+                            "Name: ${firebaseUser.displayName}, " +
+                            "Email: ${firebaseUser.email}, " +
+                            "Photo: ${firebaseUser.photoUrl}"
+                        )
+
+
+//                        userPrefs.saveUser(
+//                            uid = firebaseUser.uid,
+//                            name = firebaseUser.displayName,
+//                            email = firebaseUser.email,
+//                            photo = firebaseUser.photoUrl?.toString()
+//                        )
                         onGoHome()
                     } else {
                         setLoading(false)
-
+                        // ✅ NOW THIS WORKS
+                        UserSession.saveLogin(getApplication())
+                        userPrefs.saveProfile(
+                            profile = com.kwh.almuniconnect.storage.UserLocalModel(
+                                name = firebaseUser.displayName.toString(),
+                                email = firebaseUser.email.toString(),
+                                photo = firebaseUser.photoUrl.toString(),
+                                mobile = "",
+                                branch = "",
+                                year = "",
+                                job = "",
+                                location = "",
+                                birthday = "",
+                                linkedin = ""
+                            )
+                        )
+                      Log.e("ABC", "New user, navigating to profile update."+
+                          " UID: ${firebaseUser.uid}, " +
+                          "Name: ${firebaseUser.displayName}, " +
+                          "Email: ${firebaseUser.email}, " +
+                          "Photo: ${firebaseUser.photoUrl}")
                         onGoProfileUpdate()
+
                     }
                 }
                 .onFailure {

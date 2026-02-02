@@ -3,6 +3,7 @@
 // Features: top app bar with search & notifications, banner, horizontal lists (Events, Jobs), feed (alumni posts), FAB, and bottom navigation.
 
 package com.kwh.almuniconnect.home
+import android.app.Activity
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.*
@@ -59,6 +60,8 @@ import com.kwh.almuniconnect.permission.RequestNotificationPermission
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.utils.encodeRoute
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,6 +85,9 @@ fun HomeScreen(
 
     val context = LocalContext.current
     TrackScreen("home_screen")
+    var showExitDialog by remember { mutableStateOf(false) }
+    val activity = LocalActivity.current
+
 
     val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
     val userPrefs = remember { UserPreferences(context) }
@@ -96,6 +102,11 @@ fun HomeScreen(
             // 🚫 User denied (show snackbar or ignore)
         }
     )
+    // Handle back press
+    BackHandler {
+        showExitDialog = true
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -362,6 +373,27 @@ fun HomeScreen(
 
 
 
+        }
+        // Exit dialog
+        if (showExitDialog) {
+            AlertDialog(
+                onDismissRequest = { showExitDialog = false },
+                title = { Text("Exit App") },
+                text = { Text("Are you sure you want to exit?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showExitDialog = false
+                        activity?.finish()
+                    }) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showExitDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
         }
 
     }

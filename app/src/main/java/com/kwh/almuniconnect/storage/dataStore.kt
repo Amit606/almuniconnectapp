@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.storage
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,8 @@ class UserPreferences(private val context: Context) {
 
     suspend fun saveProfile(profile: UserLocalModel) {
         context.dataStore.edit { prefs ->
+            prefs[KEY_LOGGED_IN] = true   // ✅ ADD THIS
+
             prefs[KEY_NAME] = profile.name
             prefs[KEY_EMAIL] = profile.email
             prefs[KEY_PHOTO] = profile.photo
@@ -69,28 +72,52 @@ class UserPreferences(private val context: Context) {
         context.dataStore.data.map {
             it[KEY_LOGGED_IN] ?: false
         }
-
     fun getUser(): Flow<UserLocalModel> =
         context.dataStore.data
-            .catch { exception ->
-                // 🔥 CRITICAL: prevents NoSuchElementException
-                emit(emptyPreferences())
-            }
             .map { prefs ->
-                UserLocalModel(
-                    name = prefs[KEY_NAME] ?: "",
-                    email = prefs[KEY_EMAIL] ?: "",
-                    photo = prefs[KEY_PHOTO] ?: "",
-                    mobile = prefs[KEY_MOBILE] ?: "",
-                    branch = prefs[KEY_BRANCH] ?: "",
-                    year = prefs[KEY_YEAR] ?: "",
-                    job = prefs[KEY_JOB] ?: "",
-                    location = prefs[KEY_LOCATION] ?: "",
-                    birthday = prefs[KEY_BIRTHDAY] ?: "",
-                    linkedin = prefs[KEY_LINKEDIN] ?: ""
-                )
+                if (prefs[KEY_LOGGED_IN] != true) {
+                    UserLocalModel()
+                } else {
+                    UserLocalModel(
+                        name = prefs[KEY_NAME] ?: "",
+                        email = prefs[KEY_EMAIL] ?: "",
+                        photo = prefs[KEY_PHOTO] ?: "",
+                        mobile = prefs[KEY_MOBILE] ?: "",
+                        branch = prefs[KEY_BRANCH] ?: "",
+                        year = prefs[KEY_YEAR] ?: "",
+                        job = prefs[KEY_JOB] ?: "",
+                        location = prefs[KEY_LOCATION] ?: "",
+                        birthday = prefs[KEY_BIRTHDAY] ?: "",
+                        linkedin = prefs[KEY_LINKEDIN] ?: ""
+                    )
+                }
             }
             .distinctUntilChanged()
+
+
+
+//    fun getUser(): Flow<UserLocalModel> =
+//        context.dataStore.data
+//            .catch { exception ->
+//                Log.e("UserPreferences", "Error reading user prefs", exception)
+//                // 🔥 CRITICAL: prevents NoSuchElementException
+//                emit(emptyPreferences())
+//            }
+//            .map { prefs ->
+//                UserLocalModel(
+//                    name = prefs[KEY_NAME] ?: "",
+//                    email = prefs[KEY_EMAIL] ?: "",
+//                    photo = prefs[KEY_PHOTO] ?: "",
+//                    mobile = prefs[KEY_MOBILE] ?: "",
+//                    branch = prefs[KEY_BRANCH] ?: "",
+//                    year = prefs[KEY_YEAR] ?: "",
+//                    job = prefs[KEY_JOB] ?: "",
+//                    location = prefs[KEY_LOCATION] ?: "",
+//                    birthday = prefs[KEY_BIRTHDAY] ?: "",
+//                    linkedin = prefs[KEY_LINKEDIN] ?: ""
+//                )
+//            }
+//            .distinctUntilChanged()
 
 
     suspend fun clear() {

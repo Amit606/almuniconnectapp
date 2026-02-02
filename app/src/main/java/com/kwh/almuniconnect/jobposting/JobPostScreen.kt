@@ -3,6 +3,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -247,36 +248,45 @@ fun AppTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = {
-            Text(
-                label,
-                color = Color.Black,
-                style = MaterialTheme.typography.titleMedium
-            )
-        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
-        maxLines = 1,
-        textStyle = TextStyle(color = Color.Black),
+        singleLine = true,
+
+        label = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
+            color = Color.Black
+        ),
+
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             imeAction = imeAction
         ),
+
         keyboardActions = KeyboardActions(
-            onDone = {
-                onDone?.invoke()
-            }
+            onDone = { onDone?.invoke() }
         ),
+
+        shape = RoundedCornerShape(14.dp),
+
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF6A5AE0),
-            unfocusedBorderColor = Color.Gray,
-            focusedLabelColor = Color.White,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color(0xFFBDBDBD),
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = Color.Gray,
-            cursorColor = Color.White
+            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black
         )
     )
 }
+
 
 @Composable
 fun AppTextField(

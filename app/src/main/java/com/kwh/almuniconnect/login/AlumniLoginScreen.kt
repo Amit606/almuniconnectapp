@@ -101,21 +101,8 @@ fun AlumniLoginScreen(
 
                         Spacer(Modifier.height(32.dp))
 
-                        // ─── OR ───
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Divider(Modifier.weight(1f))
-                            Text(
-                                "  or  ",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Divider(Modifier.weight(1f))
-                        }
+//
 
-                        Spacer(Modifier.height(24.dp))
 
                         // 🌐 Material Filled Tonal Google Button
                         FilledTonalButton(
