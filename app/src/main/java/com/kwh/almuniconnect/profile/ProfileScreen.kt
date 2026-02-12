@@ -1,12 +1,7 @@
-// kotlin
 package com.kwh.almuniconnect.profile
 
 import android.app.DatePickerDialog
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,20 +19,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
-import com.kwh.almuniconnect.analytics.TrackScreen
-import com.kwh.almuniconnect.api.ApiService
-import com.kwh.almuniconnect.api.NetworkClient
-import com.kwh.almuniconnect.api.SignupRequest
+import com.kwh.almuniconnect.api.*
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
+import com.kwh.almuniconnect.jobposting.SectionTitle
 import com.kwh.almuniconnect.login.AuthRepository
 import com.kwh.almuniconnect.storage.*
 import java.util.*
@@ -47,26 +44,26 @@ fun ProfileScreen(navController: NavController) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    TrackScreen("profile_screen")
-
     val apiService = remember { NetworkClient.createService(ApiService::class.java) }
     val repository = remember { AuthRepository(apiService) }
 
-    val viewModel: ProfileViewModel = viewModel(
-        factory = ProfileViewModelFactory(repository)
-    )
+    val viewModel: ProfileViewModel =
+        viewModel(factory = ProfileViewModelFactory(repository))
 
     val apiState by viewModel.state.collectAsState()
+
     val userPrefs = remember { UserPreferences(context) }
     val user by userPrefs.getUser().collectAsState(initial = UserLocalModel())
 
-    Log.e("User", user.name)
 
+
+    var selectedBranch by remember { mutableStateOf<Branch?>(null) }
+    var branch by remember { mutableStateOf("") }
     /* ---------- FORM STATE ---------- */
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var mobile by remember { mutableStateOf("") }
-    var branch by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
     var job by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
@@ -74,38 +71,70 @@ fun ProfileScreen(navController: NavController) {
     var linkedin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
+    val years = (1972..2026).map { it.toString() }
 
+    val safeYear = if (year in years) year else ""
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
     }
 
     LaunchedEffect(user) {
-        if (user.name.isNotBlank()) {
-            name = user.name
-            email = user.email
-            mobile = user.mobile
-            branch = user.branch
-            year = user.year
-            job = user.job
-            location = user.location
-            birthday = user.birthday
-            linkedin = user.linkedin
-        }
+        name = user.name
+        email = user.email
+        mobile = user.mobile
+        branch = user.branch
+        year = user.year
+        job = user.job
+        location = user.location
+        birthday = user.birthday
+        linkedin = user.linkedin
     }
 
-    val branchOptions = listOf(
-        DropdownOption(1, "MCA"),
-        DropdownOption(2, "BTech Computer Science"),
-        DropdownOption(3, "BTech IT"),
-        DropdownOption(4, "BTech ECE"),
-        DropdownOption(5, "BTech Electrical"),
-        DropdownOption(6, "BTech Mechanical"),
-        DropdownOption(7, "BTech Civil")
-    )
+    /* ---------- HANDLE API SUCCESS ---------- */
 
-    var selectedBranch by remember { mutableStateOf<DropdownOption?>(null) }
-    val years = (1972..2026).map { it.toString() }
-    val safeYear = if (year in years) year else ""
+    LaunchedEffect(apiState) {
+
+        when (apiState) {
+
+            is ProfileState.Success -> {
+
+                val profile =
+                    (apiState as ProfileState.Success).profile
+
+                userPrefs.saveProfile(
+                    UserLocalModel(
+                        userId = profile.userId ?: "",
+                        name = profile.name ?: "",
+                        email = profile.email ?: "",
+                        mobile = profile.mobileNo ?: "",
+                        branch = profile.courseName ?: "",
+                        branchId = profile.courseId ?: 0,
+                        year = profile.passoutYear?.toString() ?: "",
+                        job = profile.companyName ?: "",
+                        location = "",
+                        birthday = profile.dateOfBirth ?: "",
+                        linkedin = profile.linkedinUrl ?: "",
+                        photo = profile.photoUrl ?: "",
+
+//                        accessToken = profile.accessToken ?: "",
+//                        accessTokenExpiry = profile.accessTokenExpiry ?: "",
+//                        refreshToken = profile.refreshToken ?: "",
+//                        refreshTokenExpiry = profile.refreshTokenExpiry ?: ""
+                    )
+                )
+
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.PROFILE) { inclusive = true }
+                }
+            }
+
+            is ProfileState.Error -> {
+                error = (apiState as ProfileState.Error).message
+            }
+
+            else -> {}
+        }
+    }
 
     /* ---------- UI ---------- */
 
@@ -116,7 +145,7 @@ fun ProfileScreen(navController: NavController) {
                 navController = navController
             )
         },
-        containerColor = Color(0xFFF6F7FB)
+        containerColor = Color.White
     ) { padding ->
 
         Box(
@@ -130,152 +159,151 @@ fun ProfileScreen(navController: NavController) {
                 ) { focusManager.clearFocus() }
         ) {
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
 
                 /* ---------- PROFILE HEADER ---------- */
+
                 item {
                     Card(
                         modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(3.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(20.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+
                             AsyncImage(
                                 model = user.photo.ifEmpty { R.drawable.man },
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(110.dp)
+                                    .size(100.dp)
                                     .clip(CircleShape)
                                     .border(
-                                        3.dp,
+                                        2.dp,
                                         MaterialTheme.colorScheme.primary,
                                         CircleShape
                                     )
                             )
 
-                            Spacer(Modifier.height(12.dp))
+                            Spacer(Modifier.height(14.dp))
 
                             Text(
                                 text = name.ifBlank { "Your Name" },
-                                style = MaterialTheme.typography.titleMedium
+                                fontSize = 20.sp,
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
 
                             Text(
-                                text = email,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
+                                text = email.ifBlank { "Your Email ID" },
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
                 }
 
                 /* ---------- FORM CARD ---------- */
+
                 item {
                     Card(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        elevation = CardDefaults.cardElevation(6.dp)
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(3.dp)
                     ) {
+
                         Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                            modifier = Modifier.padding(18.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
 
                             SectionTitle("Personal Details")
-                            AppTextField(
-                                label = "Name",
-                                value = name,
-                                imeAction = ImeAction.Next,
-                                onValueChange = { name = it }
-                            )
-                            AppTextField(
-                                label = "Email",
-                                value = email,
-                                onValueChange = { email = it }
-                            )
+
+                            AppTextField("Name", name) { name = it }
+                            AppTextField("Email", email) { email = it }
 
                             AppTextField(
                                 label = "Mobile",
                                 value = mobile,
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next,
-                                onValueChange = {
-                                    if (it.all(Char::isDigit) && it.length <= 10)
-                                        mobile = it
-                                }
-                            )
-
-                            SectionTitle("Academic Details")
-                            DropdownField(
-                                label = "Branch",
-                                selected = selectedBranch,
-                                items = branchOptions,
-                                onSelect = {
-                                    selectedBranch = it
-                                    branch = it.toString()
-                                }
-                            )
-
-                            DropdownFieldYear(
-                                label = "Passout Year",
-                                selected = safeYear,
-                                items = years,
-                                onSelect = { year = it }
-                            )
-
-                            SectionTitle("Professional Details")
-                            AppTextField(
-                                label = "Job / Company",
-                                value = job,
-                                onValueChange = { job = it }
-                            )
-                            AppTextField(
-                                label = "Location",
-                                value = location,
-                                onValueChange = { location = it }
-                            )
-                            BirthdayPicker(birthday) { birthday = it }
-                            AppTextField(
-                                label = "LinkedIn URL",
-                                value = linkedin,
-                                onValueChange = { linkedin = it }
-                            )
-
-                            error?.let {
-                                Text(it, color = MaterialTheme.colorScheme.error)
+                                keyboardType = KeyboardType.Number
+                            ) {
+                                if (it.all(Char::isDigit) && it.length <= 10)
+                                    mobile = it
                             }
 
-                            Spacer(Modifier.height(12.dp))
+                            SectionTitle("Professional Details")
+                            DropdownFieldBranch(
+                                label = "Branch",
+                                selected = selectedBranch,
+                                items = branches,   // ✅ YEH IMPORTANT HAI
+                                onSelect = {
+                                    selectedBranch = it
+                                    branch = it.name
+                                }
+                            )
+
+                            DropdownFieldYear( label = "Passout Year", selected = safeYear,
+                                items = years, onSelect = { year = it } )
+
+                            AppTextField("Job / Company", job) { job = it }
+                            AppTextField("Location", location) { location = it }
+
+                            BirthdayPicker(birthday) { birthday = it }
+
+                            AppTextField("LinkedIn URL", linkedin) {
+                                linkedin = it
+                            }
+
+                            error?.let {
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            Spacer(Modifier.height(8.dp))
 
                             Button(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(50.dp),
-                                shape = RoundedCornerShape(14.dp),
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 enabled = apiState !is ProfileState.Loading,
                                 onClick = {
+
                                     error = validateProfile(
-                                        name, email, mobile, branch, year,
-                                        job, location, birthday, linkedin
+                                        name, email, mobile,
+                                        branch, year,
+                                        job, location,
+                                        birthday, linkedin
                                     )
 
                                     if (error == null) {
-
                                         viewModel.submitProfile(
                                             SignupRequest(
                                                 name = name,
                                                 mobileNo = mobile,
                                                 email = email,
-                                                dateOfBirth = uiDateToApi(birthday),
-                                                passoutYear = year.toInt(),
-                                                courseId = selectedBranch?.id,
+                                                dateOfBirth = birthday,
+                                                passoutYear = year.toIntOrNull() ?: 0,
+                                                courseId = selectedBranch?.id ?: 0,
                                                 countryId = 81,
                                                 companyName = job,
                                                 title = job,
@@ -289,18 +317,22 @@ fun ProfileScreen(navController: NavController) {
                                                 userAgent = "android"
                                             )
                                         )
-                                        navController.navigate(Routes.HOME)
                                     }
                                 }
                             ) {
+
                                 if (apiState is ProfileState.Loading) {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(22.dp),
+                                        modifier = Modifier.size(20.dp),
                                         color = Color.White,
                                         strokeWidth = 2.dp
                                     )
                                 } else {
-                                    Text("Update Profile")
+                                    Text(
+                                        "Update Profile",
+                                        fontSize = 16.sp,
+                                        color = Color.White
+                                    )
                                 }
                             }
                         }
@@ -310,30 +342,23 @@ fun ProfileScreen(navController: NavController) {
         }
     }
 }
-
-/* ---------- SMALL UI HELPERS ---------- */
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SectionTitle(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary
-    )
-}
+fun BirthdayPicker(
+    birthday: String,
+    onDateSelected: (String) -> Unit
+) {
 
-/* ---------- BIRTHDAY PICKER ---------- */
-
-@Composable
-fun BirthdayPicker(birthday: String, onDate: (String) -> Unit) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    val dialog = remember {
+    val datePickerDialog = remember {
         DatePickerDialog(
             context,
-            { _, y, m, d ->
-                onDate("%02d/%02d/%04d".format(d, m + 1, y))
+            { _, year, month, day ->
+                val formatted =
+                    "%02d-%02d-%02d".format(year, month + 1, day)
+                onDateSelected(formatted)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -347,21 +372,35 @@ fun BirthdayPicker(birthday: String, onDate: (String) -> Unit) {
         value = birthday,
         onValueChange = {},
         readOnly = true,
-        enabled = false,
+        enabled = true,   // ✅ IMPORTANT
         label = { Text("Birthday") },
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { dialog.show() }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                datePickerDialog.show()
+            },
+        shape = RoundedCornerShape(12.dp),
+        trailingIcon = {
+            IconButton(onClick = {
+                datePickerDialog.show()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Select Date"
+                )
+            }
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.LightGray,
+            cursorColor = MaterialTheme.colorScheme.primary
+        ),
+        textStyle = TextStyle(fontSize = 15.sp)
     )
 }
-
-/* ---------- HELPERS ---------- */
-
-fun uiDateToApi(date: String): String {
-    val (d, m, y) = date.split("/")
-    return "$y-$m-$d"
-}
-/* ---------------- HELPERS ---------------- */
 
 fun validateProfile(
     name: String,
@@ -374,14 +413,39 @@ fun validateProfile(
     birthday: String,
     linkedin: String
 ): String? {
-    if (name.isBlank()) return "Enter name"
-    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) return "Invalid email"
-    if (mobile.length != 10) return "Enter valid mobile"
-    if (branch.isBlank()) return "Select branch"
-    if (year.isBlank()) return "Select year"
-    if (job.isBlank()) return "Enter job"
-    if (location.isBlank()) return "Enter location"
-    if (birthday.isBlank()) return "Select birthday"
-    if (linkedin.isNotBlank() && !linkedin.startsWith("http")) return "Invalid LinkedIn URL"
+
+    if (name.isBlank())
+        return "Please enter your name"
+
+    if (name.length < 3)
+        return "Name must be at least 3 characters"
+
+    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
+        return "Please enter a valid email"
+
+    if (mobile.length != 10)
+        return "Mobile number must be 10 digits"
+
+    if (branch.isBlank())
+        return "Please select branch"
+
+    if (year.isBlank())
+        return "Please select passout year"
+
+    if (job.isBlank())
+        return "Please enter job/company"
+
+    if (location.isBlank())
+        return "Please enter location"
+
+    if (birthday.isBlank())
+        return "Please select birthday"
+
+    if (linkedin.isNotBlank() &&
+        !linkedin.startsWith("http://") &&
+        !linkedin.startsWith("https://")
+    )
+        return "LinkedIn URL must start with http:// or https://"
+
     return null
 }

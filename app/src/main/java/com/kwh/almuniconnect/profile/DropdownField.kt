@@ -9,6 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,48 +29,55 @@ data class DropdownOption(
     val id: Int,
     val label: String
 )
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownField(
+fun DropdownFieldBranch(
     label: String,
-    selected: DropdownOption?,
-    items: List<DropdownOption>,
-    onSelect: (DropdownOption) -> Unit
+    selected: Branch?,
+    items: List<Branch>,
+    onSelect: (Branch) -> Unit
 ) {
+
     var expanded by remember { mutableStateOf(false) }
 
-    Column {
-        Text(label, color = Color.Black, fontSize = 12.sp)
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
 
-        Box(
+        OutlinedTextField(
+            value = selected?.name ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            },
             modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                .clickable { expanded = true }
-                .padding(12.dp)
-        ) {
-            Text(
-                selected?.label ?: "Select $label",
-                color = Color.Black
-            )
+                .menuAnchor()
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                items.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option.label, color = Color.Black) },
-                        onClick = {
-                            onSelect(option)
-                            expanded = false
-                        }
-                    )
-                }
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            items.forEach { branch ->
+                DropdownMenuItem(
+                    text = { Text(branch.name) },
+                    onClick = {
+                        onSelect(branch)
+                        expanded = false
+                    }
+                )
             }
         }
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownFieldYear(
     label: String,
@@ -72,34 +85,46 @@ fun DropdownFieldYear(
     items: List<String>,
     onSelect: (String) -> Unit
 ) {
+
     var expanded by remember { mutableStateOf(false) }
 
-    Column {
-        Text(label, color = Color.Black, fontSize = 12.sp)
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
 
-        Box(
+        OutlinedTextField(
+            value = selected,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            },
             modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                .clickable { expanded = true }
-                .padding(12.dp)
-        ) {
-            Text(selected.ifEmpty { "Select $label" }, color = Color.Black)
+                .menuAnchor()
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color.LightGray
+            )
+        )
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                items.forEach {
-                    DropdownMenuItem(
-                        text = { Text(it, color = Color.Black) },
-                        onClick = {
-                            onSelect(it)
-                            expanded = false
-                        }
-                    )
-                }
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            items.forEach { year ->
+                DropdownMenuItem(
+                    text = { Text(year) },
+                    onClick = {
+                        onSelect(year)
+                        expanded = false
+                    }
+                )
             }
         }
     }
 }
+

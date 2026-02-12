@@ -236,56 +236,65 @@ fun SectionHeader(text: String) {
     )
     Spacer(modifier = Modifier.height(8.dp))
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTextField(
     label: String,
     value: String,
-    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
-    onDone: (() -> Unit)? = null
+    isError: Boolean = false,
+    errorText: String? = null,
+    singleLine: Boolean = true,
+    onValueChange: (String) -> Unit
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        singleLine = true,
 
-        label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        },
+    Column(modifier = modifier.fillMaxWidth()) {
 
-        textStyle = MaterialTheme.typography.bodyLarge.copy(
-            color = Color.Black
-        ),
-
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            imeAction = imeAction
-        ),
-
-        keyboardActions = KeyboardActions(
-            onDone = { onDone?.invoke() }
-        ),
-
-        shape = RoundedCornerShape(14.dp),
-
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = Color(0xFFBDBDBD),
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = Color.Gray,
-            cursorColor = MaterialTheme.colorScheme.primary,
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = singleLine,
+            label = {
+                Text(
+                    text = label,
+                    fontSize = 14.sp
+                )
+            },
+            textStyle = TextStyle(
+                fontSize = 15.sp,
+                color = Color.Black
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction
+            ),
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = Color(0xFFE0E0E0),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White
+            ),
+            isError = isError
         )
-    )
+
+        if (isError && errorText != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = errorText,
+                color = MaterialTheme.colorScheme.error,
+                fontSize = 12.sp
+            )
+        }
+    }
 }
+
 
 
 @Composable

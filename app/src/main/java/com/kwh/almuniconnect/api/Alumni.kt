@@ -5,6 +5,7 @@ import com.kwh.almuniconnect.jobposting.JobPostResponse
 import com.kwh.almuniconnect.login.EmailCheckApiResponse
 import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.news.NewsResponse
+import com.kwh.almuniconnect.profile.ProfileResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -130,7 +131,7 @@ interface ApiService {
     suspend fun getRoles(): Response<MasterResponse>
     @Headers("Content-Type: application/json")
     @POST("auth/signup")
-    suspend fun signup(@Body body: SignupRequest): Response<SignupResponse>
+    suspend fun signup(@Body body: SignupRequest): Response<ProfileResponse>
 
 
     @GET("alumni/alumni-list")

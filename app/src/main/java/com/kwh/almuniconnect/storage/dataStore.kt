@@ -28,6 +28,13 @@ class UserPreferences(private val context: Context) {
         val KEY_LOCATION = stringPreferencesKey("location")
         val KEY_BIRTHDAY = stringPreferencesKey("birthday")
         val KEY_LINKEDIN = stringPreferencesKey("linkedin")
+        private val KEY_USER_ID = stringPreferencesKey("user_id")
+        private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
+        private val KEY_ACCESS_TOKEN_EXPIRY = stringPreferencesKey("access_token_expiry")
+        private val KEY_REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        private val KEY_REFRESH_TOKEN_EXPIRY = stringPreferencesKey("refresh_token_expiry")
+        private val KEY_BRANCH_ID = intPreferencesKey("branch_id")
+
     }
 
     /* ---------------- LOGIN SAVE ---------------- */
@@ -50,21 +57,31 @@ class UserPreferences(private val context: Context) {
     /* ---------------- PROFILE SAVE ---------------- */
 
     suspend fun saveProfile(profile: UserLocalModel) {
-        context.dataStore.edit { prefs ->
-            prefs[KEY_LOGGED_IN] = true   // ✅ ADD THIS
 
+        context.dataStore.edit { prefs ->
+
+            prefs[KEY_LOGGED_IN] = true
+
+            prefs[KEY_USER_ID] = profile.userId
             prefs[KEY_NAME] = profile.name
             prefs[KEY_EMAIL] = profile.email
             prefs[KEY_PHOTO] = profile.photo
             prefs[KEY_MOBILE] = profile.mobile
             prefs[KEY_BRANCH] = profile.branch
+            prefs[KEY_BRANCH_ID] = profile.branchId
             prefs[KEY_YEAR] = profile.year
             prefs[KEY_JOB] = profile.job
             prefs[KEY_LOCATION] = profile.location
             prefs[KEY_BIRTHDAY] = profile.birthday
             prefs[KEY_LINKEDIN] = profile.linkedin
+
+            prefs[KEY_ACCESS_TOKEN] = profile.accessToken
+            prefs[KEY_ACCESS_TOKEN_EXPIRY] = profile.accessTokenExpiry
+            prefs[KEY_REFRESH_TOKEN] = profile.refreshToken
+            prefs[KEY_REFRESH_TOKEN_EXPIRY] = profile.refreshTokenExpiry
         }
     }
+
 
     /* ---------------- READERS ---------------- */
 

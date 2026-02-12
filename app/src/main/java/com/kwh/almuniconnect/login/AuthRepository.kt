@@ -2,62 +2,98 @@ package com.kwh.almuniconnect.login
 
 import android.util.Log
 import com.google.gson.Gson
-import com.kwh.almuniconnect.api.ApiResponse
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.SignupRequest
-import com.kwh.almuniconnect.api.SignupResponse
+import com.kwh.almuniconnect.profile.ProfileResponse
 
-// AuthRepository.kt
-class AuthRepository(private val api: ApiService) {
-    suspend fun signup(request: SignupRequest): Result<SignupResponse> {
+class AuthRepository(
+    private val api: ApiService
+) {
+
+    /* ------------------------------------------------ */
+    /* ---------------- SIGNUP / PROFILE -------------- */
+    /* ------------------------------------------------ */
+
+    suspend fun signup(
+        request: SignupRequest
+    ): Result<ProfileResponse> {
+
         return try {
-            val resp = api.signup(request)
-            if (resp.isSuccessful) {
-                val body = resp.body()
+
+            val response = api.signup(request)
+
+            if (response.isSuccessful) {
+
+                val body = response.body()
+
                 if (body != null) {
+                    Log.e("AuthRepository", "Signup Success: $body")
                     Result.success(body)
                 } else {
                     Result.failure(Exception("Empty response body"))
                 }
+
             } else {
-                // try to extract error message or show code
-                val msg = resp.errorBody()?.string()
-                Result.failure(Exception("HTTP ${resp.code()}: $msg"))
+
+                val errorMsg = response.errorBody()?.string()
+
+                Log.e(
+                    "AuthRepository",
+                    "Signup Failed: ${response.code()} $errorMsg"
+                )
+
+                Result.failure(
+                    Exception("HTTP ${response.code()}: $errorMsg")
+                )
             }
+
         } catch (e: Exception) {
+
+            Log.e("AuthRepository", "Signup Exception: ${e.message}")
+
             Result.failure(e)
         }
     }
+
+
+    /* ------------------------------------------------ */
+    /* ------------- CHECK EMAIL EXIST ---------------- */
+    /* ------------------------------------------------ */
+
     suspend fun checkEmailAndGetUser(
         email: String
     ): Result<ExistingUserDto?> {
 
         return try {
-            val resp = api.checkEmailExist(email)
 
-            if (!resp.isSuccessful) {
-                return Result.failure(Exception("HTTP ${resp.code()}"))
+            val response = api.checkEmailExist(email)
+
+            if (!response.isSuccessful) {
+                return Result.failure(
+                    Exception("HTTP ${response.code()}")
+                )
             }
 
-            val body = resp.body()
+            val body = response.body()
                 ?: return Result.failure(Exception("Empty response"))
 
-            // ✅ NOW data EXISTS
             val rawData = body.data
                 ?: return Result.success(null)
+
             val jsonObject = Gson()
                 .toJsonTree(rawData)
                 .asJsonObject
 
-            // ✅ email exists → user object
             if (jsonObject.has("userId")) {
+
                 val user = Gson().fromJson(
                     jsonObject,
                     ExistingUserDto::class.java
                 )
+
                 Result.success(user)
+
             } else {
-                // ❌ email does not exist
                 Result.success(null)
             }
 
