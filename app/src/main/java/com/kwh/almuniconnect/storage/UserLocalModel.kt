@@ -14,6 +14,7 @@ data class UserLocalModel(
     val birthday: String = "",
     val linkedin: String = "",
     val photo: String = "",
+    val totalExp: Int = 0,
     val accessToken: String = "",
     val accessTokenExpiry: String = "",
     val refreshToken: String = "",

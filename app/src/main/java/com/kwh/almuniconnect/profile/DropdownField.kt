@@ -29,13 +29,60 @@ data class DropdownOption(
     val id: Int,
     val label: String
 )
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun DropdownFieldBranch(
+//    label: String,
+//    selected: Branch?,
+//    items: List<Branch>,
+//    onSelect: (Branch) -> Unit
+//) {
+//
+//    var expanded by remember { mutableStateOf(false) }
+//
+//    ExposedDropdownMenuBox(
+//        expanded = expanded,
+//        onExpandedChange = { expanded = !expanded }
+//    ) {
+//
+//        OutlinedTextField(
+//            value = selected?.name ?: "",
+//            onValueChange = {},
+//            readOnly = true,
+//            label = { Text(label) },
+//            trailingIcon = {
+//                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+//            },
+//            modifier = Modifier
+//                .menuAnchor()
+//                .fillMaxWidth(),
+//            shape = RoundedCornerShape(12.dp)
+//        )
+//
+//        ExposedDropdownMenu(
+//            expanded = expanded,
+//            onDismissRequest = { expanded = false }
+//        ) {
+//            items.forEach { branch ->
+//                DropdownMenuItem(
+//                    text = { Text(branch.name) },
+//                    onClick = {
+//                        onSelect(branch)
+//                        expanded = false
+//                    }
+//                )
+//            }
+//        }
+//    }
+//}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownFieldBranch(
+fun <T> DropdownFieldYear(
     label: String,
-    selected: Branch?,
-    items: List<Branch>,
-    onSelect: (Branch) -> Unit
+    selected: T?,
+    items: List<T>,
+    onSelect: (T) -> Unit
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -46,55 +93,7 @@ fun DropdownFieldBranch(
     ) {
 
         OutlinedTextField(
-            value = selected?.name ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-            },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            items.forEach { branch ->
-                DropdownMenuItem(
-                    text = { Text(branch.name) },
-                    onClick = {
-                        onSelect(branch)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownFieldYear(
-    label: String,
-    selected: String,
-    items: List<String>,
-    onSelect: (String) -> Unit
-) {
-
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
-    ) {
-
-        OutlinedTextField(
-            value = selected,
+            value = selected?.toString() ?: "",
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
@@ -115,11 +114,12 @@ fun DropdownFieldYear(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            items.forEach { year ->
+
+            items.forEach { item ->
                 DropdownMenuItem(
-                    text = { Text(year) },
+                    text = { Text(item.toString()) },
                     onClick = {
-                        onSelect(year)
+                        onSelect(item)
                         expanded = false
                     }
                 )
@@ -127,4 +127,5 @@ fun DropdownFieldYear(
         }
     }
 }
+
 

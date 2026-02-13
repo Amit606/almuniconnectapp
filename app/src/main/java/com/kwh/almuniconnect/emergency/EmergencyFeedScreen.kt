@@ -41,6 +41,7 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmergencyFeedScreen(
+    navController: NavController,
     onItemClick: (EmergencyDemo) -> Unit
 ) {
     Scaffold(
@@ -54,7 +55,7 @@ fun EmergencyFeedScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"

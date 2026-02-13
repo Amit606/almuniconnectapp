@@ -28,6 +28,7 @@ class UserPreferences(private val context: Context) {
         val KEY_LOCATION = stringPreferencesKey("location")
         val KEY_BIRTHDAY = stringPreferencesKey("birthday")
         val KEY_LINKEDIN = stringPreferencesKey("linkedin")
+        val KEY_TOTAL_EXP = intPreferencesKey("total_exp")
         private val KEY_USER_ID = stringPreferencesKey("user_id")
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val KEY_ACCESS_TOKEN_EXPIRY = stringPreferencesKey("access_token_expiry")
@@ -74,7 +75,7 @@ class UserPreferences(private val context: Context) {
             prefs[KEY_LOCATION] = profile.location
             prefs[KEY_BIRTHDAY] = profile.birthday
             prefs[KEY_LINKEDIN] = profile.linkedin
-
+            prefs[KEY_TOTAL_EXP] = profile.totalExp
             prefs[KEY_ACCESS_TOKEN] = profile.accessToken
             prefs[KEY_ACCESS_TOKEN_EXPIRY] = profile.accessTokenExpiry
             prefs[KEY_REFRESH_TOKEN] = profile.refreshToken
@@ -105,36 +106,14 @@ class UserPreferences(private val context: Context) {
                         job = prefs[KEY_JOB] ?: "",
                         location = prefs[KEY_LOCATION] ?: "",
                         birthday = prefs[KEY_BIRTHDAY] ?: "",
-                        linkedin = prefs[KEY_LINKEDIN] ?: ""
+                        linkedin = prefs[KEY_LINKEDIN] ?: "",
+                        totalExp = prefs[KEY_TOTAL_EXP] ?: 0,
+
                     )
                 }
             }
             .distinctUntilChanged()
 
-
-
-//    fun getUser(): Flow<UserLocalModel> =
-//        context.dataStore.data
-//            .catch { exception ->
-//                Log.e("UserPreferences", "Error reading user prefs", exception)
-//                // 🔥 CRITICAL: prevents NoSuchElementException
-//                emit(emptyPreferences())
-//            }
-//            .map { prefs ->
-//                UserLocalModel(
-//                    name = prefs[KEY_NAME] ?: "",
-//                    email = prefs[KEY_EMAIL] ?: "",
-//                    photo = prefs[KEY_PHOTO] ?: "",
-//                    mobile = prefs[KEY_MOBILE] ?: "",
-//                    branch = prefs[KEY_BRANCH] ?: "",
-//                    year = prefs[KEY_YEAR] ?: "",
-//                    job = prefs[KEY_JOB] ?: "",
-//                    location = prefs[KEY_LOCATION] ?: "",
-//                    birthday = prefs[KEY_BIRTHDAY] ?: "",
-//                    linkedin = prefs[KEY_LINKEDIN] ?: ""
-//                )
-//            }
-//            .distinctUntilChanged()
 
 
     suspend fun clear() {

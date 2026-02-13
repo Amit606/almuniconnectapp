@@ -3,6 +3,7 @@ package com.kwh.almuniconnect
 import AlumniViewModel
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,16 +57,15 @@ import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
 import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileRoute
+import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.subscription.PremiumScreen
+import com.kwh.almuniconnect.verification.AccountVerificationScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Routes.SPLASH) {
-
-
-
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
 
@@ -188,11 +188,27 @@ fun AppNavGraph(
 //                navController = navController
 //            )
 //        }
+        val user = UserLocalModel(
+            userId = "1",
+            name = "Amit Gupta",
+            email = "amit@gmail.com",
+            mobile = "9876543210",
+            branch = "Computer Science",
+            branchId = 1,
+            year = "2020",
+            job = "",
+            location = "",
+            birthday = "",
+            linkedin = "",
+            photo = "",
+            totalExp = 2
+        )
 
 
         composable(Routes.SPLASH_HOME)
         {
             SplashScreen(navController)
+
         }
 
         composable(Routes.LOGIN)
@@ -201,7 +217,31 @@ fun AppNavGraph(
 
         }
         // 🔢 OTP Screen
+     composable(Routes.VERIFICATION)
+     {
+         AccountVerificationScreen(
+             navController = navController,
+             user = user,
+             onApprove = {
+//                    Toast.makeText(
+//                        this,
+//                        "User Approved ✅",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
 
+                 // Call approve API here
+             },
+             onDeny = {
+//                    Toast.makeText(
+//                        this,
+//                        "User Denied ❌",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+
+                 // Call deny API here
+             }
+         )
+     }
 
 
         val pages = listOf(
@@ -278,19 +318,6 @@ fun AppNavGraph(
         composable(Routes.HELP_SUPPORTS) { HelpSupportScreen(navController) }
         composable(Routes.ABOUT_US) { AboutAlumniConnectScreen(navController) }
 
-//
-
-//        composable(
-//            route = "${Routes.EVENT_DETAILS}/{title}/{location}/{date}/{price}"
-//        ) { backStack ->
-//            EventDetailsScreen(
-//                navController,
-//                title = backStack.arguments?.getString("title") ?: "",
-//                location = backStack.arguments?.getString("location") ?: "",
-//                date = backStack.arguments?.getString("date") ?: "",
-//                price = backStack.arguments?.getString("price") ?: ""
-//            )
-//        }
         composable(
             route = "${Routes.EVENT_DETAILS}?title={title}&location={location}",
             arguments = listOf(
@@ -386,7 +413,7 @@ fun AppNavGraph(
 
         /* ---------- FEED ---------- */
         composable(Routes.FEED) {
-            EmergencyFeedScreen { emergency ->
+            EmergencyFeedScreen (navController){ emergency ->
                 navController.navigate(
                     "emergency_detail/${emergency.id}"
                 )
@@ -429,7 +456,7 @@ fun AppNavGraph(
             val emergencyId =
                 backStackEntry.arguments?.getString("id") ?: ""
 
-            DonateAmountScreen { amount ->
+            DonateAmountScreen(navController) { amount ->
                 navController.navigate(
                     "donation_success/$amount/$emergencyId"
                 ) {
@@ -454,15 +481,17 @@ fun AppNavGraph(
                 backStackEntry.arguments?.getString("id") ?: ""
 
             DonationSuccessScreen(
+                navController,
                 amount = amount,
 
                 onGoHome = {
-                    navController.navigate(Routes.FEED) {
+                    navController.navigate(Routes.HOME) {
                         popUpTo(0)
                     }
                 },
 
                 onViewEmergency = {
+
                     navController.navigate(
                         "emergency_detail/$emergencyId"
                     )

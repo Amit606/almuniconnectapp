@@ -30,7 +30,7 @@ data class AlumniDto(
     val countryName: String?,
     val companyName: String?,
     val title: String?,
-    val totalExperience: Int,
+    val totalExperience: Float,
     val linkedinUrl: String?,
     val photoUrl: String?,
     val isVerified: Boolean,

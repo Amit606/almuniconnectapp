@@ -247,6 +247,8 @@ fun AppTextField(
     isError: Boolean = false,
     errorText: String? = null,
     singleLine: Boolean = true,
+    readOnly: Boolean = false,        // ✅ NEW
+    enabled: Boolean = true,          // ✅ NEW
     onValueChange: (String) -> Unit
 ) {
 
@@ -256,6 +258,8 @@ fun AppTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = singleLine,
+            readOnly = readOnly,        // ✅ APPLY
+            enabled = enabled,          // ✅ APPLY
             label = {
                 Text(
                     text = label,
@@ -264,14 +268,13 @@ fun AppTextField(
             },
             textStyle = TextStyle(
                 fontSize = 15.sp,
-                color = Color.Black
+                color = if (enabled) Color.Black else Color.Gray
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
                 imeAction = imeAction
             ),
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -279,7 +282,8 @@ fun AppTextField(
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
                 cursorColor = MaterialTheme.colorScheme.primary,
                 focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                unfocusedContainerColor = Color.White,
+                disabledBorderColor = Color(0xFFE0E0E0)
             ),
             isError = isError
         )
@@ -294,6 +298,7 @@ fun AppTextField(
         }
     }
 }
+
 
 
 

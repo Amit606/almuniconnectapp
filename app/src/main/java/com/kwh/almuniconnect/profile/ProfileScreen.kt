@@ -2,6 +2,8 @@ package com.kwh.almuniconnect.profile
 
 import android.app.DatePickerDialog
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,10 +18,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -65,6 +72,8 @@ fun ProfileScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var mobile by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
+    var totalExp by remember { mutableStateOf<Int?>(null) }
+    val totalYear = (1..30).toList()
     var job by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var birthday by remember { mutableStateOf("") }
@@ -72,6 +81,10 @@ fun ProfileScreen(navController: NavController) {
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
     val years = (1972..2026).map { it.toString() }
+    val branchNames = branches.map { it.name }
+    var selectedBranchId by remember { mutableStateOf<Int?>(null) }
+
+
 
     val safeYear = if (year in years) year else ""
     LaunchedEffect(Unit) {
@@ -88,6 +101,7 @@ fun ProfileScreen(navController: NavController) {
         location = user.location
         birthday = user.birthday
         linkedin = user.linkedin
+        totalExp = user.totalExp
     }
 
     /* ---------- HANDLE API SUCCESS ---------- */
@@ -115,6 +129,7 @@ fun ProfileScreen(navController: NavController) {
                         birthday = profile.dateOfBirth ?: "",
                         linkedin = profile.linkedinUrl ?: "",
                         photo = profile.photoUrl ?: "",
+                        totalExp = profile.totalExperience ?: 0
 
 //                        accessToken = profile.accessToken ?: "",
 //                        accessTokenExpiry = profile.accessTokenExpiry ?: "",
@@ -175,43 +190,70 @@ fun ProfileScreen(navController: NavController) {
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         elevation = CardDefaults.cardElevation(3.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
 
-                            AsyncImage(
-                                model = user.photo.ifEmpty { R.drawable.man },
+                        Box {
+
+                            // ✅ Background Image
+                            Image(
+                                painter = painterResource(id = R.drawable.hbtu), // your image
                                 contentDescription = null,
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape)
-                                    .border(
-                                        2.dp,
-                                        MaterialTheme.colorScheme.primary,
-                                        CircleShape
+                                    .matchParentSize()
+                            )
+
+                            // ✅ Optional overlay (for readability)
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .background(Color.Black.copy(alpha = 0.15f))
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                AsyncImage(
+                                    model = user.photo.ifEmpty { R.drawable.man },
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(CircleShape)
+                                        .border(
+                                            2.dp,
+                                            MaterialTheme.colorScheme.primary,
+                                            CircleShape
+                                        )
+                                )
+
+                                Spacer(Modifier.height(14.dp))
+
+                                Text(
+                                    text = name.ifBlank { "Your Name" },
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,   // ✅ Bold
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = TextStyle(
+                                        shadow = Shadow(
+                                            color = Color.Black,
+                                            offset = Offset(2f, 2f),
+                                            blurRadius = 6f
+                                        )
                                     )
-                            )
+                                )
 
-                            Spacer(Modifier.height(14.dp))
-
-                            Text(
-                                text = name.ifBlank { "Your Name" },
-                                fontSize = 20.sp,
-                                color = Color.Black,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            Text(
-                                text = email.ifBlank { "Your Email ID" },
-                                fontSize = 14.sp,
-                                color = Color.Gray,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                Text(
+                                    text = email.ifBlank { "Your Email ID" },
+                                    fontSize = 14.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
@@ -230,13 +272,17 @@ fun ProfileScreen(navController: NavController) {
 
                         Column(
                             modifier = Modifier.padding(18.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
 
                             SectionTitle("Personal Details")
 
                             AppTextField("Name", name) { name = it }
-                            AppTextField("Email", email) { email = it }
+                            AppTextField(
+                                label = "Email",
+                                value = email,
+                                readOnly = true,
+                            ) { email = it }
 
                             AppTextField(
                                 label = "Mobile",
@@ -248,20 +294,32 @@ fun ProfileScreen(navController: NavController) {
                             }
 
                             SectionTitle("Professional Details")
-                            DropdownFieldBranch(
+                            DropdownFieldYear(
                                 label = "Branch",
-                                selected = selectedBranch,
-                                items = branches,   // ✅ YEH IMPORTANT HAI
-                                onSelect = {
-                                    selectedBranch = it
-                                    branch = it.name
+                                selected = branch,
+                                items = branchNames,
+                                onSelect = { selectedName ->
+
+                                    branch = selectedName
+
+                                    // find full object from name
+                                    val branchObj = branches.find { it.name == selectedName }
+                                    selectedBranchId = branchObj?.id
                                 }
                             )
 
-                            DropdownFieldYear( label = "Passout Year", selected = safeYear,
+                            DropdownFieldYear( label = "PassOut  Year", selected = safeYear,
                                 items = years, onSelect = { year = it } )
 
                             AppTextField("Job / Company", job) { job = it }
+                            // ✅ FIXED TOTAL EXP
+                            DropdownFieldYear(
+                                label = "Total Exp",
+                                selected = totalExp,
+                                items = totalYear,
+                                onSelect = { totalExp = it }
+                            )
+
                             AppTextField("Location", location) { location = it }
 
                             BirthdayPicker(birthday) { birthday = it }
@@ -303,11 +361,11 @@ fun ProfileScreen(navController: NavController) {
                                                 email = email,
                                                 dateOfBirth = birthday,
                                                 passoutYear = year.toIntOrNull() ?: 0,
-                                                courseId = selectedBranch?.id ?: 0,
+                                                courseId = selectedBranchId,
                                                 countryId = 81,
                                                 companyName = job,
                                                 title = job,
-                                                totalExperience = 0,
+                                                totalExperience = totalExp ?: 0,
                                                 linkedinUrl = linkedin,
                                                 loggedFrom = "android",
                                                 deviceId = DeviceUtils.getDeviceId(context),

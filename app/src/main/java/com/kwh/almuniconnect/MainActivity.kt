@@ -134,6 +134,9 @@ private fun handleNotificationIntent(
         Routes.JOB_DETAILS_Full -> {
             navController.safeNavigate(Routes.JOB_DETAILS_Full)
         }
+        Routes.VERIFICATION -> {
+            navController.safeNavigate(Routes.VERIFICATION)
+        }
 
         Routes.ALMUNI_POST -> {
             navController.safeNavigate(Routes.ALMUNI_POST)

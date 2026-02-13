@@ -91,6 +91,7 @@ fun SplashScreen(navController: NavController) {
         delay(1800)
 
         if (isLoggedIn) {
+            //Routes.VERIFICATION   //Home
             navController.navigate(Routes.HOME) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
             }
