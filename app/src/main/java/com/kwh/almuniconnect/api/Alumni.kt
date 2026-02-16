@@ -150,6 +150,10 @@ interface ApiService {
     suspend fun createJobPost(
         @Body request: JobPostRequest
     ): Response<JobPostResponse>
+    @DELETE("user/delete")
+    suspend fun deleteAccount(
+        @Header("Authorization") token: String
+    ): Response<Unit>
 
 }
 

@@ -8,6 +8,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +24,8 @@ import androidx.navigation.NavController
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.Routes.PRIVACY_POLICY_URL
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.help.openLink
 
@@ -26,9 +34,29 @@ import com.kwh.almuniconnect.help.openLink
 fun SettingsScreen(
     navController: NavController
 ) {
-    val context = LocalContext.current
     TrackScreen("settings_screen")
+    val context = LocalContext.current
 
+    val apiService = remember { NetworkClient.createService(ApiService::class.java) }
+    val repository = remember { UserRepository(apiService, context) }
+    val factory = remember { SettingsViewModelFactory(repository) }
+
+    val viewModel: SettingsViewModel =
+        androidx.lifecycle.viewmodel.compose.viewModel(factory = factory)
+
+    val deleteState by viewModel.deleteState.collectAsState()
+    val loading by viewModel.loading.collectAsState()
+    // 🔹 Navigate when deleted
+    LaunchedEffect(deleteState) {
+        deleteState?.let { success ->
+            if (success) {
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(0)
+                }
+            }
+        }
+    }
+    var showDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -78,7 +106,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Delete,
                     title = "Delete All Data",
                     subtitle = "Permanently remove all saved information from this device",
-                    onClick = {  }
+                    onClick = { showDialog = true  }
                 )
             }
 
@@ -111,6 +139,26 @@ fun SettingsScreen(
                     onClick = { /* logout */ }
                 )
             }
+        }
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        viewModel.deleteAccount()
+                    }) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("Cancel")
+                    }
+                },
+                title = { Text("Delete Account?") },
+                text = { Text("This action cannot be undone.") }
+            )
         }
     }
 }

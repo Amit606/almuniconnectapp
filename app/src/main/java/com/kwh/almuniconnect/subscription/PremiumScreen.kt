@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.subscription
 
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,25 +11,41 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import com.kwh.almuniconnect.billing.BillingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PremiumScreen(
     navController: NavController,
-    onUpgradeClick: () -> Unit = {}
+    onUpgradeClick: () -> Unit = {},
+     viewModel: BillingViewModel = viewModel(),
+
 ) {
+    val context = LocalContext.current
+    val activity = context as Activity
+
+    val isPremium = viewModel.isPremium.collectAsState().value
+    val isLoading = viewModel.isLoading.collectAsState().value
+    LaunchedEffect(Unit) {
+        viewModel.startBilling()
+    }
     TrackScreen("premium_screen")
+
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -160,7 +177,11 @@ fun PremiumScreen(
 
             // 🚀 CTA
             Button(
-                onClick = onUpgradeClick,
+                onClick = {
+                    if (!isPremium && !isLoading) {
+                        viewModel.buy(activity)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
