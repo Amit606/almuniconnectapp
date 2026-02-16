@@ -109,17 +109,18 @@ interface ApiService {
     suspend fun getBatches(): Response<MasterResponse>
 
 
-    @GET("events")
-    suspend fun getEvents(
-        @Query("pageNumber") pageNumber: Int,
-        @Query("pageSize") pageSize: Int
-    ): EventsResponse
 
     @GET("job-posts")
     suspend fun getJobPosts(
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
     ): Response<JobPostResponse>
+
+    @GET("events")
+    suspend fun getEvents(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int
+    ): EventsResponse
 
     @GET("news")
     suspend fun getNews(
