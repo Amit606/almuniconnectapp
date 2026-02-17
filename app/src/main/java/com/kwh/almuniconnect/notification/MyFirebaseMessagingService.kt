@@ -34,118 +34,160 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        super.onNewToken(token)
         Log.d(TAG, "FCM Token: $token")
-        // TODO: send token to your server if required
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        super.onMessageReceived(remoteMessage)
-        Log.d(TAG, "Message received: from=${remoteMessage.from}")
+        try {
+            val data = remoteMessage.data ?: emptyMap()
 
-        // Log data to help debugging
-        if (remoteMessage.data.isNotEmpty()) {
-            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
+            val title = remoteMessage.notification?.title
+                ?: data["title"]
+                ?: getString(R.string.app_name)
+
+            val body = remoteMessage.notification?.body
+                ?: data["body"]
+                ?: ""
+
+            val destination = data["destination"]
+            val ctaTitle = data["cta_title"]
+            val ctaDestination = data["cta_destination"]
+
+            showNotification(
+                title = title,
+                body = body,
+                destination = destination,
+                data = data,
+                ctaTitle = ctaTitle,
+                ctaDestination = ctaDestination
+            )
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Notification handling failed: ${e.message}")
         }
-        if (remoteMessage.notification != null) {
-            Log.d(TAG, "Message notification payload: ${remoteMessage.notification}")
-        }
-
-        val notification = remoteMessage.notification
-        val title = notification?.title ?: remoteMessage.data["title"] ?: getString(R.string.app_name)
-        val body = notification?.body ?: remoteMessage.data["body"] ?: ""
-        val destination = remoteMessage.data["destination"] // e.g. "language"
-        val data = remoteMessage.data // pass full map for image key etc.
-
-        showNotification(title, body, destination, data)
     }
 
-    /**
-     * Build and show a local notification, with PendingIntent to open MainActivity.
-     * This fetches an optional imageUrl from data["image"] and applies BigPictureStyle.
-     */
     @SuppressLint("MissingPermission")
     private fun showNotification(
         title: String?,
         body: String?,
         destination: String?,
-        data: Map<String, String>
+        data: Map<String, String>,
+        ctaTitle: String?,
+        ctaDestination: String?
     ) {
-        // Build intent to open app -- customize to your navigation setup
-        val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra("from_notification", true)
-            destination?.let { putExtra("destination", it) }
-            // Use these flags so tapping from background/closed launches activity cleanly.
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
 
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        try {
 
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            // -------- Main Intent --------
+            val mainIntent = Intent(this, MainActivity::class.java).apply {
+                putExtra("from_notification", true)
 
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.app_logo) // replace with your small icon
-            .setContentTitle(title)
-            .setContentText(body)
-            .setAutoCancel(true)
-            .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                // Pass all data safely
+                data.forEach { (key, value) ->
+                    putExtra(key, value)
+                }
 
-        // Try to find image URL in data payload
-        val imageUrl = data["image"] ?: data["image_url"] ?: data["banner"]
-
-        var bitmap: Bitmap? = null
-        if (!imageUrl.isNullOrEmpty()) {
-            try {
-                // onMessageReceived runs on a background thread, so blocking fetch is acceptable here
-                bitmap = Glide.with(this)
-                    .asBitmap()
-                    .load(imageUrl)
-                    .submit()
-                    .get()
-                Log.d(TAG, "Fetched image for notification: $imageUrl")
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to fetch image for notification: $e")
-                bitmap = null
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
-        }
 
-        if (bitmap != null) {
-            // Apply BigPictureStyle to show banner image when notification expands
-            builder.setStyle(
-                NotificationCompat.BigPictureStyle()
-                    .bigPicture(bitmap)
-                // .bigLargeIcon(null) // avoids duplicating the large icon in expanded view
+            val mainPendingIntent = PendingIntent.getActivity(
+                this,
+                Random.nextInt(),
+                mainIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            // Optional: set as large icon too (small round icon beside text)
-            builder.setLargeIcon(bitmap)
-        } else if (!body.isNullOrEmpty() && body.length > 40) {
-            // fallback to BigTextStyle if we don't have an image
-            builder.setStyle(NotificationCompat.BigTextStyle().bigText(body))
-        }
 
-        with(NotificationManagerCompat.from(this)) {
-            notify(Random.nextInt(), builder.build())
+            val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.app_logo)
+                .setContentTitle(title ?: getString(R.string.app_name))
+                .setContentText(body ?: "")
+                .setAutoCancel(true)
+                .setSound(defaultSound)
+                .setContentIntent(mainPendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+            // -------- Handle Big Image (Optional) --------
+            val imageUrl = data["image"] ?: data["image_url"] ?: data["banner"]
+
+            var bitmap: Bitmap? = null
+
+            if (!imageUrl.isNullOrEmpty()) {
+                try {
+                    bitmap = Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .submit()
+                        .get()
+                } catch (e: Exception) {
+                    Log.w(TAG, "Image load failed")
+                }
+            }
+
+            if (bitmap != null) {
+                builder.setStyle(
+                    NotificationCompat.BigPictureStyle()
+                        .bigPicture(bitmap)
+                )
+                builder.setLargeIcon(bitmap)
+            } else if (!body.isNullOrEmpty()) {
+                builder.setStyle(
+                    NotificationCompat.BigTextStyle().bigText(body)
+                )
+            }
+
+            // -------- Handle CTA (Optional) --------
+            if (!ctaTitle.isNullOrEmpty() && !ctaDestination.isNullOrEmpty()) {
+
+                val ctaIntent = Intent(this, MainActivity::class.java).apply {
+                    putExtra("from_notification", true)
+                    putExtra("destination", ctaDestination)
+
+                    // Pass full data again
+                    data.forEach { (key, value) ->
+                        putExtra(key, value)
+                    }
+
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+
+                val ctaPendingIntent = PendingIntent.getActivity(
+                    this,
+                    Random.nextInt(),
+                    ctaIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                builder.addAction(
+                    R.drawable.ic_google, // change icon if needed
+                    ctaTitle,
+                    ctaPendingIntent
+                )
+            }
+
+            NotificationManagerCompat.from(this)
+                .notify(Random.nextInt(), builder.build())
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Show notification failed: ${e.message}")
         }
     }
 
-    /**
-     * Create notification channel for Android O+
-     */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
+
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
                 description = CHANNEL_DESC
                 enableLights(true)
                 enableVibration(true)
             }
+
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }

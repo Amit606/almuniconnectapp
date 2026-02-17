@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.profile
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,19 +21,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
-import com.kwh.almuniconnect.network.AlumniProfile
+import com.kwh.almuniconnect.network.AlumniDto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlumniProfileScreen(
-    alumni: AlumniProfile,
+    alumni: AlumniDto,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -58,39 +61,54 @@ fun AlumniProfileScreen(
 
             // 🔵 Profile Image
             AsyncImage(
-                model = alumni.imageUrl,
-                contentDescription = "Profile photo",
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(alumni.photoUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(128.dp)
+                    .size(120.dp)
                     .clip(CircleShape)
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                        CircleShape
-                    )
-                    .padding(4.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                placeholder = painterResource(R.drawable.man),
+                error = painterResource(R.drawable.man),
+                fallback = painterResource(R.drawable.man)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 👤 Name
-            Text(
-                text = alumni.name,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = alumni.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (alumni.isVerified) {
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Icon(
+                        imageVector = Icons.Default.Verified,
+                        contentDescription = "Verified Alumni",
+                        tint = Color(0xFF1DA1F2),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
 
             // 💼 Position & Company
             Text(
-                text = "${alumni.position} • ${alumni.company}",
+                text = "${alumni.companyName} | ${alumni.totalExperience} yrs",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
 
             // 🎓 Branch & Year
             Text(
-                text = "${alumni.branch} | ${alumni.passingYear}",
+                text = "${alumni.courseName} | ${alumni.batch}",
                 style = MaterialTheme.typography.labelMedium,
                 color = Color.Gray
             )
@@ -115,8 +133,8 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.Phone,
                         label = "Mobile",
-                        value = alumni.phone,
-                        onClick = { callPhone(context, alumni.phone) }
+                        value = alumni.mobileNo.toString(),
+                        onClick = { callPhone(context, alumni.mobileNo.toString()) }
                     )
 
                     Divider()
@@ -124,8 +142,8 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.Email,
                         label = "Email",
-                        value = alumni.email,
-                        onClick = { sendEmail(context, alumni.email) }
+                        value = alumni.email.toString(),
+                        onClick = { sendEmail(context, alumni.email.toString()) }
                     )
 
                     Divider()
@@ -133,18 +151,28 @@ fun AlumniProfileScreen(
                     ProfileRow(
                         icon = Icons.Default.LocationOn,
                         label = "Location",
-                        value = alumni.location,
-                        onClick = { openLocation(context, alumni.location) }
+                        value = alumni.countryName.toString(),
+                        onClick = { openLocation(context, alumni.countryName.toString()) }
                     )
+                    Log.e("AlumniProfileScreen", "Rendering WhatsApp row for number: ${alumni.countryName.toString()}")
 
                     Divider()
 
                     ProfileRow(
                         icon = Icons.Default.Whatsapp,
                         label = "WhatsApp",
-                        value = alumni.phone,
+                        value = alumni.mobileNo.toString(),
                         iconTint = Color(0xFF25D366),
-                        onClick = { openWhatsApp(context, alumni.phone) }
+                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
+                    )
+                    Divider()
+
+                    ProfileRow(
+                        icon = Icons.Default.Countertops,
+                        label = "Job Referral ",
+                        value = "Job Posted 3",
+                        iconTint = Color(0xFF25D366),
+                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
                     )
                 }
             }
@@ -157,7 +185,7 @@ fun AlumniProfileScreen(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse(alumni.profileUrl)
+                            Uri.parse(alumni.linkedinUrl.toString())
                         )
                     )
                 },

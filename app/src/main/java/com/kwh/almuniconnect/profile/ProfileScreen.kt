@@ -1,38 +1,47 @@
 package com.kwh.almuniconnect.profile
 
 import android.app.DatePickerDialog
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
-import com.kwh.almuniconnect.analytics.TrackScreen
-import com.kwh.almuniconnect.api.ApiService
-import com.kwh.almuniconnect.api.NetworkClient
-import com.kwh.almuniconnect.api.SignupRequest
+import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.api.*
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
+import com.kwh.almuniconnect.jobposting.SectionTitle
 import com.kwh.almuniconnect.login.AuthRepository
-import com.kwh.almuniconnect.storage.FcmPrefs
-import com.kwh.almuniconnect.storage.UserLocalModel
-import com.kwh.almuniconnect.storage.UserPreferences
-import com.kwh.almuniconnect.storage.UserSession
-import kotlinx.coroutines.launch
+import com.kwh.almuniconnect.storage.*
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,160 +49,330 @@ import java.util.*
 fun ProfileScreen(navController: NavController) {
 
     val context = LocalContext.current
-    // 1️⃣ Create ApiService
-    val apiService = remember {
-        NetworkClient.createService(ApiService::class.java)
-    }
-    TrackScreen("profile_screen")
+    val focusManager = LocalFocusManager.current
 
-    // 2️⃣ Repository
-    val repository = remember {
-        AuthRepository(apiService)
-    }
+    val apiService = remember { NetworkClient.createService(ApiService::class.java) }
+    val repository = remember { AuthRepository(apiService) }
 
-    // 3️⃣ ViewModel WITH FACTORY (CRITICAL)
-    val viewModel: ProfileViewModel = viewModel(
-        factory = ProfileViewModelFactory(repository)
-    )
+    val viewModel: ProfileViewModel =
+        viewModel(factory = ProfileViewModelFactory(repository))
 
     val apiState by viewModel.state.collectAsState()
 
-
-    val scope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
     val userPrefs = remember { UserPreferences(context) }
+    val user by userPrefs.getUser().collectAsState(initial = UserLocalModel())
 
-    val user by userPrefs.getUser().collectAsState(
-        initial = UserLocalModel()
-    )
 
-    var name by remember(user.name) { mutableStateOf(user.name) }
-    var email by remember(user.email) { mutableStateOf(user.email) }
-    var mobile by remember(user.mobile) { mutableStateOf(user.mobile) }
-    var branch by remember(user.branch) { mutableStateOf(user.branch) }
-    var year by remember(user.year) { mutableStateOf(user.year) }
-    var job by remember(user.job) { mutableStateOf(user.job) }
-    var location by remember(user.location) { mutableStateOf(user.location) }
-    var birthday by remember(user.birthday) { mutableStateOf(user.birthday) }
-    var linkedin by remember(user.linkedin) { mutableStateOf(user.linkedin) }
+
+    var selectedBranch by remember { mutableStateOf<Branch?>(null) }
+    var branch by remember { mutableStateOf("") }
+    /* ---------- FORM STATE ---------- */
+
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var mobile by remember { mutableStateOf("") }
+    var year by remember { mutableStateOf("") }
+    var totalExp by remember { mutableStateOf<Int?>(null) }
+    val totalYear = (1..30).toList()
+    var job by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var birthday by remember { mutableStateOf("") }
+    var linkedin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
+    val years = (1972..2026).map { it.toString() }
+    val branchNames = branches.map { it.name }
+    var selectedBranchId by remember { mutableStateOf<Int?>(null) }
+
+
+
+    val safeYear = if (year in years) year else ""
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
     }
 
+    LaunchedEffect(user) {
 
-    val branches = listOf(
-        "B.Tech – CSE","B.Tech – IT","B.Tech – ECE","B.Tech – EE",
-        "B.Tech – ME","B.Tech – CE","M.Tech","MCA","MBA","BCA"
-    )
-    val years = (1972..2026).map { it.toString() }
-    val safeBranch = if (branch in branches) branch else ""
-    val safeYear = if (year in years) year else ""
+        name = user.name
+        email = user.email
+        mobile = user.mobile
+        branch = user.branch
+        year = user.year
+        job = user.job
+        location = user.location
+        birthday = user.birthday
+        linkedin = user.linkedin
+        totalExp = user.totalExp
+    }
+
+    /* ---------- HANDLE API SUCCESS ---------- */
+
+    LaunchedEffect(apiState) {
+
+        when (apiState) {
+
+            is ProfileState.Success -> {
+
+                val profile =
+                    (apiState as ProfileState.Success).profile
+
+                Log.e("ProfileScreen", "API Success: ${profile.userId}")
+                userPrefs.saveProfile(
+                    UserLocalModel(
+                        userId = profile.userId ?: "",
+                        name = profile.name ?: "",
+                        email = profile.email ?: "",
+                        mobile = profile.mobileNo ?: "",
+                        branch = profile.courseName ?: "",
+                        branchId = profile.courseId ?: 0,
+                        year = profile.passoutYear?.toString() ?: "",
+                        job = profile.companyName ?: "",
+                        location = "",
+                        birthday = profile.dateOfBirth ?: "",
+                        linkedin = profile.linkedinUrl ?: "",
+                        photo = profile.photoUrl ?: "",
+                        totalExp = profile.totalExperience ?: 0
+
+//                        accessToken = profile.accessToken ?: "",
+//                        accessTokenExpiry = profile.accessTokenExpiry ?: "",
+//                        refreshToken = profile.refreshToken ?: "",
+//                        refreshTokenExpiry = profile.refreshTokenExpiry ?: ""
+                    )
+                )
+
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.PROFILE) { inclusive = true }
+                }
+            }
+
+            is ProfileState.Error -> {
+                error = (apiState as ProfileState.Error).message
+            }
+
+            else -> {}
+        }
+    }
+
+    /* ---------- UI ---------- */
+
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Profile  ",
+                title = "Profile",
                 navController = navController
             )
-        }
-    ) { paddingValues ->
+        },
+        containerColor = Color.White
+    ) { padding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(paddingValues)
+                .padding(padding)
+                .imePadding()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) { focusManager.clearFocus() }
         ) {
-            LazyColumn {
 
-                item {
-                    Box(
-                        Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AsyncImage(
-                            model = user.photo.ifEmpty { R.drawable.man },
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(CircleShape)
-                                .border(3.dp, Color.White, CircleShape)
-                        )
-                    }
-                }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
+
+                /* ---------- PROFILE HEADER ---------- */
 
                 item {
                     Card(
-                        modifier = Modifier.padding(16.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Transparent
-                        )
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(3.dp)
                     ) {
-                        Column(Modifier.padding(12.dp)) {
+
+                        Box {
+
+                            // ✅ Background Image
+                            Image(
+                                painter = painterResource(id = R.drawable.hbtu), // your image
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .matchParentSize()
+                            )
+
+                            // ✅ Optional overlay (for readability)
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .background(Color.Black.copy(alpha = 0.15f))
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                AsyncImage(
+                                    model = user.photo.ifEmpty { R.drawable.man },
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(CircleShape)
+                                        .border(
+                                            2.dp,
+                                            MaterialTheme.colorScheme.primary,
+                                            CircleShape
+                                        )
+                                )
+
+                                Spacer(Modifier.height(14.dp))
+
+                                Text(
+                                    text = name.ifBlank { "Your Name" },
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,   // ✅ Bold
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = TextStyle(
+                                        shadow = Shadow(
+                                            color = Color.Black,
+                                            offset = Offset(2f, 2f),
+                                            blurRadius = 6f
+                                        )
+                                    )
+                                )
+
+                                Text(
+                                    text = email.ifBlank { "Your Email ID" },
+                                    fontSize = 14.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                }
+
+                /* ---------- FORM CARD ---------- */
+
+                item {
+                    Card(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(3.dp)
+                    ) {
+
+                        Column(
+                            modifier = Modifier.padding(18.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+
+                            SectionTitle("Personal Details")
 
                             AppTextField("Name", name) { name = it }
-                            AppTextField("Email", email) { email = it }
+                            AppTextField(
+                                label = "Email",
+                                value = email,
+                                readOnly = true,
+                            ) { email = it }
 
                             AppTextField(
                                 label = "Mobile",
                                 value = mobile,
-                                onValueChange = {
-                                    if (it.all(Char::isDigit) && it.length <= 10)
-                                        mobile = it
+                                keyboardType = KeyboardType.Number
+                            ) {
+                                if (it.all(Char::isDigit) && it.length <= 10)
+                                    mobile = it
+                            }
+
+                            SectionTitle("Professional Details")
+                            DropdownFieldYear(
+                                label = "Branch",
+                                selected = branch,
+                                items = branchNames,
+                                onSelect = { selectedName ->
+
+                                    branch = selectedName
+
+                                    // find full object from name
+                                    val branchObj = branches.find { it.name == selectedName }
+                                    selectedBranchId = branchObj?.id
                                 }
                             )
 
-                            Spacer(Modifier.height(8.dp))
-                            DropdownField("Branch", safeBranch, branches) { branch = it }
-                            Spacer(Modifier.height(8.dp))
-                            DropdownField("Year", safeYear, years) { year = it }
+                            DropdownFieldYear( label = "PassOut  Year", selected = safeYear,
+                                items = years, onSelect = { year = it } )
+
                             AppTextField("Job / Company", job) { job = it }
+                            // ✅ FIXED TOTAL EXP
+                            DropdownFieldYear(
+                                label = "Total Exp",
+                                selected = totalExp,
+                                items = totalYear,
+                                onSelect = { totalExp = it }
+                            )
+
                             AppTextField("Location", location) { location = it }
 
                             BirthdayPicker(birthday) { birthday = it }
 
-                            AppTextField(
-                                label = "LinkedIn URL",
-                                value = linkedin,
-                                onValueChange = { linkedin = it }
-                            )
-
-                            error?.let {
-                                Text(it, color = Color.Red)
+                            AppTextField("LinkedIn URL", linkedin) {
+                                linkedin = it
                             }
 
+                            error?.let {
+                                Text(
+                                    text = it,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            Spacer(Modifier.height(8.dp))
+
                             Button(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 enabled = apiState !is ProfileState.Loading,
                                 onClick = {
+
                                     error = validateProfile(
-                                        name, email, mobile, branch, year,
-                                        job, location, birthday, linkedin
+                                        name, email, mobile,
+                                        branch, year,
+                                        job, location,
+                                        birthday, linkedin
                                     )
 
                                     if (error == null) {
-                                        val deviceId = DeviceUtils.getDeviceId(context)
-
                                         viewModel.submitProfile(
-
                                             SignupRequest(
                                                 name = name,
                                                 mobileNo = mobile,
                                                 email = email,
-                                                dateOfBirth = uiDateToApi(birthday),
-                                                passoutYear = year.toInt(),
-                                                courseId = 1,
-                                                countryId = 1,
+                                                dateOfBirth = birthday,
+                                                passoutYear = year.toIntOrNull() ?: 0,
+                                                courseId = selectedBranchId,
+                                                countryId = 81,
                                                 companyName = job,
                                                 title = job,
-                                                totalExperience = 0,
+                                                totalExperience = totalExp ?: 0,
                                                 linkedinUrl = linkedin,
                                                 loggedFrom = "android",
-                                                deviceId = deviceId,
+                                                deviceId = DeviceUtils.getDeviceId(context),
                                                 fcmToken = fcmToken,
-                                                appVersion = "1.0.1",
+                                                appVersion = "1.0.5",
                                                 advertisementId = "",
                                                 userAgent = "android"
                                             )
@@ -201,6 +380,7 @@ fun ProfileScreen(navController: NavController) {
                                     }
                                 }
                             ) {
+
                                 if (apiState is ProfileState.Loading) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(20.dp),
@@ -208,50 +388,79 @@ fun ProfileScreen(navController: NavController) {
                                         strokeWidth = 2.dp
                                     )
                                 } else {
-                                    Text("Update Profile")
-                                }
-                            }
-                        }
-                    }
-
-                    LaunchedEffect(apiState) {
-                        when (apiState) {
-                            is ProfileState.Success -> {
-                                userPrefs.saveProfile(
-                                    user.copy(
-                                        name = name,
-                                        email = email,
-                                        mobile = mobile,
-                                        branch = branch,
-                                        year = year,
-                                        job = job,
-                                        location = location,
-                                        birthday = birthday,
-                                        linkedin = linkedin
+                                    Text(
+                                        "Update Profile",
+                                        fontSize = 16.sp,
+                                        color = Color.White
                                     )
-                                )
-                                UserSession.saveLogin(context)
-
-                                navController.navigate("home") {
-                                    popUpTo("profile") { inclusive = true }
                                 }
                             }
-
-                            is ProfileState.Error -> {
-                                error = (apiState as ProfileState.Error).message
-                            }
-
-                            else -> Unit
                         }
                     }
                 }
             }
         }
     }
-
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BirthdayPicker(
+    birthday: String,
+    onDateSelected: (String) -> Unit
+) {
 
-/* ---------------- HELPERS ---------------- */
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    val datePickerDialog = remember {
+        DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                val formatted =
+                    "%02d-%02d-%02d".format(year, month + 1, day)
+                onDateSelected(formatted)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.maxDate = System.currentTimeMillis()
+        }
+    }
+
+    OutlinedTextField(
+        value = birthday,
+        onValueChange = {},
+        readOnly = true,
+        enabled = true,   // ✅ IMPORTANT
+        label = { Text("Birthday") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                datePickerDialog.show()
+            },
+        shape = RoundedCornerShape(12.dp),
+        trailingIcon = {
+            IconButton(onClick = {
+                datePickerDialog.show()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Select Date"
+                )
+            }
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.LightGray,
+            cursorColor = MaterialTheme.colorScheme.primary
+        ),
+        textStyle = TextStyle(fontSize = 15.sp)
+    )
+}
 
 fun validateProfile(
     name: String,
@@ -264,60 +473,39 @@ fun validateProfile(
     birthday: String,
     linkedin: String
 ): String? {
-    if (name.isBlank()) return "Enter name"
-    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) return "Invalid email"
-    if (mobile.length != 10) return "Enter valid mobile"
-    if (branch.isBlank()) return "Select branch"
-    if (year.isBlank()) return "Select year"
-    if (job.isBlank()) return "Enter job"
-    if (location.isBlank()) return "Enter location"
-    if (birthday.isBlank()) return "Select birthday"
-    if (linkedin.isNotBlank() && !linkedin.startsWith("http")) return "Invalid LinkedIn URL"
+
+    if (name.isBlank())
+        return "Please enter your name"
+
+    if (name.length < 3)
+        return "Name must be at least 3 characters"
+
+    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
+        return "Please enter a valid email"
+
+    if (mobile.length != 10)
+        return "Mobile number must be 10 digits"
+
+    if (branch.isBlank())
+        return "Please select branch"
+
+    if (year.isBlank())
+        return "Please select passout year"
+
+    if (job.isBlank())
+        return "Please enter job/company"
+
+    if (location.isBlank())
+        return "Please enter location"
+
+    if (birthday.isBlank())
+        return "Please select birthday"
+
+    if (linkedin.isNotBlank() &&
+        !linkedin.startsWith("http://") &&
+        !linkedin.startsWith("https://")
+    )
+        return "LinkedIn URL must start with http:// or https://"
+
     return null
-}
-
-@Composable
-fun BirthdayPicker(
-    birthday: String,
-    onDate: (String) -> Unit
-) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-
-    val datePickerDialog = remember {
-        DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                onDate("%02d/%02d/%04d".format(day, month + 1, year))
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).apply {
-            datePicker.maxDate = System.currentTimeMillis()
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { datePickerDialog.show() }
-    ) {
-        OutlinedTextField(
-            value = birthday,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Birthday", color = Color.Black) },
-            enabled = false, // prevents keyboard
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
-            )
-        )
-    }
-}
-fun uiDateToApi(date: String): String {
-    val (d, m, y) = date.split("/")
-    return "$y-$m-$d"
 }

@@ -2,7 +2,11 @@ package com.kwh.almuniconnect.api
 
 import com.kwh.almuniconnect.evetns.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
+import com.kwh.almuniconnect.login.EmailCheckApiResponse
+import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.news.NewsResponse
+import com.kwh.almuniconnect.profile.ProfileResponse
+import com.kwh.almuniconnect.verification.PendingVerificationResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -34,7 +38,7 @@ data class SignupRequest(
     val email: String,
     val dateOfBirth: String,
     val passoutYear: Int,
-    val courseId: Int,
+    val courseId: Int?,
     val countryId: Int,
     val companyName: String,
     val title: String,
@@ -58,6 +62,21 @@ data class SignupResponse(
 data class UserData(
     val userId: String
 )
+data class JobPostRequest(
+    val title: String,
+    val description: String,
+    val company: String,
+    val location: String,
+    val employmentType: String,
+    val totalExperience: String,
+    val salary: String,
+    val expiresAt: String // yyyy-MM-dd
+)
+data class JobPostResponse(
+    val success: Boolean,
+    val message: String
+)
+
 
 // Generic ApiResponse (adjust fields if actual API differs)
 data class ApiResponse<T>(
@@ -91,11 +110,6 @@ interface ApiService {
     suspend fun getBatches(): Response<MasterResponse>
 
 
-    @GET("events")
-    suspend fun getEvents(
-        @Query("pageNumber") pageNumber: Int,
-        @Query("pageSize") pageSize: Int
-    ): EventsResponse
 
     @GET("job-posts")
     suspend fun getJobPosts(
@@ -103,16 +117,84 @@ interface ApiService {
         @Query("pageSize") pageSize: Int
     ): Response<JobPostResponse>
 
+    @GET("events")
+    suspend fun getEvents(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int
+    ): EventsResponse
+
     @GET("news")
     suspend fun getNews(
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
-    ): Response<NewsResponse>
+    ): Response<ApiResponse<NewsResponse>>
 
     @GET("masters/roles")
     suspend fun getRoles(): Response<MasterResponse>
     @Headers("Content-Type: application/json")
     @POST("auth/signup")
-    suspend fun signup(@Body body: SignupRequest): Response<SignupResponse>
+    suspend fun signup(@Body body: SignupRequest): Response<ProfileResponse>
+
+
+    @GET("alumni/alumni-list")
+    suspend fun getAlumniList(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int,
+        @Query("ascending") ascending: Boolean = false
+    ): Response<AlumniApiResponse>
+
+    @GET("auth/{email}/is-email-exist")
+    suspend fun checkEmailExist(
+        @Path(value = "email", encoded = true) email: String
+    ): Response<EmailCheckApiResponse>
+
+    @POST("job-posts")
+    suspend fun createJobPost(
+        @Body request: JobPostRequest
+    ): Response<JobPostResponse>
+    @DELETE("user/delete")
+    suspend fun deleteAccount(
+        @Header("Authorization") token: String
+    ): Response<Unit>
+    @GET("/api/v1/alumni/{alumniId}/pending-verifications")
+    suspend fun getPendingVerifications(
+        @Path("alumniId") alumniId: String,
+        @Header("accept") accept: String = "application/json",
+        @Header("X-Correlation-ID") correlationId: String
+    ): Response<PendingVerificationResponse>
+
+    @POST("api/v1/alumni/{alumniId}/profile/verify")
+    suspend fun verifyAlumniProfile(
+        @Path("alumniId") alumniId: String,
+        @Body body: VerifyRequest,
+        @Header("X-Correlation-ID") correlationId: String
+    ): Response<VerifyProfileResponse>
+
+
+
 }
+
+data class VerifyRequest(
+    val isVerified: Boolean
+)
+data class VerifyProfileResponse(
+    val userId: String,
+    val name: String,
+    val countryCode: String?,
+    val mobileNo: String?,
+    val email: String?,
+    val dateOfBirth: String?,
+    val courseId: Int,
+    val batch: Int,
+    val companyName: String?,
+    val title: String?,
+    val city: String?,
+    val countryId: Int,
+    val bio: String?,
+    val photoUrl: String?,
+    val isVerified: Boolean,
+    val createdAtUtc: String,
+    val updatedAtUtc: String
+)
+
 

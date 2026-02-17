@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.jobposting
 
+import PremiumDialog
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -7,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,14 +43,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CurrencyRupee
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PostAdd
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -58,10 +66,13 @@ import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.network.openUrl
 import com.kwh.almuniconnect.utils.CommonEmptyState
 import com.kwh.almuniconnect.utils.encodeRoute
 import com.kwh.almuniconnect.utils.getTimeAgo
@@ -80,6 +91,7 @@ fun JobListingScreen(navController: NavController) {
         factory = JobViewModelFactory(repository)
     )
     TrackScreen("job_listing_screen")
+    var showSubscriptionDialog by remember { mutableStateOf(false) }
 
     // 🔹 Collect state from ViewModel
     val state by viewModel.state.collectAsState()
@@ -93,7 +105,26 @@ fun JobListingScreen(navController: NavController) {
         topBar = {
             HBTUTopBar(
                 title = "Job Listings",
-                navController = navController
+                navController = navController,
+
+                rightAction = {
+                    IconButton(
+                        onClick = {
+                            if (false) {
+                                navController.navigate(Routes.JOB_POST)
+                            } else {
+                                showSubscriptionDialog = true
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PostAdd,
+                            contentDescription = "Add Job"
+                        )
+                    }
+
+                    }
+
             )
         }
     ) { paddingValues ->
@@ -136,12 +167,24 @@ fun JobListingScreen(navController: NavController) {
                 }
             }
         }
+        if (showSubscriptionDialog) {
+            PremiumDialog(
+                onConnectNow = {
+                    showSubscriptionDialog = false
+                    navController.navigate(Routes.SUBSCRIPTION)
+                },
+                onCancel = {
+                    showSubscriptionDialog = false
+                }
+            )
+        }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun JobCard(job:JobAPost,navController: NavController) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -209,7 +252,9 @@ fun JobCard(job:JobAPost,navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            InfoItem(Icons.Default.Person, " Job Posted By Amit Kumar Gupta")
+            InfoItemClick(Icons.Default.ChevronRight, " Job Posted By Amit Kumar Gupta"){
+                navController.navigate(Routes.HOME)
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -229,7 +274,7 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 )
 
                 Button(
-                    onClick = { navController.navigate(Routes.EVENTS) },
+                    onClick = { openUrl(context,"https://www.google.com") },
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
                 ) {
@@ -242,6 +287,7 @@ fun JobCard(job:JobAPost,navController: NavController) {
             }
 
         }
+
     }
 }
 
@@ -256,6 +302,31 @@ fun InfoItem(icon: ImageVector, text: String) {
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(text, style = MaterialTheme.typography.bodySmall)
+    }
+}
+@Composable
+fun InfoItemClick(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(4.dp)
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = Color.Gray
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
 
@@ -273,3 +344,31 @@ fun SkillChip(text: String) {
     }
 }
 
+@Composable
+fun SubscriptionRequiredDialog(
+    onDismiss: () -> Unit,
+    onSubscribe: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Premium Feature 🔒")
+        },
+        text = {
+            Text(
+                "Posting a job is a premium feature.\n\n" +
+                        "Please take a subscription to continue and reach more alumni."
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onSubscribe) {
+                Text("View Plans")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Not Now")
+            }
+        }
+    )
+}

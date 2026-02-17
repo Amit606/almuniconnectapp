@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.network
 
+import AlumniViewModel
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,143 +20,137 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
-
+import kotlin.jvm.java
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetworkScreen(
     navController: NavController,
-    onOpenProfile: (AlumniProfile) -> Unit = {},
+    onOpenProfile: (AlumniDto) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedBranch by remember { mutableStateOf("All") }
-    var selectedYear by remember { mutableStateOf("All") }
 
-    val branches = listOf("All", "CSE", "ECE", "IT", "Mechanical", "Civil", "Electrical")
-    val years = listOf("All", "2023", "2022", "2021", "2020", "2019", "2018")
+    val apiService = remember {
+        NetworkClient.createService(ApiService::class.java)
+    }
+    val repository = remember { AlumniRepository(apiService) }
 
-    val allAlumni = remember {
-        sampleAlumniProfiles()
+    val viewModel: AlumniViewModel = viewModel(
+        factory = AlumniViewModelFactory(repository)
+    )
+    var showFilter by remember { mutableStateOf(false) }
+
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadAlumni()
     }
 
-    // Filter logic
-    val filteredList = allAlumni.filter {
-        (selectedBranch == "All" || it.branch == selectedBranch) &&
-        (selectedYear == "All" || it.passingYear == selectedYear) &&
-        (searchQuery.isBlank() || it.name.contains(searchQuery, ignoreCase = true))
-    }
     TrackScreen("alumni_network_screen")
 
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Alumni Networks ",
-                navController = navController
+                title = "Alumni Networks",
+                navController = navController,
+                onFilterClick = { showFilter = true }   // 👈 filter icon
+
             )
         }
     ) { paddingValues ->
+
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-               .background(Color.White)
+                .background(Color.White)
                 .padding(horizontal = 16.dp)
         ) {
-            // Search
-
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Filters
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    FilterChipDropdown(
-                        label = "Branch",
-                        options = branches,
-                        selectedOption = selectedBranch,
-                        onSelect = { selectedBranch = it }
-                    )
+            when (state) {
+
+                is AlumniState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
 
-                Box(modifier = Modifier.weight(1f)) {
-                    FilterChipDropdown(
-                        label = "Year",
-                        options = years,
-                        selectedOption = selectedYear,
-                        onSelect = { selectedYear = it }
-                    )
+                is AlumniState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = (state as AlumniState.Error).message,
+                            color = Color.Red
+                        )
+                    }
                 }
-            }
 
-            // Alumni List
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(filteredList) { alumni ->
-                    AlumniCard(alumni = alumni, onClick = { onOpenProfile(alumni) })
+                is AlumniState.Success -> {
+
+                    val alumniList =
+                        (state as AlumniState.Success).alumni
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(
+                            items = alumniList,
+                            key = { it.alumniId } // ✅ stable key
+                        ) { alumni ->
+                            AlumniCard(
+                                alumni = alumni,
+                                onClick = { onOpenProfile(alumni) }
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FilterChipDropdown(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onSelect: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-       // modifier = Modifier.weight(1f)
-    ) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label, color = Color.White) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
+        // 🔽 Filter Bottom Sheet
+        if (showFilter) {
+            ModalBottomSheet(
+                onDismissRequest = { showFilter = false },
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            ) {
+                AlumniFilterSheet(
+                    onApply = { branch, year ->
+                        viewModel.applyFilter(branch, year)
+                        showFilter = false
+                    },
+                    onClear = {
+                        viewModel.clearFilter()
+                        showFilter = false
                     }
                 )
             }
         }
     }
+
 }
 
+
+
+
 @Composable
-fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
+fun AlumniCard(alumni: AlumniDto, onClick: () -> Unit) {
     val context = LocalContext.current
     Card(
         onClick = onClick, // ✅ ONLY THIS
@@ -175,32 +168,43 @@ fun AlumniCard(alumni: AlumniProfile, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = alumni.imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(alumni.photoUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "Profile Picture",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(90.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                placeholder = painterResource(R.drawable.man),
+                error = painterResource(R.drawable.man),
+                fallback = painterResource(R.drawable.man)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(alumni.name,  style = MaterialTheme.typography.titleMedium)
-                Text("${alumni.branch} - ${alumni.passingYear}",    style = MaterialTheme.typography.bodySmall,
+                Text("${alumni.courseName} - ${alumni.batch}",    style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF7A8194))
-                Text(alumni.company,    style = MaterialTheme.typography.bodySmall,
+                Text(
+                    alumni.companyName.toString(),    style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF7A8194))
             }
 
-            Button(
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = Color(0xFF142338)
-//                ),
-
-                onClick = { openUrl(context, alumni.profileUrl) }) {
-                Text("Connect", style = MaterialTheme.typography.titleMedium)
+            IconButton(
+                onClick = { openUrl(context, alumni.linkedinUrl.toString()) },
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.Transparent, CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_linkedin),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
             }
         }
     }
@@ -216,160 +220,88 @@ fun openUrl(context: Context, url: String) {
     context.startActivity(intent)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun AlumniFilterSheet(
+    onApply: (String?, String?) -> Unit,
+    onClear: () -> Unit
+) {
+    var selectedBranch by remember { mutableStateOf<String?>(null) }
+    var selectedYear by remember { mutableStateOf<String?>(null) }
 
-fun sampleAlumniProfiles(): List<AlumniProfile> = listOf(
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
 
-    AlumniProfile(
-        id = "1",
-        name = "Amit Gupta",
-        branch = "MCA",
-        passingYear = "2015",
-        company = "Datability Technology Pvt. Ltd.",
-        position = "Senior Software Engineering  Developer",
-        phone = "+91 98xxxxxxxx",
-        email = "amit.xxxx@gmail.com",
-        location = "Noida, India",
-        imageUrl = "https://media.licdn.com/dms/image/v2/D5603AQHPW9sCI3l87Q/profile-displayphoto-shrink_800_800/B56ZPxrPKEH0Ac-/0/1734926465012?e=1769644800&v=beta&t=CLvdtkZ_-RMdZ5qlg9AHqWy3OaSAUaURUpogstIMP2Y",
-        profileUrl = "https://www.linkedin.com/in/amitguptaandroid/"
-    ),
+        Text(
+            text = "Filter Alumni Network",
+            style = MaterialTheme.typography.titleLarge
+        )
 
-    AlumniProfile(
-        id = "2",
-        name = "Ravi Prakash",
-        branch = "MCA",
-        passingYear = "2013",
-        company = "Microsoft",
-        position = "Software Engineer",
-        phone = "+91 9876501234",
-        email = "ravi.prakash@gmail.com",
-        location = "Hyderabad, India",
-        imageUrl = "https://i.pravatar.cc/150?img=12",
-        profileUrl = "https://www.linkedin.com/in/ravi-prakash"
-    ),
+        Spacer(Modifier.height(16.dp))
 
-    AlumniProfile(
-        id = "3",
-        name = "Neha Sharma",
-        branch = "MCA",
-        passingYear = "2016",
-        company = "Infosys",
-        position = "Technology Analyst",
-        phone = "+91 9876512345",
-        email = "neha.sharma@gmail.com",
-        location = "Pune, India",
-        imageUrl = "https://i.pravatar.cc/150?img=5",
-        profileUrl = "https://www.linkedin.com/in/neha-sharma"
-    ),
+        // Branch Filter
+        Text("Branch", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
 
-    AlumniProfile(
-        id = "4",
-        name = "Ankit Verma",
-        branch = "MCA",
-        passingYear = "2014",
-        company = "TCS",
-        position = "System Engineer",
-        phone = "+91 9876523456",
-        email = "ankit.verma@gmail.com",
-        location = "Delhi, India",
-        imageUrl = "https://i.pravatar.cc/150?img=8",
-        profileUrl = "https://www.linkedin.com/in/ankit-verma"
-    ),
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("CSE", "IT", "ECE", "ME", "CE", "MCA").forEach { branch ->
+                FilterChip(
+                    selected = selectedBranch == branch,
+                    onClick = {
+                        selectedBranch =
+                            if (selectedBranch == branch) null else branch
+                    },
+                    label = { Text(branch) }
+                )
+            }
+        }
 
-    AlumniProfile(
-        id = "5",
-        name = "Pooja Singh",
-        branch = "MCA",
-        passingYear = "2017",
-        company = "Wipro",
-        position = "Project Engineer",
-        phone = "+91 9876534567",
-        email = "pooja.singh@gmail.com",
-        location = "Bangalore, India",
-        imageUrl = "https://i.pravatar.cc/150?img=16",
-        profileUrl = "https://www.linkedin.com/in/pooja-singh"
-    ),
+        Spacer(Modifier.height(16.dp))
 
-    AlumniProfile(
-        id = "6",
-        name = "Saurabh Mishra",
-        branch = "MCA",
-        passingYear = "2012",
-        company = "Accenture",
-        position = "Application Development Lead",
-        phone = "+91 9876545678",
-        email = "saurabh.mishra@gmail.com",
-        location = "Gurgaon, India",
-        imageUrl = "https://i.pravatar.cc/150?img=14",
-        profileUrl = "https://www.linkedin.com/in/saurabh-mishra"
-    ),
+        // Year Filter
+        Text("Batch Year", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
 
-    AlumniProfile(
-        id = "7",
-        name = "Kunal Jain",
-        branch = "MCA",
-        passingYear = "2018",
-        company = "Paytm",
-        position = "Android Developer",
-        phone = "+91 9876556789",
-        email = "kunal.jain@gmail.com",
-        location = "Noida, India",
-        imageUrl = "https://i.pravatar.cc/150?img=20",
-        profileUrl = "https://www.linkedin.com/in/kunal-jain"
-    ),
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("2010", "2012", "2014", "2016", "2018", "2020").forEach { year ->
+                FilterChip(
+                    selected = selectedYear == year,
+                    onClick = {
+                        selectedYear =
+                            if (selectedYear == year) null else year
+                    },
+                    label = { Text(year) }
+                )
+            }
+        }
 
-    AlumniProfile(
-        id = "8",
-        name = "Shreya Kapoor",
-        branch = "MCA",
-        passingYear = "2019",
-        company = "Amazon",
-        position = "SDE I",
-        phone = "+91 9876567890",
-        email = "shreya.kapoor@gmail.com",
-        location = "Bangalore, India",
-        imageUrl = "https://i.pravatar.cc/150?img=25",
-        profileUrl = "https://www.linkedin.com/in/shreya-kapoor"
-    ),
+        Spacer(Modifier.height(24.dp))
 
-    AlumniProfile(
-        id = "9",
-        name = "Rahul Yadav",
-        branch = "MCA",
-        passingYear = "2011",
-        company = "IBM",
-        position = "Technical Consultant",
-        phone = "+91 9876578901",
-        email = "rahul.yadav@gmail.com",
-        location = "Chennai, India",
-        imageUrl = "https://i.pravatar.cc/150?img=18",
-        profileUrl = "https://www.linkedin.com/in/rahul-yadav"
-    ),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
-    AlumniProfile(
-        id = "10",
-        name = "Simran Kaur",
-        branch = "MCA",
-        passingYear = "2020",
-        company = "Startup Founder",
-        position = "Product Manager",
-        phone = "+91 9876589012",
-        email = "simran.kaur@gmail.com",
-        location = "Delhi, India",
-        imageUrl = "https://i.pravatar.cc/150?img=30",
-        profileUrl = "https://www.linkedin.com/in/simran-kaur"
-    )
-)
+            OutlinedButton(
+                onClick = onClear,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Clear")
+            }
 
-data class AlumniProfile(
-    val id: String,
-    val name: String,
-    val branch: String,
-    val passingYear: String,
-    val company: String,
-    val position: String,          // ✅ Job position
-    val phone: String,             // ✅ Mobile number
-    val email: String,             // ✅ Email
-    val location: String,          // ✅ City / Location
-    val imageUrl: String,
-    val profileUrl: String
-)
+            Button(
+                onClick = { onApply(selectedBranch, selectedYear) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Apply")
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+

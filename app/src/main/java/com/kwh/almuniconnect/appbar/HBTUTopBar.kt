@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,7 +17,9 @@ import androidx.compose.runtime.setValue
 fun HBTUTopBar(
     title: String,
     navController: NavController,
-    showBack: Boolean = true
+    showBack: Boolean = true,
+    onFilterClick: (() -> Unit)? = null,
+    rightAction: (@Composable () -> Unit)? = null   // 👈 NEW (optional)
 ) {
     var isNavigating by remember { mutableStateOf(false) }
 
@@ -39,7 +42,22 @@ fun HBTUTopBar(
                     )
                 }
             }
+        },
+        actions = {
+            // 🔹 Existing filter (unchanged)
+            if (onFilterClick != null) {
+                IconButton(onClick = onFilterClick) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = "Filter"
+                    )
+                }
+            }
+
+            // 🔹 New optional right action (Add Job, etc.)
+            rightAction?.invoke()
         }
     )
 }
+
 

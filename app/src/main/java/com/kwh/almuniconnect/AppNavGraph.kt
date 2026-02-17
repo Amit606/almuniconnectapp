@@ -1,7 +1,9 @@
 package com.kwh.almuniconnect
 
+import AlumniViewModel
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,12 +33,8 @@ import com.kwh.almuniconnect.intro.NetworkUtils
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
 import com.kwh.almuniconnect.jobposting.JobPostScreen
-import com.kwh.almuniconnect.jobposting.sampleJob
-import com.kwh.almuniconnect.login.AuthViewModel
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.network.NetworkScreen
-import com.kwh.almuniconnect.network.sampleAlumniProfiles
-import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
@@ -44,19 +42,30 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
 import com.kwh.almuniconnect.almunipost.dummyAlumniStories
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
+import com.kwh.almuniconnect.branding.ProductServiceDummyScreen
+import com.kwh.almuniconnect.emergency.DonateAmountScreen
+import com.kwh.almuniconnect.emergency.DonationSuccessScreen
+import com.kwh.almuniconnect.emergency.EmergencyDetailScreen
+import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
+import com.kwh.almuniconnect.emergency.EmergencyRequestForm
+import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
+import com.kwh.almuniconnect.network.AlumniRepository
+import com.kwh.almuniconnect.network.AlumniViewModelFactory
 import com.kwh.almuniconnect.news.NewsListingScreen
+import com.kwh.almuniconnect.profile.AlumniProfileRoute
+import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.subscription.PremiumScreen
+import com.kwh.almuniconnect.verification.AccountVerificationScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Routes.SPLASH) {
-
-
-
     val context = LocalContext.current
     val connectivityObserver = remember { ConnectivityObserver(context) }
 
@@ -87,8 +96,9 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-             SplashScreen(navController)
+            SplashScreen(navController)
 
+           // EmergencyFeedScreen(navController)
 
         }
         composable(Routes.NEWS) {
@@ -103,44 +113,103 @@ fun AppNavGraph(
 
         }
 
-        composable(Routes.NETWORK) {
-            NetworkScreen(
-                navController = navController,
-                onOpenProfile = { alumni ->
-                    navController.navigate(
-                        Routes.profileRoute(alumni.id)
-                    )
-                }
-            )
-        }
+
         composable(Routes.USER_PROFILE)
         {
             ProfileScreen(navController)
         }
+        composable(Routes.NETWORK) {
+            val apiService = remember {
+                NetworkClient.createService(ApiService::class.java)
+            }
+            val repository = remember { AlumniRepository(apiService) }
+
+            val alumniViewModel: AlumniViewModel = viewModel(
+                factory = AlumniViewModelFactory(repository)
+            )
+
+            NetworkScreen(
+                navController = navController,
+                onOpenProfile = { alumni ->
+                    navController.navigate(
+                        Routes.profileRoute(alumni.alumniId)
+                    )
+                }
+            )
+        }
 
         composable(
-            route = Routes.PROFILE,
+            route = Routes.PROFILE_ROUTE,
             arguments = listOf(
                 navArgument("id") { type = NavType.StringType }
             )
-        ) { backStackEntry ->
+        ) { entry ->
 
-            val id = backStackEntry.arguments?.getString("id") ?: return@composable
+            val id = entry.arguments?.getString("id")
+                ?: return@composable
 
-            val alumni = sampleAlumniProfiles()
-                .firstOrNull { it.id == id }
-                ?: return@composable   // 👈 prevents crash
+            // 🔥 SAME VIEWMODEL INSTANCE
+            val alumniViewModel: AlumniViewModel = viewModel(
+                factory = AlumniViewModelFactory(
+                    AlumniRepository(
+                        NetworkClient.createService(ApiService::class.java)
+                    )
+                )
+            )
 
-            AlumniProfileScreen(
-                alumni = alumni,
-                navController = navController
+            AlumniProfileRoute(
+                alumniId = id,
+                navController = navController,
+                viewModel = alumniViewModel
             )
         }
+
+//        composable(Routes.NETWORK) {
+//            NetworkScreen(
+//                navController = navController,
+//                onOpenProfile = { alumni ->
+//                    navController.navigate(
+//                        Routes.profileRoute(alumni.alumniId)
+//                    )
+//                }
+//            )
+//        }
+//        composable(
+//            route = Routes.PROFILE_ROUTE,
+//            arguments = listOf(
+//                navArgument("id") { type = NavType.StringType }
+//            )
+//        ) { backStackEntry ->
+//
+//            val id = backStackEntry.arguments?.getString("id")
+//                ?: return@composable
+//
+//            AlumniProfileScreen(
+//                alumniId = id,
+//                navController = navController
+//            )
+//        }
+        val user = UserLocalModel(
+            userId = "1",
+            name = "Amit Gupta",
+            email = "amit@gmail.com",
+            mobile = "9876543210",
+            branch = "Computer Science",
+            branchId = 1,
+            year = "2020",
+            job = "",
+            location = "",
+            birthday = "",
+            linkedin = "",
+            photo = "",
+            totalExp = 2
+        )
 
 
         composable(Routes.SPLASH_HOME)
         {
             SplashScreen(navController)
+
         }
 
         composable(Routes.LOGIN)
@@ -149,13 +218,19 @@ fun AppNavGraph(
 
         }
         // 🔢 OTP Screen
+     composable(Routes.VERIFICATION)
+     {
+         AccountVerificationScreen(
+             navController = navController,
 
+         )
+     }
 
 
         val pages = listOf(
             IntroPage(
                 "Connect with Alumni",
-                "Stay connected with batchmates, seniors, and the global HBTU alumni network.",
+                "Stay connected with batchmates, seniors, and the global Harcourtian alumni network.",
                 R.drawable.first
             ),
             IntroPage(
@@ -164,8 +239,8 @@ fun AppNavGraph(
                 R.drawable.second
             ),
             IntroPage(
-                "Give Back to Harcourtians",
-                "Contribute to students, campus initiatives, and the future of HBTU.",
+                "Give Back to Harcourtian",
+                "Contribute to students, campus initiatives, and the future of Harcourtian.",
                 R.drawable.third
             )
 
@@ -226,19 +301,6 @@ fun AppNavGraph(
         composable(Routes.HELP_SUPPORTS) { HelpSupportScreen(navController) }
         composable(Routes.ABOUT_US) { AboutAlumniConnectScreen(navController) }
 
-//
-
-//        composable(
-//            route = "${Routes.EVENT_DETAILS}/{title}/{location}/{date}/{price}"
-//        ) { backStack ->
-//            EventDetailsScreen(
-//                navController,
-//                title = backStack.arguments?.getString("title") ?: "",
-//                location = backStack.arguments?.getString("location") ?: "",
-//                date = backStack.arguments?.getString("date") ?: "",
-//                price = backStack.arguments?.getString("price") ?: ""
-//            )
-//        }
         composable(
             route = "${Routes.EVENT_DETAILS}?title={title}&location={location}",
             arguments = listOf(
@@ -298,6 +360,9 @@ fun AppNavGraph(
         composable(Routes.JOB_POST){
             JobPostScreen(navController)
         }
+        composable(Routes.PRODUCT_SCREEN){
+            ProductServiceDummyScreen(navController)
+        }
         composable(Routes.ALMUNI_POST){
             AlumniStoriesScreen(navController)
         }
@@ -314,6 +379,111 @@ fun AppNavGraph(
                 story = story,
             )
         }
+//        composable(Routes.ENTRY) {
+//            EmergencyFeedScreen {
+//                navController.navigate(Routes.REQUEST)
+//            }
+//        }
+
+        composable(Routes.REQUEST) {
+            EmergencyRequestForm {
+                // API call → submit emergency
+                navController.navigate(Routes.FEED) {
+                    popUpTo(Routes.ENTRY) { inclusive = true }
+                }
+            }
+        }
+
+        /* ---------- FEED ---------- */
+        composable(Routes.FEED) {
+            EmergencyFeedScreen (navController){ emergency ->
+                navController.navigate(
+                    "emergency_detail/${emergency.id}"
+                )
+            }
+        }
+
+        /* ---------- DETAIL ---------- */
+        composable(
+            route = Routes.DETAIL,
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val id =
+                backStackEntry.arguments?.getString("id") ?: ""
+
+            val emergency =
+                demoEmergencyList.first { it.id == id }
+
+            EmergencyDetailScreen(
+                navController,
+                emergency = emergency,
+                onDonateClick = {
+                    navController.navigate(
+                        "emergency_donate/${emergency.id}"
+                    )
+                }
+            )
+        }
+
+        /* ---------- DONATE ---------- */
+        composable(
+            Routes.DONATE,
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val emergencyId =
+                backStackEntry.arguments?.getString("id") ?: ""
+
+            DonateAmountScreen(navController) { amount ->
+                navController.navigate(
+                    "donation_success/$amount/$emergencyId"
+                ) {
+                    popUpTo(Routes.FEED)
+                }
+            }
+        }
+
+        /* ---------- SUCCESS ---------- */
+        composable(
+            route = Routes.SUCCESS,
+            arguments = listOf(
+                navArgument("amount") { type = NavType.IntType },
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val amount =
+                backStackEntry.arguments?.getInt("amount") ?: 0
+
+            val emergencyId =
+                backStackEntry.arguments?.getString("id") ?: ""
+
+            DonationSuccessScreen(
+                navController,
+                amount = amount,
+
+                onGoHome = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(0)
+                    }
+                },
+
+                onViewEmergency = {
+
+                    navController.navigate(
+                        "emergency_detail/$emergencyId"
+                    )
+                }
+            )
+        }
+
+
+
 
     }
 }

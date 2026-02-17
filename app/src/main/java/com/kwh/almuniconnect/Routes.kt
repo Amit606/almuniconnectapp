@@ -11,8 +11,12 @@ object Routes {
     const val NETWORK = "network"
     const val COUTNRYLIST = "countrylist"
 
-    const val PROFILE = "profile/{id}"
-    fun profileRoute(id: String) = "profile/$id"
+    const val PROFILE = "profile"
+    const val PROFILE_ROUTE = "profile/{id}"
+    fun profileRoute(id: String): String {
+        return "profile/$id"
+    }
+
 
     const val MESSAGES = "messages"
     const val CREATE_POST = "create_post"
@@ -38,7 +42,7 @@ object Routes {
 
     const val HELP_SUPPORTS = "help_supports"
     const val ABOUT_US = "about_us"
-    const val APP_VERSION = "1.0.2"
+    const val APP_VERSION = "1.0.4"
     const val DEVELOPER_NAME = "Apps Chance"
     const val DEVELOPER_EMAIL = "support@alumniconnect.com"
 
@@ -49,4 +53,15 @@ object Routes {
     const val NEWS = "news"
     fun ALUMNI_STORY_DETAIL(storyName: String) = "alumni_story_details/$storyName"
    const val SUBSCRIPTION = "premium_subscription"
+
+    const val PRODUCT_SCREEN = "product_screen"
+    const val ENTRY = "emergency_entry"
+    const val REQUEST = "emergency_request"
+    const val SUCCESS = "donation_success/{amount}/{id}"
+    const val FEED = "emergency_feed"
+    const val DETAIL = "emergency_detail/{id}"
+    const val DONATE = "emergency_donate/{id}"
+    const val THANK_YOU = "emergency_thank_you/{amount}"
+    const val VERIFICATION = "verification"
+
 }

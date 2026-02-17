@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.settings
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,20 +23,49 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.Routes.PRIVACY_POLICY_URL
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.help.openLink
+import com.kwh.almuniconnect.storage.UserSession
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController
 ) {
-    val context = LocalContext.current
     TrackScreen("settings_screen")
+    val context = LocalContext.current
 
+    val apiService = remember { NetworkClient.createService(ApiService::class.java) }
+    val repository = remember { UserRepository(apiService, context) }
+    val factory = remember { SettingsViewModelFactory(repository) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val viewModel: SettingsViewModel =
+        androidx.lifecycle.viewmodel.compose.viewModel(factory = factory)
+
+    val deleteState by viewModel.deleteState.collectAsState()
+    val loading by viewModel.loading.collectAsState()
+    // 🔹 Navigate when deleted
+    LaunchedEffect(deleteState) {
+        deleteState?.let { success ->
+            if (success) {
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(0)
+                }
+            }
+        }
+    }
+    var showDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -65,6 +102,15 @@ fun SettingsScreen(
                     onClick = { navController.navigate(Routes.USER_PROFILE) }
                 )
             }
+            item {
+                SectionHeader("Pending Verifications")
+                SettingItem(
+                    icon = Icons.Default.Pending,
+                    title = "Pending Verifications Alumni",
+                    subtitle = "Please wait for the admin to verify your account",
+                    onClick = { navController.navigate(Routes.VERIFICATION) }
+                )
+            }
 
             item {
                 SectionHeader("Preferences")
@@ -78,7 +124,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Delete,
                     title = "Delete All Data",
                     subtitle = "Permanently remove all saved information from this device",
-                    onClick = { /* navigate */ }
+                    onClick = { showDialog = true  }
                 )
             }
 
@@ -88,7 +134,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Lock,
                     title = "Privacy Policy",
                     subtitle = "Read our privacy policy",
-                    onClick = {                 openLink(context, PRIVACY_POLICY_URL)
+                    onClick = {openLink(context, PRIVACY_POLICY_URL)
                     }
                 )
 
@@ -108,9 +154,63 @@ fun SettingsScreen(
                     subtitle = "Sign out from your account",
                     titleColor = MaterialTheme.colorScheme.error,
                     iconColor = MaterialTheme.colorScheme.error,
-                    onClick = { /* logout */ }
+                    onClick = {
+                       showLogoutDialog =true
+
+                    }
                 )
             }
+        }
+
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { Text("Confirm Logout") },
+                text = { Text("Are you sure you want to logout from your account?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showLogoutDialog = false
+                            scope.launch {
+                                UserSession.logout(context)
+                                navController.navigate("login") {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        }
+                    ) {
+                        Text("Logout", color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        viewModel.deleteAccount()
+                    }) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("Cancel")
+                    }
+                },
+                title = { Text("Delete Account?") },
+                text = { Text("This action cannot be undone.") }
+            )
         }
     }
 }
@@ -125,7 +225,27 @@ fun SectionHeader(title: String) {
         color = MaterialTheme.colorScheme.primary
     )
 }
+fun logoutUser(context: Context, navController: NavController) {
 
+    // 1️⃣ Firebase Logout
+    FirebaseAuth.getInstance().signOut()
+
+    // 2️⃣ Google Sign Out
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .build()
+
+    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+    googleSignInClient.signOut()
+
+    // 3️⃣ Clear Local Session (Your custom session)
+
+
+    // 4️⃣ Navigate to Login & Clear Backstack
+    navController.navigate("login") {
+        popUpTo(0) { inclusive = true }
+    }
+}
 @Composable
 fun SettingItem(
     icon: ImageVector,

@@ -1,28 +1,31 @@
 package com.kwh.almuniconnect.news
 
+import android.util.Log
 import com.kwh.almuniconnect.api.ApiService
 
-class NewsRepository(private val api: ApiService) {
+class NewsRepository(private val apiService: ApiService) {
 
-    suspend fun getNews(
-        pageNumber: Int,
-        pageSize: Int
-    ): Result<NewsResponse> {
+    suspend fun fetchNews(
+        page: Int,
+        size: Int
+    ): Result<Pair<List<NewsItem>, Int>> {
         return try {
-            val resp = api.getNews(pageNumber, pageSize)
-            if (resp.isSuccessful) {
-                val body = resp.body()
+            val response = apiService.getNews(page, size)
+
+            if (response.isSuccessful) {
+                val data = response.body()?.data
                 Result.success(
-                    body?.copy(items = body.items ?: emptyList())
-                        ?: NewsResponse(emptyList(), 0, 0, 0)
+                    Pair(
+                        data?.items ?: emptyList(),
+                        data?.totalCount ?: 0
+                    )
                 )
             } else {
-                Result.failure(
-                    Exception("HTTP ${resp.code()}")
-                )
+                Result.failure(Exception("API Error ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
 }

@@ -16,8 +16,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 8
+        versionName = "1.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -120,5 +120,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-perf")
     implementation ("com.github.bumptech.glide:glide:5.0.5")
+    implementation ("com.android.billingclient:billing-ktx:6.2.1")
+
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }
