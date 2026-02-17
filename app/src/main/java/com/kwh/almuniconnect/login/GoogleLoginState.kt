@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,10 +29,13 @@ class GoogleLoginViewModel(
             repository.checkEmailAndGetUser(email)
                 .onSuccess { user ->
                     _state.value =
-                        if (user != null)
+                        if (user != null) {
+
                             GoogleLoginState.GoHome(user)
-                        else
+                        }
+                        else {
                             GoogleLoginState.GoProfileUpdate
+                        }
                 }
                 .onFailure {
                     _state.value = GoogleLoginState.Error(

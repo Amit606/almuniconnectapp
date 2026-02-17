@@ -102,6 +102,15 @@ fun SettingsScreen(
                     onClick = { navController.navigate(Routes.USER_PROFILE) }
                 )
             }
+            item {
+                SectionHeader("Pending Verifications")
+                SettingItem(
+                    icon = Icons.Default.Pending,
+                    title = "Pending Verifications Alumni",
+                    subtitle = "Please wait for the admin to verify your account",
+                    onClick = { navController.navigate(Routes.VERIFICATION) }
+                )
+            }
 
             item {
                 SectionHeader("Preferences")

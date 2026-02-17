@@ -92,6 +92,7 @@ fun ProfileScreen(navController: NavController) {
     }
 
     LaunchedEffect(user) {
+
         name = user.name
         email = user.email
         mobile = user.mobile
@@ -115,6 +116,7 @@ fun ProfileScreen(navController: NavController) {
                 val profile =
                     (apiState as ProfileState.Success).profile
 
+                Log.e("ProfileScreen", "API Success: ${profile.userId}")
                 userPrefs.saveProfile(
                     UserLocalModel(
                         userId = profile.userId ?: "",

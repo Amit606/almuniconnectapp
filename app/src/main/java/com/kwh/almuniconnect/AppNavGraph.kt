@@ -96,7 +96,8 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-             SplashScreen(navController)
+            SplashScreen(navController)
+
            // EmergencyFeedScreen(navController)
 
         }
@@ -221,25 +222,7 @@ fun AppNavGraph(
      {
          AccountVerificationScreen(
              navController = navController,
-             user = user,
-             onApprove = {
-//                    Toast.makeText(
-//                        this,
-//                        "User Approved ✅",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
 
-                 // Call approve API here
-             },
-             onDeny = {
-//                    Toast.makeText(
-//                        this,
-//                        "User Denied ❌",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-
-                 // Call deny API here
-             }
          )
      }
 
@@ -247,7 +230,7 @@ fun AppNavGraph(
         val pages = listOf(
             IntroPage(
                 "Connect with Alumni",
-                "Stay connected with batchmates, seniors, and the global HBTU alumni network.",
+                "Stay connected with batchmates, seniors, and the global Harcourtian alumni network.",
                 R.drawable.first
             ),
             IntroPage(
@@ -256,8 +239,8 @@ fun AppNavGraph(
                 R.drawable.second
             ),
             IntroPage(
-                "Give Back to Harcourtians",
-                "Contribute to students, campus initiatives, and the future of HBTU.",
+                "Give Back to Harcourtian",
+                "Contribute to students, campus initiatives, and the future of Harcourtian.",
                 R.drawable.third
             )
 

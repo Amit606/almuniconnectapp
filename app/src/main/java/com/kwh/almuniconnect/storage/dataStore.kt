@@ -97,6 +97,7 @@ class UserPreferences(private val context: Context) {
                     UserLocalModel()
                 } else {
                     UserLocalModel(
+                        userId = prefs[KEY_USER_ID]?: "",
                         name = prefs[KEY_NAME] ?: "",
                         email = prefs[KEY_EMAIL] ?: "",
                         photo = prefs[KEY_PHOTO] ?: "",

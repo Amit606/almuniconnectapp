@@ -81,21 +81,32 @@ class AuthViewModel(
                                 name = firebaseUser.displayName.toString(),
                                 email = firebaseUser.email.toString(),
                                 photo = firebaseUser.photoUrl.toString(),
-                                mobile = "",
-                                branch = "",
-                                year = "",
-                                job = "",
-                                location = "",
+                                mobile = user.mobileNo?:"",
+                                branch = user.batch.toString(),
+                                year = user.companyName?:"",
+                                job = user.companyName?:"",
+                                location ="",
                                 birthday = "",
                                 linkedin = ""
                             )
                         )
-                        Log.e("AuthViewModel", "User logged in and profile saved."+
-                            " UID: ${firebaseUser.uid}, " +
-                            "Name: ${firebaseUser.displayName}, " +
-                            "Email: ${firebaseUser.email}, " +
-                            "Photo: ${firebaseUser.photoUrl}"
-                        )
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.userId)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.email)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.mobileNo)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.name)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.title)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.courseId)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.companyName)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.batch)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.userId)
+//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.userId)
+//
+//                        Log.e("AuthViewModel", "User logged in and profile saved."+
+//                            " UID: ${firebaseUser.uid}, " +
+//                            "Name: ${firebaseUser.displayName}, " +
+//                            "Email: ${firebaseUser.email}, " +
+//                            "Photo: ${firebaseUser.photoUrl}"
+//                        )
 
 
 //                        userPrefs.saveUser(

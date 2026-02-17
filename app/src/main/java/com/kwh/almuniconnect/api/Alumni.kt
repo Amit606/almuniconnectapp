@@ -6,6 +6,7 @@ import com.kwh.almuniconnect.login.EmailCheckApiResponse
 import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.news.NewsResponse
 import com.kwh.almuniconnect.profile.ProfileResponse
+import com.kwh.almuniconnect.verification.PendingVerificationResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -155,6 +156,45 @@ interface ApiService {
     suspend fun deleteAccount(
         @Header("Authorization") token: String
     ): Response<Unit>
+    @GET("/api/v1/alumni/{alumniId}/pending-verifications")
+    suspend fun getPendingVerifications(
+        @Path("alumniId") alumniId: String,
+        @Header("accept") accept: String = "application/json",
+        @Header("X-Correlation-ID") correlationId: String
+    ): Response<PendingVerificationResponse>
+
+    @POST("api/v1/alumni/{alumniId}/profile/verify")
+    suspend fun verifyAlumniProfile(
+        @Path("alumniId") alumniId: String,
+        @Body body: VerifyRequest,
+        @Header("X-Correlation-ID") correlationId: String
+    ): Response<VerifyProfileResponse>
+
+
 
 }
+
+data class VerifyRequest(
+    val isVerified: Boolean
+)
+data class VerifyProfileResponse(
+    val userId: String,
+    val name: String,
+    val countryCode: String?,
+    val mobileNo: String?,
+    val email: String?,
+    val dateOfBirth: String?,
+    val courseId: Int,
+    val batch: Int,
+    val companyName: String?,
+    val title: String?,
+    val city: String?,
+    val countryId: Int,
+    val bio: String?,
+    val photoUrl: String?,
+    val isVerified: Boolean,
+    val createdAtUtc: String,
+    val updatedAtUtc: String
+)
+
 
