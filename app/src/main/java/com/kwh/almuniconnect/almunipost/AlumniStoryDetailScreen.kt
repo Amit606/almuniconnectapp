@@ -1,40 +1,36 @@
 package com.kwh.almuniconnect.almunipost
+
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.kwh.almuniconnect.R
-import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @Composable
 fun AlumniStoryDetailScreen(
-    navController : NavController,
-    story: AlumniStory
-
+    navController: NavController,
+    story: AlumniStory?
 ) {
+
     TrackScreen("alumni_story_detail_screen")
+    Log.e("Name", "Received name: ${story?.name}")
 
     Scaffold(
         topBar = {
@@ -45,6 +41,22 @@ fun AlumniStoryDetailScreen(
         }
     ) { paddingValues ->
 
+        // ✅ NULL STORY SAFE UI
+        if (story == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Story not available",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
+            return@Scaffold
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -52,10 +64,14 @@ fun AlumniStoryDetailScreen(
                 .padding(paddingValues)
         ) {
 
-            /* Cover Image */
+            // ✅ Safe Image Handling
             item {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(id = story.imageRes),
+                val imageRes =
+                    if (story.imageRes != 0) story.imageRes
+                    else R.drawable.man   // Add placeholder in drawable
+
+                Image(
+                    painter = painterResource(id = imageRes),
                     contentDescription = "Alumni Cover",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
@@ -67,7 +83,8 @@ fun AlumniStoryDetailScreen(
             item {
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    if (story.featured) {
+                    // Featured Badge
+                    if (story.featured == true) {
                         Text(
                             text = "⭐ Featured Alumni",
                             color = Color(0xFFB8860B),
@@ -77,28 +94,32 @@ fun AlumniStoryDetailScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
+                    // Name
                     Text(
-                        text = story.name,
+                        text = story.name ?: "Unknown Alumni",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
+                    // Title + Company
                     Text(
-                        text = "${story.title} • ${story.companyOrStartup}",
+                        text = "${story.title ?: "N/A"} • ${story.companyOrStartup ?: "N/A"}",
                         fontSize = 15.sp,
                         color = Color.Gray
                     )
 
+                    // Batch
                     Text(
-                        text = "Batch of ${story.batch}",
+                        text = "Batch of ${story.batch ?: "N/A"}",
                         fontSize = 13.sp,
                         color = Color.Gray
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+                    // Category Chip Safe
                     CategoryChip(story.category)
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -112,7 +133,7 @@ fun AlumniStoryDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = story.story,
+                        text = story.story ?: "No story available.",
                         fontSize = 15.sp,
                         lineHeight = 22.sp
                     )
@@ -144,12 +165,14 @@ fun AlumniStoryDetailScreen(
     }
 }
 @Composable
-fun CategoryChip(category: StoryCategory) {
+fun CategoryChip(category: StoryCategory?) {
+
     val (text, color) = when (category) {
         StoryCategory.SUCCESS -> "Success Story" to Color(0xFF4CAF50)
         StoryCategory.STARTUP -> "Startup" to Color(0xFF2196F3)
         StoryCategory.AWARD -> "Award & Recognition" to Color(0xFFFF9800)
         StoryCategory.FEATURED -> "Featured" to Color(0xFF9C27B0)
+        null -> "General" to Color.Gray
     }
 
     Box(

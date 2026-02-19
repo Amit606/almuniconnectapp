@@ -43,7 +43,7 @@ fun AlumniStoryCard(
             Image(
                 painter = painterResource(id = story.imageRes),
                 contentDescription = "Alumni Image",
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
@@ -51,7 +51,7 @@ fun AlumniStoryCard(
 
             Column(modifier = Modifier.padding(16.dp)) {
 
-                if (story.featured) {
+                if (story.featured == true) {
                     Text(
                         text = "⭐ Featured Alumni",
                         color = Color(0xFFB8860B),
@@ -62,7 +62,7 @@ fun AlumniStoryCard(
                 }
 
                 Text(
-                    text = story.name,
+                    text = story?.name ?: "Unknown Alumni",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -82,7 +82,7 @@ fun AlumniStoryCard(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = story.story,
+                    text = story?.story?:"No story available.",
                     fontSize = 14.sp,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis

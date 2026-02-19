@@ -34,6 +34,7 @@ data class MasterItem(
 )
 data class SignupRequest(
     val name: String,
+    val photoUrl:String,
     val mobileNo: String,
     val email: String,
     val dateOfBirth: String,
@@ -44,6 +45,7 @@ data class SignupRequest(
     val title: String,
     val totalExperience: Int,
     val linkedinUrl: String,
+    val cityName:String,
     val loggedFrom: String,
     val deviceId: String,
     val fcmToken: String,
@@ -156,14 +158,14 @@ interface ApiService {
     suspend fun deleteAccount(
         @Header("Authorization") token: String
     ): Response<Unit>
-    @GET("/api/v1/alumni/{alumniId}/pending-verifications")
+    @GET("alumni/{alumniId}/pending-verifications")
     suspend fun getPendingVerifications(
         @Path("alumniId") alumniId: String,
         @Header("accept") accept: String = "application/json",
         @Header("X-Correlation-ID") correlationId: String
     ): Response<PendingVerificationResponse>
 
-    @POST("api/v1/alumni/{alumniId}/profile/verify")
+    @POST("alumni/{alumniId}/profile/verify")
     suspend fun verifyAlumniProfile(
         @Path("alumniId") alumniId: String,
         @Body body: VerifyRequest,

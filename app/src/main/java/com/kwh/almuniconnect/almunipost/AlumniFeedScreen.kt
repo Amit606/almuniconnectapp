@@ -91,23 +91,23 @@ fun AlumniPostCard(post: AlumniStory) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(
-                text = post.name,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = post.batch,
-                fontSize = 12.sp,
-                color = Color.Black,
-
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = post.name,  color = Color.DarkGray,
-            )
+//            Text(
+//                text = post.name,
+//                color = Color.Black,
+//                fontWeight = FontWeight.Bold
+//            )
+//
+//            Text(
+//                text = post.batch,
+//                fontSize = 12.sp,
+//                color = Color.Black,
+//
+//            )
+//
+//            Spacer(modifier = Modifier.height(8.dp))
+//
+//            Text(text = post.name,  color = Color.DarkGray,
+//            )
         }
     }
 }

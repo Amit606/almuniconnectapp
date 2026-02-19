@@ -41,7 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
-import com.kwh.almuniconnect.almunipost.dummyAlumniStories
+import com.kwh.almuniconnect.almunipost.alumniFeed
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
@@ -369,14 +369,15 @@ fun AppNavGraph(
         composable("story_detail/{name}") { backStackEntry ->
 
             val name = backStackEntry.arguments?.getString("name")
-
-            val story = dummyAlumniStories.first {
+           Log.e("Name", "Received name: $name")
+            val story = alumniFeed.firstOrNull {
                 it.name == name
             }
+            Log.e("Name", "Received name: ${story?.name}")
 
             AlumniStoryDetailScreen(
-                navController =navController,
-                story = story,
+                navController = navController,
+                story = story   // already nullable safe
             )
         }
 //        composable(Routes.ENTRY) {

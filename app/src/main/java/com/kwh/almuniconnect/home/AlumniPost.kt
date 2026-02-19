@@ -69,14 +69,27 @@ fun AlumniPost(post: AlumniStory,
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(post.name, color = Color.Black,  style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        text = post?.name ?: "Unknown",
+                        color = Color.Black,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(post.title,color=Color.Black, style = MaterialTheme.typography.bodySmall)
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(post.companyOrStartup, color = Color.Black, style = MaterialTheme.typography.bodySmall,)
 
+                Text(
+                    text = post?.title ?: "N/A",
+                    color = Color.Black,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = post?.companyOrStartup ?: "N/A",
+                    color = Color.Black,
+                    style = MaterialTheme.typography.bodySmall
+                )
 
             }
         }

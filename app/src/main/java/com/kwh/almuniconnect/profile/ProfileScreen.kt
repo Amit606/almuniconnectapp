@@ -75,7 +75,7 @@ fun ProfileScreen(navController: NavController) {
     var totalExp by remember { mutableStateOf<Int?>(null) }
     val totalYear = (1..30).toList()
     var job by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
+    var cityName by remember { mutableStateOf("") }
     var birthday by remember { mutableStateOf("") }
     var linkedin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
@@ -99,10 +99,11 @@ fun ProfileScreen(navController: NavController) {
         branch = user.branch
         year = user.year
         job = user.job
-        location = user.location
+        cityName = user.cityName
         birthday = user.birthday
         linkedin = user.linkedin
         totalExp = user.totalExp
+        Log.e("CityName", "City Name: ${user.cityName}")
     }
 
     /* ---------- HANDLE API SUCCESS ---------- */
@@ -116,7 +117,7 @@ fun ProfileScreen(navController: NavController) {
                 val profile =
                     (apiState as ProfileState.Success).profile
 
-                Log.e("ProfileScreen", "API Success: ${profile.userId}")
+                Log.e("ProfileScreen", "API Success: ${profile.cityName}")
                 userPrefs.saveProfile(
                     UserLocalModel(
                         userId = profile.userId ?: "",
@@ -127,11 +128,11 @@ fun ProfileScreen(navController: NavController) {
                         branchId = profile.courseId ?: 0,
                         year = profile.passoutYear?.toString() ?: "",
                         job = profile.companyName ?: "",
-                        location = "",
+                        cityName = profile.cityName?:"",
                         birthday = profile.dateOfBirth ?: "",
                         linkedin = profile.linkedinUrl ?: "",
                         photo = profile.photoUrl ?: "",
-                        totalExp = profile.totalExperience ?: 0
+                        totalExp = profile.totalExperience ?: 0,
 
 //                        accessToken = profile.accessToken ?: "",
 //                        accessTokenExpiry = profile.accessTokenExpiry ?: "",
@@ -322,7 +323,7 @@ fun ProfileScreen(navController: NavController) {
                                 onSelect = { totalExp = it }
                             )
 
-                            AppTextField("Location", location) { location = it }
+                            AppTextField("Location", cityName) { cityName = it }
 
                             BirthdayPicker(birthday) { birthday = it }
 
@@ -351,14 +352,18 @@ fun ProfileScreen(navController: NavController) {
                                     error = validateProfile(
                                         name, email, mobile,
                                         branch, year,
-                                        job, location,
+                                        job, cityName,
                                         birthday, linkedin
                                     )
-
+                                 Log.e("ProfileScreen", "Validation error: $error")
                                     if (error == null) {
+                                        Log.e("CityName", "City Name: ${cityName}")
+
                                         viewModel.submitProfile(
-                                            SignupRequest(
+
+                                                    SignupRequest(
                                                 name = name,
+                                                photoUrl= "https://cdn-icons-png.flaticon.com/512/149/149071.png",
                                                 mobileNo = mobile,
                                                 email = email,
                                                 dateOfBirth = birthday,
@@ -370,9 +375,10 @@ fun ProfileScreen(navController: NavController) {
                                                 totalExperience = totalExp ?: 0,
                                                 linkedinUrl = linkedin,
                                                 loggedFrom = "android",
+                                                cityName = cityName,
                                                 deviceId = DeviceUtils.getDeviceId(context),
                                                 fcmToken = fcmToken,
-                                                appVersion = "1.0.5",
+                                                appVersion = "1.0.6",
                                                 advertisementId = "",
                                                 userAgent = "android"
                                             )
@@ -469,7 +475,7 @@ fun validateProfile(
     branch: String,
     year: String,
     job: String,
-    location: String,
+    cityName: String,
     birthday: String,
     linkedin: String
 ): String? {
@@ -495,7 +501,7 @@ fun validateProfile(
     if (job.isBlank())
         return "Please enter job/company"
 
-    if (location.isBlank())
+    if (cityName.isBlank())
         return "Please enter location"
 
     if (birthday.isBlank())

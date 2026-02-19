@@ -498,8 +498,7 @@ data class Event(val id: String, val title: String, val date: String, val locati
 
 private fun sampleEvents() = listOf(
     Event("1", "MCA Almuni Meet 2026", "Feb 22, 2026", "Delhi/NCR"),
-    Event("2", "Tech Talk: AI in Industry", "Feb 05, 2026", "Online"),
-    Event("3", "Regional Chapter: Delhi", "Mar 12, 2026", "Delhi")
+    Event("2", "Delhi NCR - Holi Milan", "March 15", "Noida "),
 )
 
 
@@ -509,34 +508,11 @@ private fun sampleNews(): List<UniversityNews> {
     return listOf(
         UniversityNews(
             id = "1",
-            title = "HBTU MCA Alumni Meet 2026 Announced 🎉",
-            description = "The grand HBTU MCA Alumni Meet 2026 will be held on 22 February 2026. Registrations are open now.",
-            date = "05 Jan 2026"
-        ),
-        UniversityNews(
-            id = "2",
-            title = "New MCA Lab Inaugurated",
-            description = "A new advanced computer lab has been inaugurated for MCA students with modern infrastructure.",
-            date = "28 Dec 2025"
-        ),
-        UniversityNews(
-            id = "3",
-            title = "HBTU Ranked Among Top Technical Universities",
-            description = "HBTU has been ranked among the top engineering institutions in India for academic excellence.",
-            date = "15 Dec 2025"
-        ),
-        UniversityNews(
-            id = "4",
-            title = "MCA Placement Drive 2026 Begins",
-            description = "The MCA placement drive for the 2026 batch has started with multiple reputed IT companies participating.",
-            date = "10 Dec 2025"
-        ),
-        UniversityNews(
-            id = "5",
-            title = "HBTU Hosts National Tech Fest",
-            description = "HBTU successfully hosted a national-level technical fest with participation from colleges across India.",
-            date = "02 Dec 2025"
+            title = "Harcourtian MCA Alumni Meet 2026 Announced 🎉",
+            description = "The grand Harcourtian MCA Alumni Meet 2026 will be held on 22 February 2026. Registrations are open now.",
+            date = "1 Jan 2026"
         )
+
     )
 }
 data class UniversityNews(
