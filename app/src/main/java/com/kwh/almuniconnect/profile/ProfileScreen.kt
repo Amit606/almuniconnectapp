@@ -53,9 +53,10 @@ fun ProfileScreen(navController: NavController) {
 
     val apiService = remember { NetworkClient.createService(ApiService::class.java) }
     val repository = remember { AuthRepository(apiService) }
+    val tokenDataStore = TokenDataStore(context)
 
     val viewModel: ProfileViewModel =
-        viewModel(factory = ProfileViewModelFactory(repository))
+        viewModel(factory = ProfileViewModelFactory(repository,tokenDataStore))
 
     val apiState by viewModel.state.collectAsState()
 
@@ -134,15 +135,15 @@ fun ProfileScreen(navController: NavController) {
                         photo = profile.photoUrl ?: "",
                         totalExp = profile.totalExperience ?: 0,
 
-//                        accessToken = profile.accessToken ?: "",
-//                        accessTokenExpiry = profile.accessTokenExpiry ?: "",
-//                        refreshToken = profile.refreshToken ?: "",
-//                        refreshTokenExpiry = profile.refreshTokenExpiry ?: ""
+
                     )
                 )
+                if(profile.isActive==true){
 
                 navController.navigate(Routes.HOME) {
                     popUpTo(Routes.PROFILE) { inclusive = true }
+                }} else {
+                    navController.navigate("approval_pending")
                 }
             }
 

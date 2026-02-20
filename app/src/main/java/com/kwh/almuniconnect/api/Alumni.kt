@@ -169,7 +169,9 @@ interface ApiService {
     suspend fun verifyAlumniProfile(
         @Path("alumniId") alumniId: String,
         @Body body: VerifyRequest,
-        @Header("X-Correlation-ID") correlationId: String
+        @Header("X-Correlation-ID") correlationId: String,
+        @Header("Authorization") authorization: String   // 👈 Add this
+
     ): Response<VerifyProfileResponse>
 
 

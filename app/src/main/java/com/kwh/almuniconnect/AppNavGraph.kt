@@ -59,6 +59,7 @@ import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileRoute
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.subscription.PremiumScreen
+import com.kwh.almuniconnect.ui.ApprovalPendingScreen
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -117,6 +118,9 @@ fun AppNavGraph(
         composable(Routes.USER_PROFILE)
         {
             ProfileScreen(navController)
+        }
+        composable("approval_pending") {
+            ApprovalPendingScreen()
         }
         composable(Routes.NETWORK) {
             val apiService = remember {

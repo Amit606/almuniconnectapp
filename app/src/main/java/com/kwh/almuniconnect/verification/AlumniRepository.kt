@@ -1,9 +1,12 @@
 package com.kwh.almuniconnect.verification
 
+import android.content.Context
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.api.VerifyProfileResponse
 import com.kwh.almuniconnect.api.VerifyRequest
+import com.kwh.almuniconnect.storage.TokenDataStore
+import kotlinx.coroutines.flow.first
 import java.util.UUID
 
 class AlumniRepository {
@@ -34,17 +37,24 @@ class AlumniRepository {
             Result.failure(e)
         }
     }
-    suspend fun verifyAlumni(
+    suspend fun verifyAlumni(context: Context,
         alumniId: String,
         isVerified: Boolean
     ): Result<VerifyProfileResponse> {
 
         return try {
+            val tokenDataStore = TokenDataStore(context)
+            val token = tokenDataStore.getAccessToken().first()
+
+            if (token.isNullOrEmpty()) {
+                return Result.failure(Exception("Access token missing"))
+            }
 
             val response = api.verifyAlumniProfile(
                 alumniId = alumniId,
                 body = VerifyRequest(isVerified),
-                correlationId = UUID.randomUUID().toString()
+                correlationId = UUID.randomUUID().toString(),
+                authorization = "Bearer $token"   // 👈 Pass here
             )
 
             if (response.isSuccessful) {
@@ -52,7 +62,7 @@ class AlumniRepository {
                     Result.success(it)
                 } ?: Result.failure(Exception("Empty response"))
             } else {
-                Result.failure(Exception("Verification failed"))
+                Result.failure(Exception("Verification failed: ${response.code()}"))
             }
 
         } catch (e: Exception) {

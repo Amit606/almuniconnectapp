@@ -107,10 +107,10 @@ fun AccountVerificationScreen(
                         VerificationCard(
                             user = alumni,
                             onApprove = {
-                                viewModel.approveAlumni(alumni.alumniId)
+                                viewModel.approveAlumni(context,alumni.alumniId)
                             },
                             onDeny = {
-                                viewModel.denyAlumni(alumni.alumniId)
+                                viewModel.denyAlumni(context,alumni.alumniId)
                             }
                         )
                     }

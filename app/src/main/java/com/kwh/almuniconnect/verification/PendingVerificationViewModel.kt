@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.verification
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,10 +37,10 @@ class PendingVerificationViewModel : ViewModel() {
             )
         }
     }
-    fun approveAlumni(alumniId: String) {
+    fun approveAlumni(context:Context,alumniId: String) {
         viewModelScope.launch {
 
-            val result = repository.verifyAlumni(
+            val result = repository.verifyAlumni(context,
                 alumniId = alumniId,
                 isVerified = true
             )
@@ -65,10 +66,10 @@ class PendingVerificationViewModel : ViewModel() {
             )
         }
     }
-    fun denyAlumni(alumniId: String) {
+    fun denyAlumni(context:Context,alumniId: String) {
         viewModelScope.launch {
 
-            val result = repository.verifyAlumni(
+            val result = repository.verifyAlumni(context,
                 alumniId = alumniId,
                 isVerified = false
             )

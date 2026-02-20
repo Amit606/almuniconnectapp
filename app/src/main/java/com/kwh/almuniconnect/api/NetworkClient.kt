@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.api
 
+import com.kwh.almuniconnect.storage.TokenDataStore
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -15,6 +16,7 @@ object NetworkClient {
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY  // shows request/response in Logcat
     }
+
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)

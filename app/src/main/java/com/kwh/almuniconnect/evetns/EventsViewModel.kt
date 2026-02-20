@@ -1,15 +1,16 @@
 package com.kwh.almuniconnect.evetns
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.api.Context
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class EventsViewModel : ViewModel() {
-
+class EventsViewModel() : ViewModel() {
     private val api = NetworkClient.createService(ApiService::class.java)
     private val repository = EventsRepository(api)
 
