@@ -95,6 +95,18 @@ class PendingVerificationViewModel : ViewModel() {
             )
         }
     }
+    fun isAlumniVerified(
+        alumniId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+
+            val isVerified = repository.isAlumniVerified(alumniId)
+
+            onResult(isVerified)
+        }
+    }
+
     fun setEmptyState() {
         uiState = UiState.Empty
     }

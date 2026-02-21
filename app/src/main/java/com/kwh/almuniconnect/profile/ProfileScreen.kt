@@ -143,7 +143,7 @@ fun ProfileScreen(navController: NavController) {
                     navController.navigate(Routes.HOME) {
                     popUpTo(Routes.PROFILE) { inclusive = true }
                 }} else {
-                    navController.navigate("approval_pending")
+                    navController.navigate(Routes.APPROVAL_PENDING)
                 }
             }
             is ProfileState.Error -> {

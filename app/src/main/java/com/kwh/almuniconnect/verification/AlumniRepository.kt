@@ -14,6 +14,25 @@ class AlumniRepository {
     private val api: ApiService =
         NetworkClient.createService(ApiService::class.java)
 
+    suspend fun isAlumniVerified(alumniId: String): Boolean {
+        return try {
+            val response = api.checkAlumniVerification(
+                alumniId = alumniId,
+                correlationId = UUID.randomUUID().toString()
+            )
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                body?.success == true && body.data == true
+            } else {
+                false
+            }
+
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     suspend fun getPending(alumniId: String): Result<List<AlumniData>> {
         return try {
             val response = api.getPendingVerifications(

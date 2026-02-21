@@ -7,6 +7,7 @@ import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.news.NewsResponse
 import com.kwh.almuniconnect.profile.ProfileResponse
 import com.kwh.almuniconnect.verification.PendingVerificationResponse
+import com.kwh.almuniconnect.verification.VerifyResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -174,8 +175,12 @@ interface ApiService {
 
     ): Response<VerifyProfileResponse>
 
-
-
+    @GET("alumni/{alumniId}/is-verified")
+    suspend fun checkAlumniVerification(
+        @Path("alumniId") alumniId: String,
+        @Header("accept") accept: String = "application/json",
+        @Header("X-Correlation-ID") correlationId: String
+    ): Response<VerifyResponse>
 }
 
 data class VerifyRequest(

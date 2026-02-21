@@ -108,8 +108,7 @@ fun AppNavGraph(
         }
         composable(Routes.Internet_Splash) {
             NoInternetDialog(
-                onConnectNow = {  },
-                onCancel = { /* Optional */ }
+
             )
 
         }
@@ -119,7 +118,7 @@ fun AppNavGraph(
         {
             ProfileScreen(navController)
         }
-        composable("approval_pending") {
+        composable(Routes.APPROVAL_PENDING) {
             ApprovalPendingScreen()
         }
         composable(Routes.NETWORK) {

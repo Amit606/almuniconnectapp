@@ -63,5 +63,6 @@ object Routes {
     const val DONATE = "emergency_donate/{id}"
     const val THANK_YOU = "emergency_thank_you/{amount}"
     const val VERIFICATION = "verification"
+    const val APPROVAL_PENDING="approval_pending"
 
 }
