@@ -306,16 +306,20 @@ fun AppNavGraph(
         composable(Routes.ABOUT_US) { AboutAlumniConnectScreen(navController) }
 
         composable(
-            route = "${Routes.EVENT_DETAILS}?title={title}&location={location}",
+            route = "${Routes.EVENT_DETAILS}?title={title}&date={date}&location={location}",
             arguments = listOf(
                 navArgument("title") { type = NavType.StringType },
-                navArgument("location") { type = NavType.StringType }
+                navArgument("location") { type = NavType.StringType },
+                navArgument("date") { type = NavType.StringType }
+
             )
         ) { entry ->
             val title = entry.arguments?.getString("title").orEmpty()
             val location = entry.arguments?.getString("location").orEmpty()
+            val date = entry.arguments?.getString("date").orEmpty()
 
-            EventDetailsScreen(navController,title, location,"","")
+
+            EventDetailsScreen(navController,title, location,date,"")
         }
         composable(
             route = "${Routes.SERVICE_DETAILS}?title={title}&location={location}",

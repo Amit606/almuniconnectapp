@@ -62,6 +62,7 @@ import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.utils.encodeRoute
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import com.kwh.almuniconnect.evetns.Event
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -269,11 +270,12 @@ fun HomeScreen(
                     items(sampleEvents) { event ->
                         EventCard(event = event, onClick = {
                             AnalyticsManager.logEvent(
-                                AnalyticsEvent.ScreenView("events_clicked_${event.id}")
+                                AnalyticsEvent.ScreenView("events_clicked_${event.title}")
                             )
                             navController.navigate(
-                            "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&location=${event.location.encodeRoute()}"
-                        ) })
+                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&description=${event.description.encodeRoute()}&date=${event.startAt.encodeRoute()}&location=${event.location.encodeRoute()}"
+                            )
+                        })
                     }
                 }
             }
@@ -494,12 +496,31 @@ fun BottomAppBarWithNav(
 }
 
 // Sample models + data
-data class Event(val id: String, val title: String, val date: String, val location: String)
 
 private fun sampleEvents() = listOf(
-    Event("1", "MCA Almuni Meet 2026", "Feb 22, 2026", "Delhi/NCR"),
-    Event("2", "Delhi NCR - Holi Milan", "March 15", "Noida "),
-)
+        Event(
+            title = "MCA Alumni Meet 2026",
+            location = "Delhi/NCR",
+            description = "We are excited to invite all alumni to join us for a Holi Milan Samaroh filled with joy and celebrations.",
+            date = "Feb 22, 2026",
+            price = "Free",
+            image = R.drawable.ic_almuni_meet,
+            startAt = "2026-02-22T11:00:00",
+            endAt = "2026-02-22T17:00:00"
+        ),
+        Event(
+            title = "Delhi NCR - Holi Milan",
+            location = "Noida",
+            description = "Celebrate Holi Milan with friends and alumni network.",
+            date = "March 15, 2026",
+            price = "₹500",
+            image = R.drawable.ic_holi,
+            startAt = "2026-03-15T11:00:00",
+            endAt = "2026-03-15T15:00:00"
+        )
+    )
+
+
 
 
 

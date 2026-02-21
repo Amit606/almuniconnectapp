@@ -264,7 +264,7 @@ fun AlumniFilterSheet(
         // Year Filter
         Text("Batch Year", fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(8.dp))
-
+        val years = (1972..2026 step 2).map { it.toString() }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("2010", "2012", "2014", "2016", "2018", "2020").forEach { year ->
                 FilterChip(

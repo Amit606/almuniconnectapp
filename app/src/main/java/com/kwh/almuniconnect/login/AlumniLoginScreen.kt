@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.permission.RequestNotificationPermission
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +41,14 @@ fun AlumniLoginScreen(
     LaunchedEffect(Unit) {
         visible = true
     }
-
+    RequestNotificationPermission(
+        onPermissionGranted = {
+            // 🔔 Notifications enabled
+        },
+        onPermissionDenied = {
+            // 🚫 User denied (show snackbar or ignore)
+        }
+    )
     Scaffold { padding ->
 
         Box(

@@ -23,6 +23,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.api.JobPostRequest
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -350,3 +362,85 @@ private fun isValidUrl(url: String): Boolean {
 }
 
 
+@Composable
+fun AppTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    trailingContent: @Composable (() -> Unit)? = null
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier.fillMaxWidth(),
+        singleLine = true,
+        trailingIcon = trailingContent
+    )
+}
+@Composable
+fun LinkiedID(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        trailingIcon = {
+
+            Row {
+
+                // Copy Icon
+                IconButton(
+                    onClick = {
+                        if (value.isNotBlank()) {
+                            clipboard.setText(AnnotatedString(value))
+                            Toast.makeText(
+                                context,
+                                "Copied to clipboard",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ContentCopy,
+                        contentDescription = "Copy"
+                    )
+                }
+
+                // Open Link Icon
+                IconButton(
+                    onClick = {
+                        if (value.isNotBlank()) {
+
+                            val url =
+                                if (value.startsWith("https://") || value.startsWith("http://"))
+                                    value
+                                else
+                                    "https://$value"
+
+                            Log.e("JobPostScreen", "Opening URL: $url"+value)
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, url.toUri())
+                            )
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.OpenInNew,
+                        contentDescription = "Open"
+                    )
+                }
+            }
+        }
+    )
+}

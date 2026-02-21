@@ -3,47 +3,28 @@ package com.kwh.almuniconnect.evetns
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.webkit.WebView
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.R
@@ -53,6 +34,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import java.net.URLDecoder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,141 +48,181 @@ fun EventDetailsScreen(
     val context = LocalContext.current
     TrackScreen("event_details_screen")
 
+    val horizontalPadding = 20.dp
+
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Events Details",
+                title = "Event Details",
                 navController = navController
             )
         }
     ) { paddingValues ->
+        val decodedTitle = URLDecoder.decode(title, "UTF-8")
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                   // .background(Color(0xFF0E1420))
-            ) {
+            // 🔝 Top Image with Gradient Overlay
+            Box {
 
-                // 🔝 Top Image with Date Badge
-                Box {
-                    Image(
-                        painter = painterResource(R.drawable.newggg),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(280.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                val imageRes = when {
+                    decodedTitle.contains("Holi Milan", ignoreCase = true) ->
+                        R.drawable.ic_holi
 
+                    decodedTitle.contains("Alumni Meet", ignoreCase = true) ->
+                        R.drawable.ic_alumni
 
-
+                    else ->
+                        R.drawable.ic_demo_events
                 }
 
-                // 📝 Event Title & Favorite
-                Row(
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        title,
-                        fontSize = 22.sp,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f)
-                    )
-
-
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        date,
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.weight(1f)
-                    )
-
-
-                }
-
-                // 📍 Location & Rating
-                Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Text(location, style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-
-
-
-                // 📄 Description
-                Text(
-                    "Description",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(20.dp)),   // 👈 Add this
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
                 )
 
-                Text(
-                    "Join us for an amazing alumni and college event where seniors and juniors come together. Network, celebrate, and relive memories with HBTU family.",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                // 📍 Location Map (Free OpenStreetMap)
-                Text(
-                    "Location",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
-
-                    modifier = Modifier.padding(16.dp)
-                )
-
-                StreetMapViewOSM(location)
-
-                Spacer(Modifier.height(16.dp))
-
-                // 🔵 Open in Google Maps
-                Button(
-                    onClick = { openInGoogleMaps(context, location) },
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4))
-                ) {
-                    Text("Open in Google Maps",  style = MaterialTheme.typography.titleMedium,)
-                }
-
-                Spacer(Modifier.height(10.dp))
-
-                // 🟢 Share Location WhatsApp
-                Button(
-                    onClick = { shareLocationOnWhatsApp(context, location) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366))
-                ) {
-                    Text("Share Location on WhatsApp", style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-
-                Spacer(Modifier.height(20.dp))
+                        .matchParentSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.5f)
+                                )
+                            )
+                        )
+                )
             }
-        }
 
+            Spacer(Modifier.height(16.dp))
+
+            // 📝 Title
+            Text(
+                text = decodedTitle,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = horizontalPadding)
+            )
+
+            Spacer(Modifier.height(6.dp))
+
+            // 📅 Date
+            Log.e("EventDetailsScreen", "Decoded Date: $date")
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = horizontalPadding)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+                val formattedDate = date.substringBefore("T")
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(Modifier.height(6.dp))
+            val decodedLocation = URLDecoder.decode(location, "UTF-8")
+
+            // 📍 Location
+            Text(
+                text = decodedLocation,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = horizontalPadding)
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = horizontalPadding),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // 📄 Description
+            Text(
+                text = "Description",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = horizontalPadding)
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "Join us for an amazing alumni and college event where seniors and juniors come together. Network, celebrate, and relive memories with HBTU family.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = horizontalPadding)
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            // 📍 Map Section
+            Text(
+                text = "Location",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = horizontalPadding)
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            StreetMapViewOSM(location)
+
+            Spacer(Modifier.height(20.dp))
+
+            // 🔵 Open in Google Maps
+            Button(
+                onClick = { openInGoogleMaps(context, location) },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .padding(horizontal = horizontalPadding)
+            ) {
+                Text("Open in Google Maps")
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // 🟢 Share Location
+            Button(
+                onClick = { shareLocationOnWhatsApp(context, location) },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .padding(horizontal = horizontalPadding)
+            ) {
+                Text("Share Location")
+            }
+
+            Spacer(Modifier.height(24.dp))
+        }
     }
+}
 
 fun openInGoogleMaps(context: Context, address: String) {
     val uri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(address)}")
@@ -210,10 +232,10 @@ fun openInGoogleMaps(context: Context, address: String) {
     try {
         context.startActivity(intent)
     } catch (e: Exception) {
-        // If Google Maps app not installed
         context.startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 }
+
 fun shareLocationOnWhatsApp(context: Context, location: String) {
     val mapsLink = "https://www.google.com/maps/search/?api=1&query=${Uri.encode(location)}"
     val message = "📍 Event Location:\n$location\n\nOpen in Maps 👇\n$mapsLink"
@@ -227,7 +249,6 @@ fun shareLocationOnWhatsApp(context: Context, location: String) {
     try {
         context.startActivity(intent)
     } catch (e: Exception) {
-        // WhatsApp not installed – open share chooser
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, message)
@@ -235,15 +256,16 @@ fun shareLocationOnWhatsApp(context: Context, location: String) {
         context.startActivity(Intent.createChooser(shareIntent, "Share location"))
     }
 }
+
 @Composable
 fun StreetMapViewOSM(address: String) {
-
 
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
-            .padding(20.dp)
+            .padding(horizontal = 20.dp)
+            .shadow(8.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp)),
         factory = {
 
@@ -254,11 +276,9 @@ fun StreetMapViewOSM(address: String) {
             val controller = map.controller
             controller.setZoom(15.0)
 
-            // Default location (Delhi)
             val geoPoint = GeoPoint(28.5562, 77.1000)
             controller.setCenter(geoPoint)
 
-            // Marker
             val marker = Marker(map)
             marker.position = geoPoint
             marker.title = address
@@ -268,4 +288,3 @@ fun StreetMapViewOSM(address: String) {
         }
     )
 }
-

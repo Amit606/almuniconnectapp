@@ -33,6 +33,7 @@ import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.network.AlumniDto
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -168,15 +169,15 @@ fun AlumniProfileScreen(
                         iconTint = Color(0xFF25D366),
                         onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
                     )
-                    Divider()
-
-                    ProfileRow(
-                        icon = Icons.Default.Countertops,
-                        label = "Job Referral ",
-                        value = "Job Posted 3",
-                        iconTint = Color(0xFF25D366),
-                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
-                    )
+//                    Divider()
+//
+//                    ProfileRow(
+//                        icon = Icons.Default.Countertops,
+//                        label = "Job Referral ",
+//                        value = "Job Posted 3",
+//                        iconTint = Color(0xFF25D366),
+//                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
+//                    )
                 }
             }
 
@@ -188,7 +189,7 @@ fun AlumniProfileScreen(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse(alumni.linkedinUrl.toString())
+                            alumni.linkedinUrl.toString().toUri()
                         )
                     )
                 },

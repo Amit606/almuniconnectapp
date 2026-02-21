@@ -98,7 +98,7 @@ fun EventsScreen(
                         .padding(paddingValues)
                 ) {
 
-                    item { EventBanner() }
+                   // item { EventBanner() }
 
                     item {
                         Text(
@@ -111,7 +111,7 @@ fun EventsScreen(
                     items(events) { event ->
                         EventCard(event) {
                             navController.navigate(
-                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&location=${event.location.encodeRoute()}"
+                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&description=${event.description.encodeRoute()}&date=${event.startAt.encodeRoute()}&location=${event.location.encodeRoute()}"
                             )
                         }
                     }
@@ -122,114 +122,93 @@ fun EventsScreen(
     }
 }
 
-
-
-
-@Composable
-fun EventBanner() {
-    Box(
-        modifier = Modifier
-            .height(250.dp)
-            .fillMaxWidth()
-    ) {
-        Image(
-            painter = painterResource(R.drawable.newggg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0x66000000))
-        )
-
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-        ) {
-            Text(
-                "SUN, 22 FEB 2026",
-                color = Color.White,
-                fontSize = 12.sp
-            )
-            Text(
-                "MCA Alumni Meet & Greet",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
-}
-
 @Composable
 fun EventCard(
     event: Event,
     onClick: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White//Color(0xFFFFF4F1)
-        ),
-        elevation = CardDefaults.cardElevation(1.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
+
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            // Event Image
             Image(
                 painter = painterResource(event.image),
                 contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.FillBounds
+                    .size(110.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
                 Text(
-                    event.title,
-                    color = Color.Black,
-                    style = MaterialTheme.typography.labelLarge
-                )
-                Text(
-                    event.location,
-                    color = Color.DarkGray,
-                    style = MaterialTheme.typography.labelMedium
+                    text = event.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.DateRange,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        event.date,
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                Text(
+                    text = event.location,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(
+                            horizontal = 8.dp,
+                            vertical = 4.dp
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = event.date,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
-
-//
         }
     }
 }
+
 
 

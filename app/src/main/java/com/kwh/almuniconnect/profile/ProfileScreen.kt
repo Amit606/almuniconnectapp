@@ -39,6 +39,7 @@ import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.api.*
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
+import com.kwh.almuniconnect.jobposting.LinkiedID
 import com.kwh.almuniconnect.jobposting.SectionTitle
 import com.kwh.almuniconnect.login.AuthRepository
 import com.kwh.almuniconnect.storage.*
@@ -139,18 +140,15 @@ fun ProfileScreen(navController: NavController) {
                     )
                 )
                 if(profile.isActive==true){
-
-                navController.navigate(Routes.HOME) {
+                    navController.navigate(Routes.HOME) {
                     popUpTo(Routes.PROFILE) { inclusive = true }
                 }} else {
                     navController.navigate("approval_pending")
                 }
             }
-
             is ProfileState.Error -> {
                 error = (apiState as ProfileState.Error).message
             }
-
             else -> {}
         }
     }
@@ -328,7 +326,7 @@ fun ProfileScreen(navController: NavController) {
 
                             BirthdayPicker(birthday) { birthday = it }
 
-                            AppTextField("LinkedIn URL", linkedin) {
+                            LinkiedID("LinkedIn URL", linkedin) {
                                 linkedin = it
                             }
 
@@ -356,15 +354,12 @@ fun ProfileScreen(navController: NavController) {
                                         job, cityName,
                                         birthday, linkedin
                                     )
-                                 Log.e("ProfileScreen", "Validation error: $error")
                                     if (error == null) {
-                                        Log.e("CityName", "City Name: ${cityName}")
-
                                         viewModel.submitProfile(
 
                                                     SignupRequest(
                                                 name = name,
-                                                photoUrl= "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+                                                photoUrl= user.photo,
                                                 mobileNo = mobile,
                                                 email = email,
                                                 dateOfBirth = birthday,

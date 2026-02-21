@@ -30,6 +30,7 @@ data class EventDto(
 data class Event(
     val title: String,
     val location: String,
+    val description: String,
     val date: String,
     val price: String,
     val image: Int,
