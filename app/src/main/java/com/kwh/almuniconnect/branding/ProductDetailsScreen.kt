@@ -78,7 +78,7 @@ fun ProductDetailsScreen(
             // 🌄 Hero Image with Gradient
             Box {
                 Image(
-                    painter = painterResource(R.drawable.newggg),
+                    painter = painterResource(R.drawable.ic_services),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()

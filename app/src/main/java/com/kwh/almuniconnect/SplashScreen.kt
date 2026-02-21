@@ -99,14 +99,13 @@ fun SplashScreen(navController: NavController) {
 
         splashViewModel.checkAlumniVerification(user.userId) { isVerified ->
 
-         Log.e("SplashScreen", "Alumni verification status: $isVerified")
 
             if (isVerified) {
                 navController.navigate(Routes.HOME) {
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             } else {
-                navController.navigate(Routes.HOME) {
+                navController.navigate(Routes.APPROVAL_PENDING) {
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             }

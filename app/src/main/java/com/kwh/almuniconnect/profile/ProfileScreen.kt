@@ -139,7 +139,7 @@ fun ProfileScreen(navController: NavController) {
 
                     )
                 )
-                if(profile.isActive==true){
+                if(profile.isVerified==true){
                     navController.navigate(Routes.HOME) {
                     popUpTo(Routes.PROFILE) { inclusive = true }
                 }} else {

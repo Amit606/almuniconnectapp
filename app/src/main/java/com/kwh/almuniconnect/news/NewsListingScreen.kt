@@ -91,8 +91,8 @@ fun NewsListingScreen(navController: NavController) {
 
             is NewsState.Error -> {
                 CommonEmptyState(
-                    title = "No Upcoming Events",
-                    message = "There are no upcoming events right now.\nPlease check back later.",
+                    title = "No Upcoming News Events",
+                    message = "There are no news upcoming events right now.\nPlease check back later.",
                     lottieRes = R.raw.no_events,
                     actionText = "Refresh",
                     onActionClick = { viewModel.loadNews() }
@@ -144,9 +144,9 @@ fun NewsCard(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(news.imageUrl)
                     .crossfade(true)
-                    .placeholder(R.drawable.newggg)
-                    .error(R.drawable.newggg)
-                    .fallback(R.drawable.newggg)
+                    .placeholder(R.drawable.ic_news)
+                    .error(R.drawable.ic_news)
+                    .fallback(R.drawable.ic_news)
                     .build(),
                 contentDescription = news.title,
                 contentScale = ContentScale.FillBounds,

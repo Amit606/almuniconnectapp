@@ -141,14 +141,26 @@ fun EventCard(
     ) {
 
         Row(
-            modifier = Modifier
-                .padding(14.dp),
+            modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // Event Image
+            // 🔥 Safer image selection logic
+            val imageRes = when {
+                event.title.contains("Holi", ignoreCase = true) ->
+                    R.drawable.ic_holi
+
+                event.title.contains("Alumni", ignoreCase = true) ||
+                        event.title.contains("Almuni", ignoreCase = true) ->
+                    R.drawable.ic_alumni
+
+                else ->
+                    R.drawable.ic_demo_events
+            }
+
+            // ✅ Correct Image (Fixed size for Row layout)
             Image(
-                painter = painterResource(event.image),
+                painter = painterResource(id = imageRes),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -190,7 +202,7 @@ fun EventCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            Icons.Default.DateRange,
+                            imageVector = Icons.Default.DateRange,
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.primary

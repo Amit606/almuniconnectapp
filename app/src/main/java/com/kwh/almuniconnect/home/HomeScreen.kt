@@ -130,20 +130,20 @@ fun HomeScreen(
 //                            contentDescription = "Notifications"
 //                        )
 //                    }
-                    IconButton(onClick = {  navController.navigate(Routes.FEED) }) {
-                        Icon(
-                            Icons.Default.Emergency,
-                            tint = Color.Red, // Gold highlight
-                            contentDescription = "Emergency Help"
-                        )
-                    }
-                    IconButton(onClick = { navController.navigate(Routes.SUBSCRIPTION) }) {
-                        Icon(
-                            Icons.Default.WorkspacePremium,
-                            tint = Color.Blue, // Gold highlight
-                            contentDescription = "Premium Access"
-                        )
-                    }
+//                    IconButton(onClick = {  navController.navigate(Routes.FEED) }) {
+//                        Icon(
+//                            Icons.Default.Emergency,
+//                            tint = Color.Red, // Gold highlight
+//                            contentDescription = "Emergency Help"
+//                        )
+//                    }
+//                    IconButton(onClick = { navController.navigate(Routes.SUBSCRIPTION) }) {
+//                        Icon(
+//                            Icons.Default.WorkspacePremium,
+//                            tint = Color.Blue, // Gold highlight
+//                            contentDescription = "Premium Access"
+//                        )
+//                    }
 
                     IconButton(onClick = {
                         navController.navigate(Routes.USER_PROFILE)
@@ -227,9 +227,9 @@ fun HomeScreen(
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(bannerImages[page])
                                     .crossfade(true)
-                                    .error(R.drawable.newggg)        // ❌ broken URL
-                                    .placeholder(R.drawable.newggg) // ⏳ loading
-                                    .fallback(R.drawable.newggg)    // ❓ null data
+                                    .error(R.drawable.ic_services)        // ❌ broken URL
+                                    .placeholder(R.drawable.ic_news) // ⏳ loading
+                                    .fallback(R.drawable.ic_alumni)    // ❓ null data
                                     .build(),
                                 contentDescription = "Banner",
                                 contentScale = ContentScale.Crop,
@@ -281,35 +281,35 @@ fun HomeScreen(
             }
 
             // Events section
-            item {
-                SectionTitle(
-                    title = "Products & Services",
-                    actionText = "View All",
-                    onAction = {
-                        AnalyticsManager.logEvent(
-                            AnalyticsEvent.ScreenView("Services_view_all")
-                        )
-                        navController.navigate(Routes.PRODUCT_SCREEN)
-                    }
-                )
-            }
-
-            item {
-                val sampleEvents = getDummyProducts()
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(sampleEvents) { event ->
-                        ProductCard(event = event, onClick = {
-                            AnalyticsManager.logEvent(
-                                AnalyticsEvent.ScreenView("services_clicked_${event.productName}")
-                            )
-                           navController.navigate(Routes.PRODUCT_SCREEN)
-
-
-                        }
-                        )
-                    }
-                }
-            }
+//            item {
+//                SectionTitle(
+//                    title = "Products & Services",
+//                    actionText = "View All",
+//                    onAction = {
+//                        AnalyticsManager.logEvent(
+//                            AnalyticsEvent.ScreenView("Services_view_all")
+//                        )
+//                        navController.navigate(Routes.PRODUCT_SCREEN)
+//                    }
+//                )
+//            }
+//
+//            item {
+//                val sampleEvents = getDummyProducts()
+//                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                    items(sampleEvents) { event ->
+//                        ProductCard(event = event, onClick = {
+//                            AnalyticsManager.logEvent(
+//                                AnalyticsEvent.ScreenView("services_clicked_${event.productName}")
+//                            )
+//                           navController.navigate(Routes.PRODUCT_SCREEN)
+//
+//
+//                        }
+//                        )
+//                    }
+//                }
+//            }
 
             // Jobs section
             item {

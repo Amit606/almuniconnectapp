@@ -21,6 +21,6 @@ data class UserProfile(
     val appVersion: String?,
     val advertisementId: String?,
     val userAgent: String?,
-    val isActive: Boolean?,
+    val isVerified: Boolean?,
     val createdAt: String?
 )
