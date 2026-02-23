@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.api
 
+import com.kwh.almuniconnect.api.NetworkClient.logging
 import com.kwh.almuniconnect.storage.TokenDataStore
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,13 +14,13 @@ object NetworkClient {
 
     private const val BASE_URL = "https://hbtu-alumni-api.azurewebsites.net/api/v1/"  // 🔁 Replace with your backend base URL
 
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY  // shows request/response in Logcat
-    }
+    val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.NONE
+        }
 
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
+    val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(logging)
         .build()
 
     private val retrofit: Retrofit by lazy {

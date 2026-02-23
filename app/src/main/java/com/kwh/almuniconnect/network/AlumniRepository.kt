@@ -7,24 +7,26 @@ class AlumniRepository(private val api: ApiService) {
 
     suspend fun getAlumniList(
         pageNumber: Int,
-        pageSize: Int
+        pageSize: Int,
+        ascending: Boolean
     ): Result<AlumniListResponse> {
         return try {
-            val resp = api.getAlumniList(pageNumber, pageSize)
+            val resp = api.getAlumniList(
+                pageNumber = pageNumber,
+                pageSize = pageSize,
+                ascending = ascending
+            )
 
             if (resp.isSuccessful) {
-                resp.body()?.data?.let { data ->
-                    Result.success(data)
-                } ?: Result.failure(
-                    Exception("Empty alumni data")
-                )
+                resp.body()?.data?.let {
+                    Result.success(it)
+                } ?: Result.failure(Exception("Empty alumni data"))
             } else {
                 Result.failure(
-                    Exception(
-                        "HTTP ${resp.code()}: ${resp.errorBody()?.string()}"
-                    )
+                    Exception("HTTP ${resp.code()}")
                 )
             }
+
         } catch (e: Exception) {
             Result.failure(e)
         }

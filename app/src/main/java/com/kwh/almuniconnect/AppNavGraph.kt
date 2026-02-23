@@ -53,10 +53,12 @@ import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
 import com.kwh.almuniconnect.emergency.EmergencyRequestForm
 import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
+import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
 import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileRoute
+import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.subscription.PremiumScreen
 import com.kwh.almuniconnect.ui.ApprovalPendingScreen
@@ -140,32 +142,49 @@ fun AppNavGraph(
                 }
             )
         }
+        composable("profile") {
 
-        composable(
-            route = Routes.PROFILE_ROUTE,
-            arguments = listOf(
-                navArgument("id") { type = NavType.StringType }
-            )
-        ) { entry ->
+            val alumni = navController
+                .previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<AlumniDto>("alumni")
 
-            val id = entry.arguments?.getString("id")
-                ?: return@composable
-
-            // 🔥 SAME VIEWMODEL INSTANCE
-            val alumniViewModel: AlumniViewModel = viewModel(
-                factory = AlumniViewModelFactory(
-                    AlumniRepository(
-                        NetworkClient.createService(ApiService::class.java)
-                    )
+            alumni?.let {
+                AlumniProfileScreen(
+                    alumni = it,
+                    navController = navController
                 )
-            )
-
-            AlumniProfileRoute(
-                alumniId = id,
-                navController = navController,
-                viewModel = alumniViewModel
-            )
+            }
         }
+
+//        composable(
+//            route = Routes.PROFILE_ROUTE,
+//            arguments = listOf(
+//                navArgument("id") { type = NavType.StringType }
+//            )
+//        ) { entry ->
+//
+//            val id = entry.arguments?.getString("id")
+//                ?: return@composable
+//
+//            val alumniViewModel: AlumniViewModel = viewModel(
+//                factory = AlumniViewModelFactory(
+//                    AlumniRepository(
+//                        NetworkClient.createService(ApiService::class.java)
+//                    )
+//                )
+//            )
+//
+//            LaunchedEffect(id) {
+//                Log.e("FixedProfile", "Navigating to profile with ID: $id")
+//            }
+//
+//            AlumniProfileRoute(
+//                alumniId = id,
+//                navController = navController,
+//                viewModel = alumniViewModel
+//            )
+//        }
 
 //        composable(Routes.NETWORK) {
 //            NetworkScreen(

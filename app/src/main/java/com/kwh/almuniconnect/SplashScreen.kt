@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
@@ -105,7 +104,7 @@ fun SplashScreen(navController: NavController) {
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             } else {
-                navController.navigate(Routes.APPROVAL_PENDING) {
+                navController.navigate(Routes.HOME) {
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             }

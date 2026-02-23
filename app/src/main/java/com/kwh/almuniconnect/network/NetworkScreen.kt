@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
@@ -44,18 +46,18 @@ fun NetworkScreen(
     val apiService = remember {
         NetworkClient.createService(ApiService::class.java)
     }
-    val repository = remember { AlumniRepository(apiService) }
+
+    val repository = remember {
+        AlumniRepository(apiService)
+    }
 
     val viewModel: AlumniViewModel = viewModel(
         factory = AlumniViewModelFactory(repository)
     )
+
+    val alumniItems = viewModel.alumniPagingFlow.collectAsLazyPagingItems()
+
     var showFilter by remember { mutableStateOf(false) }
-
-    val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadAlumni()
-    }
 
     TrackScreen("alumni_network_screen")
 
@@ -64,90 +66,162 @@ fun NetworkScreen(
             HBTUTopBar(
                 title = "Alumni Networks",
                 navController = navController,
-                onFilterClick = { showFilter = true }   // 👈 filter icon
-
+                onFilterClick = { showFilter = true }
             )
         }
     ) { paddingValues ->
 
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(Color.White)
-                .padding(horizontal = 16.dp)
         ) {
 
-            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
 
-            when (state) {
-
-                is AlumniState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                items(
+                    count = alumniItems.itemCount,
+                    key = { index ->
+                        alumniItems[index]?.alumniId ?: index
                     }
-                }
+                ) { index ->
 
-                is AlumniState.Error -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = (state as AlumniState.Error).message,
-                            color = Color.Red
+                    val alumni = alumniItems[index]
+
+                    alumni?.let {
+                        AlumniCard(
+                            alumni = it,
+                            onClick = {
+
+                                    navController.currentBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("alumni", it)
+
+                                    navController.navigate("profile")
+
+                            }
                         )
                     }
                 }
 
-                is AlumniState.Success -> {
+                // 🔥 Loading / Error states
+                alumniItems.apply {
 
-                    val alumniList =
-                        (state as AlumniState.Success).alumni
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(
-                            items = alumniList,
-                            key = { it.alumniId } // ✅ stable key
-                        ) { alumni ->
-                            AlumniCard(
-                                alumni = alumni,
-                                onClick = { onOpenProfile(alumni) }
-                            )
+                    when {
+
+                        loadState.refresh is LoadState.Loading -> {
+                            item {
+                                FullScreenLoader()
+                            }
+                        }
+
+                        loadState.append is LoadState.Loading -> {
+                            item {
+                                BottomLoader()
+                            }
+                        }
+
+                        loadState.refresh is LoadState.Error -> {
+                            item {
+                                ErrorItem(
+                                    message = "Failed to load alumni",
+                                    onRetry = { retry() }
+                                )
+                            }
+                        }
+
+                        loadState.append is LoadState.Error -> {
+                            item {
+                                ErrorItem(
+                                    message = "Failed to load more",
+                                    onRetry = { retry() }
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-        // 🔽 Filter Bottom Sheet
-        if (showFilter) {
-            ModalBottomSheet(
-                onDismissRequest = { showFilter = false },
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            ) {
-                AlumniFilterSheet(
-                    onApply = { branch, year ->
-                        viewModel.applyFilter(branch, year)
-                        showFilter = false
-                    },
-                    onClear = {
-                        viewModel.clearFilter()
-                        showFilter = false
-                    }
-                )
+
+            // 🔽 Filter Bottom Sheet (UI only)
+            if (showFilter) {
+                ModalBottomSheet(
+                    onDismissRequest = { showFilter = false },
+                    shape = RoundedCornerShape(
+                        topStart = 20.dp,
+                        topEnd = 20.dp
+                    )
+                ) {
+                    AlumniFilterSheet(
+                        onApply = { _, _ ->
+                            // 🔥 For production:
+                            // move filtering to backend
+                            alumniItems.refresh()
+                            showFilter = false
+                        },
+                        onClear = {
+                            alumniItems.refresh()
+                            showFilter = false
+                        }
+                    )
+                }
             }
         }
     }
-
 }
 
 
+@Composable
+fun FullScreenLoader() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+@Composable
+fun BottomLoader() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+@Composable
+fun ErrorItem(
+    message: String,
+    onRetry: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
+        Text(
+            text = message,
+            color = Color.Red
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = onRetry) {
+            Text("Retry")
+        }
+    }
+}
 
 @Composable
 fun AlumniCard(alumni: AlumniDto, onClick: () -> Unit) {

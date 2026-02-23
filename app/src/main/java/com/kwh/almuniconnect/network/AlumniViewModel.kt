@@ -4,7 +4,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.kwh.almuniconnect.network.AlumniDto
+import com.kwh.almuniconnect.network.AlumniPagingSource
 import com.kwh.almuniconnect.network.AlumniRepository
 import kotlinx.coroutines.launch
 
@@ -29,79 +33,47 @@ class AlumniViewModel(
     private val repository: AlumniRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AlumniState>(AlumniState.Loading)
-    val state: StateFlow<AlumniState> = _state
+    private var ascendingOrder = false
 
-    private var pageNumber = 1
-    private val pageSize = 10
-    private val alumniList = mutableListOf<AlumniDto>()
-    private var isLastPage = false
-    private var isLoading = false
-    private var originalList: List<AlumniDto> = emptyList()
-
-    fun loadAlumni(reset: Boolean = false) {
-        if (isLoading || isLastPage) return
-
-        viewModelScope.launch {
-            isLoading = true
-
-            if (reset) {
-                pageNumber = 1
-                isLastPage = false
-                alumniList.clear()
-                _state.value = AlumniState.Loading
-            }
-
-            repository.getAlumniList(pageNumber, pageSize)
-                .onSuccess { response ->
-
-                    val safeItems = response.items ?: emptyList()
-                    alumniList.addAll(safeItems)
-
-                    originalList = alumniList.toList()
-
-                    isLastPage = alumniList.size >= response.totalCount
-
-                    _state.value = AlumniState.Success(
-                        alumni = alumniList.toList(),
-                        totalCount = response.totalCount,
-                        pageNumber = pageNumber
-                    )
-
-                    pageNumber++
-                }
-                .onFailure {
-                    _state.value = AlumniState.Error(
-                        it.message ?: "Failed to load alumni"
-                    )
-                }
-
-            isLoading = false
+    val alumniPagingFlow = Pager(
+        config = PagingConfig(
+            pageSize = 20,
+            enablePlaceholders = false
+        ),
+        pagingSourceFactory = {
+            AlumniPagingSource(
+                repository = repository,
+                ascending = ascendingOrder
+            )
         }
-    }
+    ).flow.cachedIn(viewModelScope)
 
-    fun applyFilter(branch: String?, year: String?) {
-        val yearInt = year?.toIntOrNull()
-
-        val filtered = originalList.filter {
-            (branch == null || it.courseName == branch) &&
-                    (yearInt == null || it.batch == yearInt)
-        }
-
-        _state.value = AlumniState.Success(
-            alumni = filtered,
-            totalCount = filtered.size,
-            pageNumber = pageNumber
-        )
-    }
-
-    fun clearFilter() {
-        _state.value = AlumniState.Success(
-            alumni = originalList,
-            totalCount = originalList.size,
-            pageNumber = pageNumber
-        )
+    fun toggleSort() {
+        ascendingOrder = !ascendingOrder
     }
 }
+//    fun applyFilter(branch: String?, year: String?) {
+//        val yearInt = year?.toIntOrNull()
+//
+//        val filtered = originalList.filter {
+//            (branch == null || it.courseName == branch) &&
+//                    (yearInt == null || it.batch == yearInt)
+//        }
+//
+//        _state.value = AlumniState.Success(
+//            alumni = filtered,
+//            totalCount = filtered.size,
+//            pageNumber = pageNumber
+//        )
+//    }
+//
+//    fun clearFilter() {
+//        _state.value = AlumniState.Success(
+//            alumni = originalList,
+//            totalCount = originalList.size,
+//            pageNumber = pageNumber
+//        )
+//    }
+//}
 
 

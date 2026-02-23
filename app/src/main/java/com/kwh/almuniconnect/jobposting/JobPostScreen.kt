@@ -26,6 +26,8 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.util.Patterns
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.OpenInNew
@@ -34,6 +36,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -379,68 +382,44 @@ fun AppTextField(
         trailingIcon = trailingContent
     )
 }
+
+
+
+
 @Composable
 fun LinkiedID(
     label: String,
     value: String,
     onValueChange: (String) -> Unit
 ) {
-    val clipboard = LocalClipboardManager.current
+
     val context = LocalContext.current
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth(),
-        trailingIcon = {
+    // 🔥 Your LinkedIn URL
+    val linkedInUrl = "https://www.linkedin.com/in/"
 
-            Row {
+    Column(modifier = Modifier.fillMaxWidth()) {
 
-                // Copy Icon
-                IconButton(
-                    onClick = {
-                        if (value.isNotBlank()) {
-                            clipboard.setText(AnnotatedString(value))
-                            Toast.makeText(
-                                context,
-                                "Copied to clipboard",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ContentCopy,
-                        contentDescription = "Copy"
-                    )
-                }
+        // ✅ Only Input Field
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
 
-                // Open Link Icon
-                IconButton(
-                    onClick = {
-                        if (value.isNotBlank()) {
+        Spacer(modifier = Modifier.height(8.dp))
 
-                            val url =
-                                if (value.startsWith("https://") || value.startsWith("http://"))
-                                    value
-                                else
-                                    "https://$value"
-
-                            Log.e("JobPostScreen", "Opening URL: $url"+value)
-                            context.startActivity(
-                                Intent(Intent.ACTION_VIEW, url.toUri())
-                            )
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.OpenInNew,
-                        contentDescription = "Open"
-                    )
-                }
+        // ✅ Clickable LinkedIn URL Below
+        Text(
+            text = linkedInUrl,
+            color = Color(0xFF0A66C2), // LinkedIn blue
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier.clickable {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(linkedInUrl))
+                context.startActivity(intent)
             }
-        }
-    )
+        )
+    }
 }

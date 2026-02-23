@@ -77,8 +77,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
 ) {
     val bannerImages = listOf(
-        "https://hbtu.ac.in/wp-content/uploads/2024/07/esummit2.jpg",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2DeC1-buz32t5m1PzWA9lzU2RiJoBZY0z6w&s",
+        "https://media.licdn.com/dms/image/v2/D5622AQEpXG7qk2zqzQ/feedshare-shrink_2048_1536/B56ZyFqzbXHYAk-/0/1771769119135?e=1773273600&v=beta&t=BTrHysZStPOdY7ZboX0QyEL9-Gdgpn7ej0qFEPUmEpg",
+        "https://media.licdn.com/dms/image/v2/D5622AQHrEsqbJgSwMw/feedshare-shrink_1280/B56ZyFqyFhJMAc-/0/1771769114126?e=1773273600&v=beta&t=YScwffp-tydR63TXuJfMJW66BNXKyhQhZn8IdwQFEJo",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkyoDGJ-JKnlOGS9nMXtD9zYzYWbsBWLKenw&s",
         "https://farelabs.com/wp-content/uploads/2025/02/WhatsApp-Image-2025-02-15-at-2.31.02-PM-1024x766.png",
         "https://hbtu.ac.in/wp-content/uploads/2024/09/MoU_FARE-Labs.jpg"
@@ -498,22 +498,13 @@ fun BottomAppBarWithNav(
 // Sample models + data
 
 private fun sampleEvents() = listOf(
-        Event(
-            title = "MCA Alumni Meet 2026",
-            location = "Delhi/NCR",
-            description = "We are excited to invite all alumni to join us for a Holi Milan Samaroh filled with joy and celebrations.",
-            date = "Feb 22, 2026",
-            price = "Free",
-            image = R.drawable.ic_almuni_meet,
-            startAt = "2026-02-22T11:00:00",
-            endAt = "2026-02-22T17:00:00"
-        ),
+
         Event(
             title = "Delhi NCR - Holi Milan",
             location = "Noida",
             description = "Celebrate Holi Milan with friends and alumni network.",
             date = "March 15, 2026",
-            price = "₹500",
+            price = "₹1100",
             image = R.drawable.ic_holi,
             startAt = "2026-03-15T11:00:00",
             endAt = "2026-03-15T15:00:00"
@@ -529,8 +520,8 @@ private fun sampleNews(): List<UniversityNews> {
     return listOf(
         UniversityNews(
             id = "1",
-            title = "Harcourtian MCA Alumni Meet 2026 Announced 🎉",
-            description = "The grand Harcourtian MCA Alumni Meet 2026 will be held on 22 February 2026. Registrations are open now.",
+            title = "Harcourtian Holi Milan Announced 15 March 2026 🎉",
+            description = "The grand Harcourtian Holi Milan   will be held on 15 March  2026. Registrations are open now.",
             date = "1 Jan 2026"
         )
 

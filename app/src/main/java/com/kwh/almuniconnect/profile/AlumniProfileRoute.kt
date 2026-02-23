@@ -20,45 +20,44 @@ fun AlumniProfileRoute(
     navController: NavController,
     viewModel: AlumniViewModel
 ) {
-    val state by viewModel.state.collectAsState()
+  //  val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(alumniId) {
-        // If list is empty, load it
-        if (state !is AlumniState.Success) {
-            viewModel.loadAlumni()
-        }
-    }
+//    LaunchedEffect(alumniId) {
+//        viewModel.loadAlumni()
+//    }
 
-    val alumni = (state as? AlumniState.Success)
-        ?.alumni
-        ?.firstOrNull { it.alumniId == alumniId }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
 
-    when {
-        alumni != null -> {
-            AlumniProfileScreen(
-                alumni = alumni,
-                navController = navController
-            )
-        }
-
-        state is AlumniState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-
-        state is AlumniState.Error -> {
-            Text(
-                text = (state as AlumniState.Error).message,
-                color = Color.Red
-            )
-        }
-
-        else -> {
-            Text("Profile not found")
-        }
+//        when (val currentState = state) {
+//
+//            is AlumniState.Loading -> {
+//                CircularProgressIndicator()
+//            }
+//
+//            is AlumniState.Success -> {
+//
+//                val alumni = currentState.alumni
+//                    .firstOrNull { it.alumniId == alumniId }
+//
+//                if (alumni != null) {
+//                    AlumniProfileScreen(
+//                        alumni = alumni,
+//                        navController = navController
+//                    )
+//                } else {
+//                    Text("Profile not found")
+//                }
+//            }
+//
+//            is AlumniState.Error -> {
+//                Text(
+//                    text = currentState.message,
+//                    color = Color.Red
+//                )
+//            }
+//        }
     }
 }

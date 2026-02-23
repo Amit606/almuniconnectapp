@@ -217,6 +217,7 @@ fun ProfileScreen(navController: NavController) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
 
+
                                 AsyncImage(
                                     model = user.photo.ifEmpty { R.drawable.man },
                                     contentDescription = null,

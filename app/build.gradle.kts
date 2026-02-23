@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.firebase.crashlytics")
+    id("kotlin-parcelize")
+
 
     id("com.google.gms.google-services") // ✅ MUST
 
@@ -16,8 +18,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.0.9"
+        versionCode = 13
+        versionName = "1.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,6 +43,10 @@ android {
     buildFeatures {
         compose = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
+
 }
 
 dependencies {
@@ -121,6 +127,9 @@ dependencies {
     implementation("com.google.firebase:firebase-perf")
     implementation ("com.github.bumptech.glide:glide:5.0.5")
     implementation ("com.android.billingclient:billing-ktx:6.2.1")
+
+    implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
+    implementation ("androidx.paging:paging-compose:3.2.1")
 
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }

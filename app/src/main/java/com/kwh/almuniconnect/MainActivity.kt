@@ -131,11 +131,15 @@ private fun handleNotificationIntent(
 
     when (destination) {
 
+
         Routes.JOB_DETAILS_Full -> {
             navController.safeNavigate(Routes.JOB_DETAILS_Full)
         }
         Routes.VERIFICATION -> {
             navController.safeNavigate(Routes.VERIFICATION)
+        }
+        Routes.APPROVAL_PENDING -> {
+            navController.safeNavigate(Routes.APPROVAL_PENDING)
         }
 
         Routes.ALMUNI_POST -> {
