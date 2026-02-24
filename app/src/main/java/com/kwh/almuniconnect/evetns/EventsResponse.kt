@@ -34,6 +34,7 @@ data class Event(
     val date: String,
     val price: String,
     val image: Int,
+    val imageUrl: String? = null,
     val startAt: String,
     val endAt: String,
 )

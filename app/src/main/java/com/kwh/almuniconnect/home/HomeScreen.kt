@@ -3,7 +3,8 @@
 // Features: top app bar with search & notifications, banner, horizontal lists (Events, Jobs), feed (alumni posts), FAB, and bottom navigation.
 
 package com.kwh.almuniconnect.home
-import android.app.Activity
+import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.*
@@ -15,11 +16,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,42 +27,40 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.navArgument
-import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
-import com.kwh.almuniconnect.almunipost.AlumniStory
 import com.kwh.almuniconnect.almunipost.alumniFeed
 import com.kwh.almuniconnect.analytics.AnalyticsEvent
 import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.jobposting.JobAPost
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
-import com.kwh.almuniconnect.network.NetworkScreen
 import com.kwh.almuniconnect.permission.RequestNotificationPermission
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.utils.encodeRoute
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.evetns.Event
+import com.kwh.almuniconnect.evetns.EventsUiState
+import com.kwh.almuniconnect.evetns.EventsViewModel
+import kotlinx.coroutines.delay
+import java.time.LocalDate
+import java.time.LocalDateTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -202,49 +199,96 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             item {
 
-                val pagerState = rememberPagerState(pageCount = { bannerImages.size })
+                val viewModel: HomeViewModel = viewModel()
+                val bannerImages = viewModel.banners
+                val isLoading = viewModel.isLoading
+                val context = LocalContext.current
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    HorizontalPager(
-                        state = pagerState,
+                if (isLoading) {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(220.dp),
-                        contentPadding = PaddingValues(horizontal = 6.dp),
-                        pageSpacing = 12.dp
-                    ) { page ->
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(bannerImages[page])
-                                    .crossfade(true)
-                                    .error(R.drawable.ic_services)        // ❌ broken URL
-                                    .placeholder(R.drawable.ic_news) // ⏳ loading
-                                    .fallback(R.drawable.ic_alumni)    // ❓ null data
-                                    .build(),
-                                contentDescription = "Banner",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
+                else if (bannerImages.isNotEmpty()) {
+
+                    val pagerState = rememberPagerState(
+                        pageCount = { bannerImages.size }
+                    )
+
+                    // ✅ Auto scroll SAFE (restarts only when list changes)
+                    LaunchedEffect(bannerImages.size) {
+                        if (bannerImages.size > 1) {
+                            while (true) {
+                                delay(3000)
+                                val nextPage =
+                                    (pagerState.currentPage + 1) % bannerImages.size
+                                pagerState.animateScrollToPage(nextPage)
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                    PagerDotsIndicator(
-                        pagerState = pagerState,
-                        activeColor = Color.Black,
-                        inactiveColor = Color.Gray
-                    )
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp),
+                            contentPadding = PaddingValues(horizontal = 6.dp),
+                            pageSpacing = 12.dp
+                        ) { page ->
+
+                            // ✅ Safe URL handling
+                            val imageUrl = bannerImages
+                                .getOrNull(page)
+                                ?.takeIf { it.isNotBlank() }
+
+                            Card(
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(imageUrl)
+                                        .crossfade(true)
+                                        .placeholder(R.drawable.ic_news)
+                                        .error(R.drawable.ic_services)
+                                        .fallback(R.drawable.ic_alumni)
+                                        .listener(
+                                            onError = { _, result ->
+                                                Log.e(
+                                                    "BannerError",
+                                                    "Failed URL: $imageUrl - ${result.throwable.message}"
+                                                )
+                                            }
+                                        )
+                                        .build(),
+                                    contentDescription = "Banner",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        PagerDotsIndicator(
+                            pagerState = pagerState,
+                            activeColor = Color.Black,
+                            inactiveColor = Color.Gray
+                        )
+                    }
                 }
             }
 
@@ -263,53 +307,73 @@ fun HomeScreen(
                     }
                 )
             }
-
             item {
-                val sampleEvents = sampleEvents()
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(sampleEvents) { event ->
-                        EventCard(event = event, onClick = {
-                            AnalyticsManager.logEvent(
-                                AnalyticsEvent.ScreenView("events_clicked_${event.title}")
-                            )
-                            navController.navigate(
-                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&description=${event.description.encodeRoute()}&date=${event.startAt.encodeRoute()}&location=${event.location.encodeRoute()}"
-                            )
-                        })
+
+                val viewModel: EventsViewModel = viewModel()
+                val uiState by viewModel.uiState.collectAsState()
+                LaunchedEffect(Unit) {
+                    viewModel.loadEvents()
+                }
+                when (uiState) {
+
+                    is EventsUiState.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
+
+                    is EventsUiState.Success -> {
+
+                        val events = (uiState as EventsUiState.Success).events
+
+                        if (events.isNotEmpty()) {
+
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(events) { event ->
+                                    EventCard(
+                                        event = event,
+                                        onClick = {
+                                            navController.navigate(
+                                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&description=${event.description.encodeRoute()}&date=${event.startAt.encodeRoute()}&location=${event.location.encodeRoute()}"
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+
+                        } else {
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No Upcoming Events",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+
+                    is EventsUiState.Error -> {
+                        Text(
+                            text = "No Upcoming Events",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.Gray
+                        )                    }
                 }
             }
 
-            // Events section
-//            item {
-//                SectionTitle(
-//                    title = "Products & Services",
-//                    actionText = "View All",
-//                    onAction = {
-//                        AnalyticsManager.logEvent(
-//                            AnalyticsEvent.ScreenView("Services_view_all")
-//                        )
-//                        navController.navigate(Routes.PRODUCT_SCREEN)
-//                    }
-//                )
-//            }
-//
-//            item {
-//                val sampleEvents = getDummyProducts()
-//                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//                    items(sampleEvents) { event ->
-//                        ProductCard(event = event, onClick = {
-//                            AnalyticsManager.logEvent(
-//                                AnalyticsEvent.ScreenView("services_clicked_${event.productName}")
-//                            )
-//                           navController.navigate(Routes.PRODUCT_SCREEN)
-//
-//
-//                        }
-//                        )
-//                    }
-//                }
-//            }
 
             // Jobs section
             item {
@@ -521,17 +585,26 @@ private fun sampleNews(): List<UniversityNews> {
         UniversityNews(
             id = "1",
             title = "Harcourtian Holi Milan Announced 15 March 2026 🎉",
-            description = "The grand Harcourtian Holi Milan   will be held on 15 March  2026. Registrations are open now.",
-            date = "1 Jan 2026"
+            description = "The grand Harcourtian Holi Milan will be held on 15 March 2026. Registrations are open now.",
+            date = "15 march 2026",
+            imageUrl = "https://yourdomain.com/holi_banner.jpg",
+            category = "Alumni Event",
+            authorName = "Delhi/NCR Alumni Association",
+            authorImage = "https://yourdomain.com/logo.jpg"
         )
 
     )
 }
 data class UniversityNews(
     val id: String,
+
     val title: String,
     val description: String,
-    val date: String
+    val date: String,
+    val imageUrl: String?,
+    val category: String?,
+    val authorName: String?,
+    val authorImage: String?
 )
 data class HProduct(
     val id: String,
@@ -631,7 +704,113 @@ fun getDummyProducts() = listOf(
     )
 )
 
+@Composable
+fun EventCard(
+    imageUrl: String,
+    title: String,
+    date: String,
+    organizer: String,
+    onBuyClick: () -> Unit
+) {
 
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+    ) {
+
+        Column {
+
+            // 🔹 Event Image
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "Event Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp
+                        )
+                    )
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+
+                // 🔹 Title
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1E1E1E)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 🔹 Date Row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = date,
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 🔹 Bottom Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Column {
+                        Text(
+                            text = "Organized By",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+
+                        Text(
+                            text = organizer,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFE91E63)
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = onBuyClick,
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("BUY NOW")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
 
 
 
