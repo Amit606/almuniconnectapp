@@ -65,4 +65,5 @@ object Routes {
     const val VERIFICATION = "verification"
     const val APPROVAL_PENDING="approval_pending"
 
+    const val FEEDBACK="feedback"
 }

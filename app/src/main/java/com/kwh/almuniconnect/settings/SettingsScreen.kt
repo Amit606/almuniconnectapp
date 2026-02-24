@@ -137,6 +137,13 @@ fun SettingsScreen(
                     onClick = {openLink(context, PRIVACY_POLICY_URL)
                     }
                 )
+                SettingItem(
+                    icon = Icons.Default.Feedback,
+                    title = "Feedback",
+                    subtitle = "Provide any feedback or report issues",
+                    onClick = { navController.navigate(Routes.FEEDBACK) }
+
+                )
 
                 SettingItem(
                     icon = Icons.Default.Help,

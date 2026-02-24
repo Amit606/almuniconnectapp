@@ -52,6 +52,7 @@ import com.kwh.almuniconnect.emergency.EmergencyDetailScreen
 import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
 import com.kwh.almuniconnect.emergency.EmergencyRequestForm
 import com.kwh.almuniconnect.emergency.demoEmergencyList
+import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniRepository
@@ -100,6 +101,7 @@ fun AppNavGraph(
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
             SplashScreen(navController)
+            //FeedbackForm(navController)
 
            // EmergencyFeedScreen(navController)
 
@@ -162,6 +164,11 @@ fun AppNavGraph(
         composable(Routes.SPLASH_HOME)
         {
             SplashScreen(navController)
+
+        }
+        composable(Routes.FEEDBACK)
+        {
+            FeedbackForm(navController)
 
         }
 

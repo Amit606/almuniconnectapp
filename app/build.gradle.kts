@@ -18,8 +18,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 13
-        versionName = "1.1.3"
+        versionCode = 14
+        versionName = "1.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -84,7 +84,6 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.4.0+")
 
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
 
     // Add the dependencies for the Remote Config and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
@@ -120,7 +119,7 @@ dependencies {
 
     implementation ("com.google.android.play:app-update:2.1.0")
     implementation("com.airbnb.android:lottie-compose:6.3.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+   // implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
@@ -131,5 +130,6 @@ dependencies {
     implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation ("androidx.paging:paging-compose:3.2.1")
 
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }
