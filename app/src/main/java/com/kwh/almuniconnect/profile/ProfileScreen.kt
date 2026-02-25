@@ -119,7 +119,6 @@ fun ProfileScreen(navController: NavController) {
                 val profile =
                     (apiState as ProfileState.Success).profile
 
-                Log.e("ProfileScreen", "API Success: ${profile.cityName}")
                 userPrefs.saveProfile(
                     UserLocalModel(
                         userId = profile.userId ?: "",

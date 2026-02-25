@@ -73,48 +73,26 @@ class AuthViewModel(
                 .onSuccess { user ->
                     if (user != null) {
                         setLoading(false)
-
                         // ✅ NOW THIS WORKS
                         UserSession.saveLogin(getApplication())
                         userPrefs.saveProfile(
                             profile = com.kwh.almuniconnect.storage.UserLocalModel(
-                                name = firebaseUser.displayName.toString(),
-                                email = firebaseUser.email.toString(),
-                                photo = firebaseUser.photoUrl.toString(),
+                                userId = user.userId,
+                                name =user.name.toString(),
+                                email = user.email.toString(),
+                                photo = user.photoUrl?:"",
                                 mobile = user.mobileNo?:"",
-                                branch = user.batch.toString(),
+                                passoutYear= user.passoutYear?.toInt() ?: 0,
+                                branch = user.courseName?:"",
                                 year = user.companyName?:"",
                                 job = user.companyName?:"",
-                                location ="",
-                                birthday = "",
-                                linkedin = ""
+                                totalExp = user.totalExperience?.toInt() ?: 0,
+                                cityName =user.cityName?:"",
+                                birthday = user.dateOfBirth?:"",
+                                linkedin = user.linkedinUrl?:""
                             )
                         )
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.userId)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.email)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.mobileNo)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.name)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.title)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.courseId)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.companyName)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.batch)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.userId)
-//                        Log.e("GoogleLoginViewModel", "User logged in and profile saved."+user.userId)
 //
-//                        Log.e("AuthViewModel", "User logged in and profile saved."+
-//                            " UID: ${firebaseUser.uid}, " +
-//                            "Name: ${firebaseUser.displayName}, " +
-//                            "Email: ${firebaseUser.email}, " +
-//                            "Photo: ${firebaseUser.photoUrl}"
-//                        )
-
-
-//                        userPrefs.saveUser(
-//                            uid = firebaseUser.uid,
-//                            name = firebaseUser.displayName,
-//                            email = firebaseUser.email,
-//                            photo = firebaseUser.photoUrl?.toString()
-//                        )
                         onGoHome()
                     } else {
                         setLoading(false)
@@ -129,16 +107,13 @@ class AuthViewModel(
                                 branch = "",
                                 year = "",
                                 job = "",
+                                passoutYear=0,
                                 location = "",
                                 birthday = "",
                                 linkedin = ""
                             )
                         )
-                      Log.e("ABC", "New user, navigating to profile update."+
-                          " UID: ${firebaseUser.uid}, " +
-                          "Name: ${firebaseUser.displayName}, " +
-                          "Email: ${firebaseUser.email}, " +
-                          "Photo: ${firebaseUser.photoUrl}")
+
                         onGoProfileUpdate()
 
                     }

@@ -66,7 +66,9 @@ class AuthRepository(
 
         return try {
 
-            val response = api.checkEmailExist(email)
+            val response = api.checkEmailExist("amitsun.noida@gmail.com")
+
+            Log.e("AuthRepository", "Response: ${response.code()} ${response.body()}")
 
             if (!response.isSuccessful) {
                 return Result.failure(
@@ -77,23 +79,17 @@ class AuthRepository(
             val body = response.body()
                 ?: return Result.failure(Exception("Empty response"))
 
-            val rawData = body.data
-                ?: return Result.success(null)
+            if (!body.success) {
+                return Result.failure(Exception(body.message ?: "Unknown error"))
+            }
 
-            val jsonObject = Gson()
-                .toJsonTree(rawData)
-                .asJsonObject
+            val user = body.data?.userProfile
 
-            if (jsonObject.has("userId")) {
-
-                val user = Gson().fromJson(
-                    jsonObject,
-                    ExistingUserDto::class.java
-                )
-
+            if (user != null) {
+                Log.e("AuthRepository", "Existing user found: ${user.userId}")
                 Result.success(user)
-
             } else {
+                Log.e("AuthRepository", "User not found")
                 Result.success(null)
             }
 

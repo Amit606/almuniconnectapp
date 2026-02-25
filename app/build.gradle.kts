@@ -131,5 +131,7 @@ dependencies {
     implementation ("androidx.paging:paging-compose:3.2.1")
 
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
+
+
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }
