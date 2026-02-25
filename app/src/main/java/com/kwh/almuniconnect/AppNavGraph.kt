@@ -57,6 +57,8 @@ import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
+import com.kwh.almuniconnect.network.BranchGridDemoScreen
+import com.kwh.almuniconnect.network.YearGridScreen
 import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileRoute
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
@@ -100,11 +102,21 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-            SplashScreen(navController)
+          //  SplashScreen(navController)
+            BranchGridDemoScreen(navController)
             //FeedbackForm(navController)
 
            // EmergencyFeedScreen(navController)
 
+        }
+        composable("year/{branchName}") { backStackEntry ->
+            val branchName =
+                backStackEntry.arguments?.getString("branchName") ?: ""
+
+            YearGridScreen(
+                branchName = branchName,
+                navController = navController
+            )
         }
         composable(Routes.NEWS) {
             NewsListingScreen(navController)
