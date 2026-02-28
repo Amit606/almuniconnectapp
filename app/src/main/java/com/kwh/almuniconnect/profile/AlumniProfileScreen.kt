@@ -186,12 +186,17 @@ fun AlumniProfileScreen(
             // 🔗 LinkedIn Button
             OutlinedButton(
                 onClick = {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            alumni.linkedinUrl.toString().toUri()
+                    try {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                alumni.linkedinUrl.toString().toUri()
+                            )
                         )
-                    )
+                    }
+                    catch (e: Exception) {
+                        Log.e("AlumniProfileScreen", "Failed to open LinkedIn URL: ${alumni.linkedinUrl}", e)
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(22.dp)

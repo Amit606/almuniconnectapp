@@ -3,9 +3,7 @@ package com.kwh.almuniconnect
 import AlumniViewModel
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.kwh.almuniconnect.almunipost.AlumniFeedScreen
 import com.kwh.almuniconnect.evetns.EventDetailsScreen
 import com.kwh.almuniconnect.evetns.EventsScreen
 import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
@@ -39,6 +36,7 @@ import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
 import com.kwh.almuniconnect.almunipost.alumniFeed
@@ -57,12 +55,14 @@ import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
-import com.kwh.almuniconnect.network.BranchGridDemoScreen
+import com.kwh.almuniconnect.network.AppDatabase
+import com.kwh.almuniconnect.network.BranchRepository
 import com.kwh.almuniconnect.network.YearGridScreen
+import com.kwh.almuniconnect.network.BranchScreen
+import com.kwh.almuniconnect.network.BranchViewModel
+import com.kwh.almuniconnect.network.BranchViewModelFactory
 import com.kwh.almuniconnect.news.NewsListingScreen
-import com.kwh.almuniconnect.profile.AlumniProfileRoute
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
-import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.subscription.PremiumScreen
 import com.kwh.almuniconnect.ui.ApprovalPendingScreen
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
@@ -102,22 +102,90 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-          //  SplashScreen(navController)
-            BranchGridDemoScreen(navController)
+          // SplashScreen(navController)
+
+                val context = LocalContext.current
+
+                val database = remember {
+                    AppDatabase.getDatabase(context)
+                }
+
+                val dao = remember {
+                    database.branchDao()
+                }
+
+                val remoteConfig = remember {
+                    FirebaseRemoteConfig.getInstance()
+                }
+
+                val repository = remember {
+                    BranchRepository(dao, remoteConfig)
+                }
+
+                val viewModel: BranchViewModel = viewModel(
+                    factory = BranchViewModelFactory(repository)
+                )
+
+                BranchScreen(
+                    navController = navController,
+                    viewModel = viewModel
+                )
+
+
+            //  BranchGridDemoScreen(navController)
             //FeedbackForm(navController)
 
            // EmergencyFeedScreen(navController)
 
         }
-        composable("year/{branchName}") { backStackEntry ->
-            val branchName =
-                backStackEntry.arguments?.getString("branchName") ?: ""
+
+//        composable("branch") {
+//            BranchScreen(navController)
+//        }
+
+        composable(
+            route = "year/{branchId}/{branchShort}",
+            arguments = listOf(
+                navArgument("branchId") {
+                    type = NavType.IntType
+                },
+                navArgument("branchShort") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val branchId =
+                backStackEntry.arguments?.getInt("branchId") ?: return@composable
+
+            val branchShort =
+                backStackEntry.arguments?.getString("branchShort") ?: return@composable
 
             YearGridScreen(
-                branchName = branchName,
-                navController = navController
+                navController = navController,
+                branchId = branchId,
+                branchShort = branchShort
             )
         }
+
+
+
+
+
+
+
+
+
+
+//        composable("year/{branchName}") { backStackEntry ->
+//            val branchName =
+//                backStackEntry.arguments?.getString("branchName") ?: ""
+//
+//            YearGridScreen(
+//                branchName = branchName,
+//                navController = navController
+//            )
+//        }
         composable(Routes.NEWS) {
             NewsListingScreen(navController)
 
@@ -163,6 +231,7 @@ fun AppNavGraph(
                 ?.savedStateHandle
                 ?.get<AlumniDto>("alumni")
 
+            Log.e("AlumniProfile", "Received alumni: $alumni")
             alumni?.let {
                 AlumniProfileScreen(
                     alumni = it,

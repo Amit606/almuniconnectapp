@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 
 
     id("com.google.gms.google-services") // ✅ MUST
@@ -132,6 +133,9 @@ dependencies {
 
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
 
-
+    implementation ("com.drivemetadata:dmd-android-sdk:1.4.0") //dmd_1.3.7.aar
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }

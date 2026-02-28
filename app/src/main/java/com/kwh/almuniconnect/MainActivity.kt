@@ -13,20 +13,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.drivemetadata.DriveMetaData
+import com.drivemetadata.callbacks.DriveMetaDataCallbacks
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
-import com.kwh.almuniconnect.api.ApiService
-import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.ui.theme.LinkedTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(),DriveMetaDataCallbacks {
     private lateinit var updateHelper: InAppUpdateHelper
     private var notificationIntent by mutableStateOf<Intent?>(null)
 
@@ -40,6 +43,7 @@ class MainActivity : ComponentActivity() {
         updateHelper.checkUpdate(this)
         // get cold-start notification
         notificationIntent = intent
+        DriveMetaData.with(this).setDriveMetaDataCallbacks(this::onResponse);
 
 
 
@@ -79,6 +83,14 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         notificationIntent = intent
     }
+
+    override fun onResponse(p0: Boolean, p1: String?, p2: String?) {
+        Log.d(
+            "MainActivity",
+            "status " + p0 + " message " + p1 + "requestAcknowledgementID =====    > " + p2
+        )
+
+    }
 }
 private fun tokenGeneration(context: Context) {
 
@@ -94,6 +106,7 @@ private fun tokenGeneration(context: Context) {
 
                 try {
                     val savedToken = FcmPrefs.getToken(appContext)
+                    uploadTokenToServer(newToken,context)
 
                     if (savedToken == newToken) {
                         Log.d("FCM", "Token unchanged → $newToken")
@@ -101,7 +114,7 @@ private fun tokenGeneration(context: Context) {
                     }
 
                     // 🔥 Optional backend update
-                    // uploadTokenToServer(newToken)
+                     uploadTokenToServer(newToken,context)
 
                     FcmPrefs.saveToken(appContext, newToken)
 
@@ -116,6 +129,31 @@ private fun tokenGeneration(context: Context) {
             // ✅ NO CRASH
             Log.w("FCM", "FCM token fetch failed (safe to ignore)", e)
         }
+}
+
+private fun uploadTokenToServer(token: String,context: Context) {
+    // Create the JSON structure to send the new token to the API
+    val deviceToken = JSONObject()
+    val userIdentifier = JSONObject()
+    val deviceTokenObject = JSONObject()
+    try {
+        deviceToken.put("device_token", token)
+        userIdentifier.put("mobile", "7905717240") // Replace with actual user data
+        userIdentifier.put("customer_id", "9789") // Replace with actual user data
+        deviceTokenObject.put("deviceNotificationToken", deviceToken)
+        deviceTokenObject.put("userIdentifier", userIdentifier)
+
+        // Send the token update via API call (or any other service you're using)
+        DriveMetaData.with(context).sendTags(deviceTokenObject.toString(), "deviceToken")
+    } catch (e: JSONException) {
+        Log.e("Token", "Uploading token to server: $e")
+
+        e.printStackTrace()
+    }
+
+
+
+
 }
 
 private fun handleNotificationIntent(

@@ -22,7 +22,7 @@ class PendingVerificationViewModel : ViewModel() {
             uiState = UiState.Loading
 
             val result = repository.getPending(alumniId)
-
+            Log.e("PendingVerificationViewModel", "Fetched pending verifications: ${result.getOrNull()?.size ?: 0}")
             uiState = result.fold(
                 onSuccess = { list ->
                     if (list.isEmpty()) {
@@ -53,6 +53,7 @@ class PendingVerificationViewModel : ViewModel() {
 
                     val updatedList =
                         currentList.filter { it.alumniId != alumniId }
+                    Log.e("PendingVerificationViewModel", "Updated List: $updatedList")
 
                     uiState = if (updatedList.isEmpty()) {
                         UiState.Empty

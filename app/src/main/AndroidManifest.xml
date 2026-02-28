@@ -15,6 +15,7 @@
         android:name=".HbtuApplication"
         android:roundIcon="@mipmap/app_logo"
         android:supportsRtl="true"
+        tools:replace="android:allowBackup"
         android:theme="@style/Theme.Almuniconnect"
         tools:targetApi="31">
         <activity

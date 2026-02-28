@@ -103,7 +103,7 @@ fun AccountVerificationScreen(
                         items = state.data,
                         key = { it.alumniId }
                     ) { alumni ->
-
+                      Log.e("AccountVerificationScreen", "Rendering alumni: ${alumni.name} (${alumni.alumniId})")
                         VerificationCard(
                             user = alumni,
                             onApprove = {

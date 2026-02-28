@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.verification
 
 import android.content.Context
+import android.util.Log
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.api.VerifyProfileResponse
@@ -43,6 +44,7 @@ class AlumniRepository {
             if (response.isSuccessful && response.body()?.success == true) {
 
                 val items = response.body()?.data?.items ?: emptyList()
+                Log.e("AlumniRepository", "Fetched ${items.size} pending verifications")
 
                 Result.success(items)
 
