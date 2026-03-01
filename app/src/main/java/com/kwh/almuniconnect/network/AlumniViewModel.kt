@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniPagingSource
 import com.kwh.almuniconnect.network.AlumniRepository
+import com.kwh.almuniconnect.network.YearUiModel
 import kotlinx.coroutines.launch
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +34,8 @@ class AlumniViewModel(
     private val repository: AlumniRepository
 ) : ViewModel() {
 
+    /* ---------------- PAGING SECTION ---------------- */
+
     private var ascendingOrder = false
 
     val alumniPagingFlow = Pager(
@@ -51,29 +54,62 @@ class AlumniViewModel(
     fun toggleSort() {
         ascendingOrder = !ascendingOrder
     }
+
+
+    /* ---------------- FULL LIST SECTION ---------------- */
+
+    var allAlumni by mutableStateOf<List<AlumniDto>>(emptyList())
+        private set
+
+    fun setAlumniList(list: List<AlumniDto>) {
+        allAlumni = list
+    }
+    fun loadAllAlumni() {
+        viewModelScope.launch {
+
+            val result = repository.getAlumniList(
+                pageNumber = 1,
+                pageSize = 100,
+                ascending = false
+            )
+
+            result.onSuccess { response ->
+                allAlumni = response.items ?: emptyList()
+                Log.e("VM_DEBUG", "Loaded size: ${allAlumni.size}")
+            }
+
+            result.onFailure {
+                Log.e("VM_ERROR", it.message ?: "Unknown error")
+            }
+        }
+    }
+
+    /* ---------------- YEAR GROUPING ---------------- */
+
+    fun getYearsByBranch(branchShort: String): List<YearUiModel> {
+
+        return allAlumni
+            .filter { it.courseName.equals(branchShort, ignoreCase = true) }
+            .groupBy { it.batch }
+            .map { (year, list) ->
+                YearUiModel(
+                    year = year.toString(),
+                    alumniCount = list.size
+                )
+            }
+            .sortedByDescending { it.year.toInt() }
+    }
+
+    /* ---------------- FILTER BRANCH + YEAR ---------------- */
+
+    fun getAlumniByBranchAndYear(
+        branchShort: String,
+        year: Int
+    ): List<AlumniDto> {
+
+        return allAlumni.filter {
+            it.courseName.equals(branchShort, true) &&
+                    it.batch == year
+        }
+    }
 }
-//    fun applyFilter(branch: String?, year: String?) {
-//        val yearInt = year?.toIntOrNull()
-//
-//        val filtered = originalList.filter {
-//            (branch == null || it.courseName == branch) &&
-//                    (yearInt == null || it.batch == yearInt)
-//        }
-//
-//        _state.value = AlumniState.Success(
-//            alumni = filtered,
-//            totalCount = filtered.size,
-//            pageNumber = pageNumber
-//        )
-//    }
-//
-//    fun clearFilter() {
-//        _state.value = AlumniState.Success(
-//            alumni = originalList,
-//            totalCount = originalList.size,
-//            pageNumber = pageNumber
-//        )
-//    }
-//}
-
-

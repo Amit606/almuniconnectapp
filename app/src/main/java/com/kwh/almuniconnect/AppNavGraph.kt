@@ -53,6 +53,7 @@ import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniDto
+import com.kwh.almuniconnect.network.AlumniListScreen
 import com.kwh.almuniconnect.network.AlumniRepository
 import com.kwh.almuniconnect.network.AlumniViewModelFactory
 import com.kwh.almuniconnect.network.AppDatabase
@@ -146,12 +147,8 @@ fun AppNavGraph(
         composable(
             route = "year/{branchId}/{branchShort}",
             arguments = listOf(
-                navArgument("branchId") {
-                    type = NavType.IntType
-                },
-                navArgument("branchShort") {
-                    type = NavType.StringType
-                }
+                navArgument("branchId") { type = NavType.IntType },
+                navArgument("branchShort") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
@@ -160,11 +157,30 @@ fun AppNavGraph(
 
             val branchShort =
                 backStackEntry.arguments?.getString("branchShort") ?: return@composable
+            // 🔥 CREATE REPOSITORY
+            // ✅ Create ApiService from NetworkClient
+            val apiService = remember {
+                NetworkClient.createService(ApiService::class.java)
+            }
+            // 🔥 CREATE FACTORY
+            // ✅ Create Repository
+            val repository = remember {
+                AlumniRepository(apiService)
+            }
+
+            // ✅ Create Factory
+            val factory = remember {
+                AlumniViewModelFactory(repository)
+            }
+
+            // 🔥 CREATE VIEWMODEL
+            val viewModel: AlumniViewModel = viewModel(factory = factory)
 
             YearGridScreen(
                 navController = navController,
                 branchId = branchId,
-                branchShort = branchShort
+                branchShort = branchShort,
+                viewModel = viewModel
             )
         }
 
@@ -205,25 +221,51 @@ fun AppNavGraph(
         composable(Routes.APPROVAL_PENDING) {
             ApprovalPendingScreen()
         }
-        composable(Routes.NETWORK) {
-            val apiService = remember {
-                NetworkClient.createService(ApiService::class.java)
-            }
-            val repository = remember { AlumniRepository(apiService) }
-
-            val alumniViewModel: AlumniViewModel = viewModel(
-                factory = AlumniViewModelFactory(repository)
-            )
-
-            NetworkScreen(
-                navController = navController,
-                onOpenProfile = { alumni ->
-                    navController.navigate(
-                        Routes.profileRoute(alumni.alumniId)
-                    )
+        composable(
+            route = "alumni/{branchShort}/{year}",
+            arguments = listOf(
+                navArgument("branchShort") {
+                    type = NavType.StringType
+                },
+                navArgument("year") {
+                    type = NavType.IntType
                 }
             )
+        ) { backStackEntry ->
+
+            val branchShort =
+                backStackEntry.arguments?.getString("branchShort")
+                    ?: return@composable
+
+            val year =
+                backStackEntry.arguments?.getInt("year")
+                    ?: return@composable
+
+            AlumniListScreen(
+                navController = navController,
+                branchShort = branchShort,
+                year = year
+            )
         }
+//        composable(Routes.NETWORK) {
+//            val apiService = remember {
+//                NetworkClient.createService(ApiService::class.java)
+//            }
+//            val repository = remember { AlumniRepository(apiService) }
+//
+//            val alumniViewModel: AlumniViewModel = viewModel(
+//                factory = AlumniViewModelFactory(repository)
+//            )
+//
+//            NetworkScreen(
+//                navController = navController,
+//                onOpenProfile = { alumni ->
+//                    navController.navigate(
+//                        Routes.profileRoute(alumni.alumniId)
+//                    )
+//                }
+//            )
+//        }
         composable("profile") {
 
             val alumni = navController

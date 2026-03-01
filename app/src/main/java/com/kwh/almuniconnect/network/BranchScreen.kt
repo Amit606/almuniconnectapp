@@ -24,6 +24,8 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,13 +122,15 @@ fun BranchCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally   // 👈 Center everything
         ) {
 
             Icon(
                 imageVector = getBranchIcon(branch.shortName),
                 contentDescription = branch.name,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(40.dp),
+                tint = getBranchColor(branch.shortName)  // 👈 Colorful icon
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -141,7 +145,8 @@ fun BranchCard(
             Text(
                 text = branch.name,
                 style = MaterialTheme.typography.bodySmall,
-                maxLines = 2
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -165,5 +170,37 @@ fun getBranchIcon(shortName: String): ImageVector {
         "M.Tech" -> Icons.Default.School
 
         else -> Icons.Default.School
+    }
+}
+@Composable
+fun getBranchColor(shortName: String): Color {
+
+    return when (shortName) {
+
+        "CS", "IT", "MCA" -> Color(0xFF2962FF)   // Blue
+
+        "EL" -> Color(0xFFFFC107)                // Amber
+
+        "EC" -> Color(0xFF00BCD4)                // Cyan
+
+        "ME" -> Color(0xFFFF6D00)                // Orange
+
+        "CIV" -> Color(0xFF795548)               // Brown
+
+        "CH", "BIO" -> Color(0xFF4CAF50)         // Green
+
+        "FOOD" -> Color(0xFFE91E63)              // Pink
+
+        "OIL" -> Color(0xFF607D8B)               // Blue Grey
+
+        "PNT" -> Color(0xFF9C27B0)               // Purple
+
+        "PLA" -> Color(0xFF3F51B5)               // Indigo
+
+        "MBA" -> Color(0xFF009688)               // Teal
+
+        "M.Tech" -> Color(0xFFD32F2F)            // Red
+
+        else -> MaterialTheme.colorScheme.primary
     }
 }

@@ -1,4 +1,5 @@
 package com.kwh.almuniconnect.network
+import AlumniViewModel
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -10,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.Routes
 import java.util.Calendar
@@ -30,55 +33,70 @@ data class YearUiModel(
 fun YearGridScreen(
     navController: NavController,
     branchId: Int,
-    branchShort: String
+    branchShort: String,
+    viewModel: AlumniViewModel
 ) {
 
-    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-
-    val years = remember {
-        (1980..currentYear)
-            .map { year ->
-                YearUiModel(
-                    year = year.toString(),
-                    alumniCount = (0..50).random()
-                )
-            }
-            .sortedByDescending { it.year.toInt() }
+    // 🔥 Load once
+    LaunchedEffect(Unit) {
+        viewModel.loadAllAlumni()
     }
+
+    // 🔥 Observe state
+    val allAlumni = viewModel.allAlumni
+
+    // 🔥 Derived state (important)
+    val years = remember(allAlumni, branchShort) {
+        viewModel.getYearsByBranch(branchShort)
+    }
+
+   // val years = viewModel.getYearsByBranch(branchShort)
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "$branchShort Alumni",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Text("$branchShort Alumni")
                 }
             )
         }
     ) { paddingValues ->
 
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 110.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        if (years.isEmpty()) {
 
-            items(years, key = { it.year }) { yearItem ->
-                PremiumYearGridItem(
-                    yearItem = yearItem,
-                    onClick = {
-                        navController.navigate(Routes.NETWORK
-                        )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No Alumni Found")
+            }
 
-                    }
-                )
+        } else {
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 110.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                items(years, key = { it.year }) { yearItem ->
+
+                    PremiumYearGridItem(
+                        yearItem = yearItem,
+                        onClick = {
+                            navController.navigate("alumni/${branchShort}/${yearItem.year}")
+//                            navController.navigate(
+//                                "alumni/${branchShort}/${yearItem.year}"
+//                            )
+                        }
+                    )
+                }
             }
         }
     }

@@ -20,7 +20,7 @@ data class AlumniListResponse(
 // AlumniDto.kt
 @Parcelize
 data class AlumniDto(
-    val alumniId: String,
+    val alumniId: String?,
     val name: String,
     val countryCode: String?,
     val mobileNo: String?,

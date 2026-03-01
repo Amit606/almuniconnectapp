@@ -17,7 +17,7 @@ class AlumniPagingSource(
 
             val result = repository.getAlumniList(
                 pageNumber = page,
-                pageSize = 20,
+                pageSize = 100,
                 ascending = ascending
             )
 
