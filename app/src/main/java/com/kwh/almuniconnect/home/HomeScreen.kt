@@ -44,7 +44,6 @@ import com.kwh.almuniconnect.analytics.AnalyticsEvent
 import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.jobposting.JobAPost
-import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.permission.RequestNotificationPermission
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
@@ -173,7 +172,7 @@ fun HomeScreen(
                 when (selected) {
                     BottomNavItem.Home -> {}
                     BottomNavItem.Network -> {
-                        navController.navigate(Routes.NETWORK)
+                        navController.navigate(Routes.BRANCHES)
                     }
                     BottomNavItem.JOBS -> onOpenMessages()
                     BottomNavItem.ChANNEL -> {navController.navigate(Routes.WHATSUP_CHANNEL)}
@@ -370,27 +369,27 @@ fun HomeScreen(
 
 
             // Jobs section
-            item {
-                SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
-                    AnalyticsManager.logEvent(
-                        AnalyticsEvent.ScreenView("jobs_view_all")
-                    )
-                    navController.navigate(Routes.JOB_DETAILS)
-                })
-            }
+//            item {
+//                SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
+//                    AnalyticsManager.logEvent(
+//                        AnalyticsEvent.ScreenView("jobs_view_all")
+//                    )
+//                    navController.navigate(Routes.JOB_DETAILS)
+//                })
+//            }
 
-            item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(dummyJobPosts) { job ->
-                        JobMiniCard(job = job, onClick = {
-                            AnalyticsManager.logEvent(
-                                AnalyticsEvent.ScreenView("jobs_clicked_${job.title}")
-                            )
-                            navController.navigate("job_details/${job.jobId}")
-                        })
-                    }
-                }
-            }
+//            item {
+//                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                    items(dummyJobPosts) { job ->
+//                        JobMiniCard(job = job, onClick = {
+//                            AnalyticsManager.logEvent(
+//                                AnalyticsEvent.ScreenView("jobs_clicked_${job.title}")
+//                            )
+//                            navController.navigate("job_details/${job.jobId}")
+//                        })
+//                    }
+//                }
+//            }
 
             // Feed
             item {

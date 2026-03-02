@@ -31,7 +31,6 @@ import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
 import com.kwh.almuniconnect.jobposting.JobPostScreen
 import com.kwh.almuniconnect.login.LoginRoute
-import com.kwh.almuniconnect.network.NetworkScreen
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
@@ -51,7 +50,6 @@ import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
 import com.kwh.almuniconnect.emergency.EmergencyRequestForm
 import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
-import com.kwh.almuniconnect.jobposting.dummyJobPosts
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniListScreen
 import com.kwh.almuniconnect.network.AlumniRepository
@@ -65,7 +63,7 @@ import com.kwh.almuniconnect.network.BranchViewModelFactory
 import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.subscription.PremiumScreen
-import com.kwh.almuniconnect.ui.ApprovalPendingScreen
+import com.kwh.almuniconnect.profile.ApprovalPendingScreen
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -103,46 +101,40 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-          // SplashScreen(navController)
+           SplashScreen(navController)
 
-                val context = LocalContext.current
-
-                val database = remember {
-                    AppDatabase.getDatabase(context)
-                }
-
-                val dao = remember {
-                    database.branchDao()
-                }
-
-                val remoteConfig = remember {
-                    FirebaseRemoteConfig.getInstance()
-                }
-
-                val repository = remember {
-                    BranchRepository(dao, remoteConfig)
-                }
-
-                val viewModel: BranchViewModel = viewModel(
-                    factory = BranchViewModelFactory(repository)
-                )
-
-                BranchScreen(
-                    navController = navController,
-                    viewModel = viewModel
-                )
-
-
-            //  BranchGridDemoScreen(navController)
-            //FeedbackForm(navController)
-
-           // EmergencyFeedScreen(navController)
 
         }
 
-//        composable("branch") {
-//            BranchScreen(navController)
-//        }
+        composable(Routes.BRANCHES) {
+
+            val context = LocalContext.current
+
+            val database = remember {
+                AppDatabase.getDatabase(context)
+            }
+
+            val dao = remember {
+                database.branchDao()
+            }
+
+            val remoteConfig = remember {
+                FirebaseRemoteConfig.getInstance()
+            }
+
+            val repository = remember {
+                BranchRepository(dao, remoteConfig)
+            }
+
+            val viewModel: BranchViewModel = viewModel(
+                factory = BranchViewModelFactory(repository)
+            )
+
+            BranchScreen(
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
 
         composable(
             route = "year/{branchId}/{branchShort}",
@@ -184,24 +176,6 @@ fun AppNavGraph(
             )
         }
 
-
-
-
-
-
-
-
-
-
-//        composable("year/{branchName}") { backStackEntry ->
-//            val branchName =
-//                backStackEntry.arguments?.getString("branchName") ?: ""
-//
-//            YearGridScreen(
-//                branchName = branchName,
-//                navController = navController
-//            )
-//        }
         composable(Routes.NEWS) {
             NewsListingScreen(navController)
 
@@ -428,18 +402,16 @@ fun AppNavGraph(
             )
         ) { backStackEntry ->
 
-            val jobId = backStackEntry.arguments?.getString("jobId")
-
-            val job = dummyJobPosts.firstOrNull {
-                it.jobId == jobId
-            }
-
-            job?.let {
-                JobDetailScreen(
-                    navController = navController,
-                    job = it
-                )
-            }
+//            val jobId = backStackEntry.arguments?.getString("jobId")
+//
+//
+//
+//            job?.let {
+//                JobDetailScreen(
+//                    navController = navController,
+//                    job = it
+//                )
+//            }
         }
 
 

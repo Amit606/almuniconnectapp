@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.jobposting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ class JobViewModel(
 
             repository.getJobPosts(pageNumber, pageSize)
                 .onSuccess {
+                    Log.e("JobViewModel", "Loaded jobs: ${it.items.size}, totalCount: ${it.totalCount}")
                     jobList.addAll(it.items)
                     _state.value = JobState.Success(jobList, it.totalCount)
                     pageNumber++

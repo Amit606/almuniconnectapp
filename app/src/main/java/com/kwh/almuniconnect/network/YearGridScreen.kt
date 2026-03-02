@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 import java.util.Calendar
 
 data class YearUiModel(
@@ -54,10 +55,9 @@ fun YearGridScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("$branchShort Alumni")
-                }
+            HBTUTopBar(
+                title = "$branchShort Alumni Network",
+                navController = navController,
             )
         }
     ) { paddingValues ->
@@ -91,9 +91,7 @@ fun YearGridScreen(
                         yearItem = yearItem,
                         onClick = {
                             navController.navigate("alumni/${branchShort}/${yearItem.year}")
-//                            navController.navigate(
-//                                "alumni/${branchShort}/${yearItem.year}"
-//                            )
+
                         }
                     )
                 }

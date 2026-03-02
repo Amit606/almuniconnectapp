@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import com.kwh.almuniconnect.appbar.HBTUTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,18 +40,19 @@ fun BranchScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Alumni Branches") }
+            HBTUTopBar(
+                title = "Alumni Branches",
+                navController = navController,
             )
         }
-    ) { padding ->
+    ) { paddingValues ->
 
         when {
             isLoading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding),
+                        .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -61,7 +63,7 @@ fun BranchScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding),
+                        .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -75,7 +77,7 @@ fun BranchScreen(
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 140.dp),
                     modifier = Modifier
-                        .padding(padding)
+                        .padding(paddingValues)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)

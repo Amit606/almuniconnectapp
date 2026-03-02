@@ -1,4 +1,4 @@
-package com.kwh.almuniconnect.ui
+package com.kwh.almuniconnect.profile
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*

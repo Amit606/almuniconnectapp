@@ -2,6 +2,7 @@ package com.kwh.almuniconnect.feedback
 
 import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +16,7 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun FeedbackForm(navController: NavController) {
     val context = LocalContext.current
@@ -44,21 +46,7 @@ fun FeedbackForm(navController: NavController) {
         ) {
 
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Your Name") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            )
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Your Email") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            )
 
             OutlinedTextField(
                 value = message,
@@ -73,7 +61,7 @@ fun FeedbackForm(navController: NavController) {
 
             Button(
                 onClick = {
-                    if (name.isBlank() || email.isBlank() || message.isBlank()) {
+                    if (message.isBlank()) {
                         Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
@@ -120,6 +108,7 @@ fun FeedbackForm(navController: NavController) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 fun submitFeedback(
     context: android.content.Context,
     userId: String,

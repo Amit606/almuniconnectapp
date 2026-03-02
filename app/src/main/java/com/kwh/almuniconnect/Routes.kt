@@ -66,4 +66,9 @@ object Routes {
     const val APPROVAL_PENDING="approval_pending"
 
     const val FEEDBACK="feedback"
+    const val BRANCHES ="branches"
+    const val COURSES ="courses"
+    const val BATCHES ="batches"
+    const val COUNTRIES ="countries"
+    const val ROLES ="roles"
 }

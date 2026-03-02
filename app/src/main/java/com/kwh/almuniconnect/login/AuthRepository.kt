@@ -66,9 +66,7 @@ class AuthRepository(
 
         return try {
 
-            val response = api.checkEmailExist("amitsun.noida@gmail.com")
-
-            Log.e("AuthRepository", "Response: ${response.code()} ${response.body()}")
+            val response = api.checkEmailExist("amitsun.noida@gmail.com")//
 
             if (!response.isSuccessful) {
                 return Result.failure(
@@ -86,10 +84,8 @@ class AuthRepository(
             val user = body.data?.userProfile
 
             if (user != null) {
-                Log.e("AuthRepository", "Existing user found: ${user.userId}")
                 Result.success(user)
             } else {
-                Log.e("AuthRepository", "User not found")
                 Result.success(null)
             }
 

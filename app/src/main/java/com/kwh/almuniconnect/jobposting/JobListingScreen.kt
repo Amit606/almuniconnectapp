@@ -144,8 +144,8 @@ fun JobListingScreen(navController: NavController) {
 
             is JobState.Error -> {
                 CommonEmptyState(
-                    title = "No Upcoming Events",
-                    message = "There are no upcoming events right now.\nPlease check back later.",
+                    title = "No Upcoming Jobs",
+                    message = "There are no upcoming jobs right now.\nPlease check back later.",
                     lottieRes = R.raw.no_events,
                     actionText = "Refresh",
                     onActionClick = { viewModel.loadJobs() }
@@ -206,29 +206,6 @@ fun JobCard(job:JobAPost,navController: NavController) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Company + Rating
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Capgemini",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = Color(0xFFFFB300),
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = "3.7 | 51573 Reviews",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
             // Experience, Salary, Location
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -252,11 +229,11 @@ fun JobCard(job:JobAPost,navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            InfoItemClick(Icons.Default.ChevronRight, " Job Posted By Amit Kumar Gupta"){
-                navController.navigate(Routes.HOME)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
+//            InfoItemClick(Icons.Default.ChevronRight, " Job Posted By Amit Kumar Gupta"){
+//                navController.navigate(Routes.HOME)
+//            }
+//
+//            Spacer(modifier = Modifier.height(8.dp))
 
 
             // Footer
@@ -273,17 +250,17 @@ fun JobCard(job:JobAPost,navController: NavController) {
                     color = Color.Gray
                 )
 
-                Button(
-                    onClick = { openUrl(context,"https://www.google.com") },
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Apply Now",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+//                Button(
+//                    onClick = { openUrl(context,"https://www.google.com") },
+//                    shape = RoundedCornerShape(8.dp),
+//                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
+//                ) {
+//                    Text(
+//                        text = "Apply Now",
+//                        style = MaterialTheme.typography.bodySmall,
+//                        fontWeight = FontWeight.SemiBold
+//                    )
+//                }
             }
 
         }
