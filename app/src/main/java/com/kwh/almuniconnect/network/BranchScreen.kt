@@ -124,8 +124,8 @@ fun BranchCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally   // 👈 Center everything
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Icon(
@@ -139,10 +139,10 @@ fun BranchCard(
 
             Text(
                 text = branch.shortName,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.bodySmall
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             Text(
                 text = branch.name,

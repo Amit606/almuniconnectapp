@@ -22,15 +22,20 @@ class TalentViewModel : ViewModel() {
             _talents.value = it
         }
     }
-
+    fun getTalentById(talentId: String?): Talent? {
+        return _talents.value.find { it.id == talentId }
+    }
     fun addTalent(
         name: String,
         branch: String,
         year: Int,
         skill: String,
+        photo:String,
         videoLink: String,
+        description: String,
         userId: String,
-        email: String
+        email: String,
+
     ) {
         viewModelScope.launch {
 
@@ -40,7 +45,9 @@ class TalentViewModel : ViewModel() {
                 year = year,
                 skill = skill,
                 videoLink = videoLink,
-                status = TalentStatus.APPROVED ,
+                photo=photo,
+                description= description,
+                status = TalentStatus.PENDING.name,
                 userId = userId,
                 userEmail=email,
                 // 🔥 Auto Pending

@@ -104,7 +104,7 @@ fun SplashScreen(navController: NavController) {
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             } else {
-                navController.navigate(Routes.APPROVAL_PENDING) {
+                navController.navigate(Routes.APPROVAL_PENDING) { //APPROVAL_PENDING
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             }

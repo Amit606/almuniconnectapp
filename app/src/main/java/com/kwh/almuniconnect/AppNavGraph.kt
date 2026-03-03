@@ -66,6 +66,9 @@ import com.kwh.almuniconnect.subscription.PremiumScreen
 import com.kwh.almuniconnect.profile.ApprovalPendingScreen
 import com.kwh.almuniconnect.tallent.AddTalentScreen
 import com.kwh.almuniconnect.tallent.HarcourtianTalentScreen
+import com.kwh.almuniconnect.tallent.TalentDetailScreen
+import com.kwh.almuniconnect.tallent.TalentViewModel
+import com.kwh.almuniconnect.tallent.shareTalent
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -103,15 +106,37 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-          // SplashScreen(navController)
+          SplashScreen(navController)
+
+        }
+
+        composable(Routes.TALENT_LIST) {
             HarcourtianTalentScreen(navController)
 
         }
-        composable("add_talent") {
+        composable(Routes.ADD_TALENT_LIST) {
             AddTalentScreen(navController)
 
+        }
+        composable(
+            route = "talent_detail/{talentId}",
+            arguments = listOf(navArgument("talentId") {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
 
+            val viewModel: TalentViewModel = viewModel()
+            val talentId = backStackEntry.arguments?.getString("talentId")
+            val talent = viewModel.getTalentById(talentId)
 
+            talent?.let {
+                TalentDetailScreen(
+                    navController,
+                    talent = it,
+                    onLikeClick = { viewModel.likeTalent(it.id) },
+                    onShareClick = { shareTalent(context, it) }
+                )
+            }
         }
 
         composable(Routes.BRANCHES) {

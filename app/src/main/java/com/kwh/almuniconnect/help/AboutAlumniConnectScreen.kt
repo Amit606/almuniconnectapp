@@ -174,7 +174,9 @@ fun AboutFooter() {
         Column(modifier = Modifier.padding(16.dp)) {
 
             // Info rows
-            InfoRow(icon = Icons.Default.Info, label = "App Version", value = APP_VERSION)
+            val version = getAppVersion()
+
+            InfoRow(icon = Icons.Default.Info, label = "App Version", value = version)
             InfoRow(icon = Icons.Default.Person, label = "Developer", value = DEVELOPER_NAME)
             InfoRow(icon = Icons.Default.Email, label = "Email", value = DEVELOPER_EMAIL)
 
@@ -190,7 +192,19 @@ fun AboutFooter() {
         }
     }
 }
-
+@Composable
+fun getAppVersion(): String {
+    val context = LocalContext.current
+    return try {
+        val packageInfo = context.packageManager.getPackageInfo(
+            context.packageName,
+            0
+        )
+        packageInfo.versionName ?: "Unknown"
+    } catch (e: Exception) {
+        "Unknown"
+    }
+}
 @Composable
 fun InfoRow(icon: ImageVector, label: String, value: String) {
     Row(

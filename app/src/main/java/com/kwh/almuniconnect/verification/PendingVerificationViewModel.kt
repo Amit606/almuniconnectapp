@@ -31,14 +31,13 @@ class PendingVerificationViewModel : ViewModel() {
                     }
                 },
                 onFailure = {
-                    UiState.Error(it.message ?: "Something went wrong")
+                    UiState.Error("No Pending Verifications found")
                 }
             )
         }
     }
     fun approveAlumni(context:Context,alumniId: String) {
         viewModelScope.launch {
-          Log.e("PendingVerificationViewModel", "Approving alumni with ID: $alumniId")
             val result = repository.verifyAlumni(context,
                 alumniId = alumniId,
                 isVerified = true
@@ -60,7 +59,7 @@ class PendingVerificationViewModel : ViewModel() {
                     }
                 },
                 onFailure = {
-                    uiState = UiState.Error("Verification failed")
+                    uiState = UiState.Error("No Pending Verifications found")
                 }
             )
         }

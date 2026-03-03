@@ -71,4 +71,7 @@ object Routes {
     const val BATCHES ="batches"
     const val COUNTRIES ="countries"
     const val ROLES ="roles"
+    const val TALENT_LIST="talent_list"
+    const val ADD_TALENT_LIST="add_talent_list"
+
 }

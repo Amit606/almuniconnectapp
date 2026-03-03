@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.tallent
 
+import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -13,42 +14,41 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
-fun YoutubePlayerView(videoUrl: String) {
+fun YoutubePlayerWebView(videoUrl: String) {
 
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val videoId = extractVideoId(videoUrl)
 
     AndroidView(
-        factory = {
-            val youtubePlayerView = YouTubePlayerView(context)
-            lifecycleOwner.lifecycle.addObserver(youtubePlayerView)
+        factory = { context ->
+            WebView(context).apply {
+                settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
 
-            youtubePlayerView.addYouTubePlayerListener(
-                object : AbstractYouTubePlayerListener() {
-                    override fun onReady(youTubePlayer: YouTubePlayer) {
-                        val videoId = extractYoutubeId(videoUrl)
-                        youTubePlayer.loadVideo(videoId, 0f)
-                    }
-                }
-            )
-            youtubePlayerView
+                loadData(
+                    """
+                    <html>
+                        <body style="margin:0">
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                src="https://www.youtube.com/embed/$videoId"
+                                frameborder="0"
+                                allowfullscreen>
+                            </iframe>
+                        </body>
+                    </html>
+                    """.trimIndent(),
+                    "text/html",
+                    "utf-8"
+                )
+            }
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(220.dp)
     )
 }
-fun extractYoutubeId(url: String): String {
-    return when {
-        url.contains("youtu.be") -> {
-            url.substringAfterLast("/")
-        }
-        url.contains("watch?v=") -> {
-            url.substringAfter("watch?v=").substringBefore("&")
-        }
-        url.contains("shorts/") -> {
-            url.substringAfter("shorts/").substringBefore("?")
-        }
-        else -> ""
-    }
+fun extractVideoId(url: String): String {
+    val regex = Regex("""(?:v=|\/)([0-9A-Za-z_-]{11}).*""")
+    return regex.find(url)?.groupValues?.get(1) ?: url
 }

@@ -15,7 +15,7 @@ object NetworkClient {
     private const val BASE_URL = "https://hbtu-alumni-api.azurewebsites.net/api/v1/"  // 🔁 Replace with your backend base URL
 
     val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = HttpLoggingInterceptor.Level.NONE
         }
 
 

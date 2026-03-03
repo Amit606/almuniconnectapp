@@ -69,7 +69,7 @@ class AuthRepository(
       val tokenDataStore = TokenDataStore(context)
         return try {
 
-            val response = api.checkEmailExist("amitsun.noida@gmail.com")//
+            val response = api.checkEmailExist(email)//
 
             if (!response.isSuccessful) {
                 return Result.failure(

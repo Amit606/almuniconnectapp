@@ -114,13 +114,13 @@ fun HomeScreen(
                         )
                 },
                 actions = {
-//                    IconButton(onClick = { /* open notifications */ }) {
-//                        Icon(
-//                            Icons.Default.Notifications,
-//                            tint = Color.Blue, // Gold highlight
-//                            contentDescription = "Notifications"
-//                        )
-//                    }
+                    IconButton(onClick = { navController.navigate(Routes.TALENT_LIST) }) {
+                        Icon(
+                            Icons.Default.Mic,
+                            tint = Color.Blue, // Gold highlight
+                            contentDescription = "Notifications"
+                        )
+                    }
 //                    IconButton(onClick = {  navController.navigate(Routes.FEED) }) {
 //                        Icon(
 //                            Icons.Default.Emergency,

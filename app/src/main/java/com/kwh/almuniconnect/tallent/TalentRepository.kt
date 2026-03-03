@@ -1,5 +1,8 @@
 package com.kwh.almuniconnect.tallent
 
+import android.util.Log
+import androidx.compose.animation.core.updateTransition
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -22,11 +25,32 @@ class TalentRepository {
                 onResult(talents)
             }
     }
-
     suspend fun addTalent(talent: Talent) {
-        val doc = collection.document()
-        doc.set(talent.copy(id = doc.id)).await()
+        try {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+                ?: throw Exception("User not logged in")
+
+            val doc = collection.document()
+
+            doc.set(
+                talent.copy(
+                    id = doc.id,
+                    userId = uid,
+                    status = "PENDING"
+                )
+            ).await()
+
+        } catch (e: Exception) {
+            Log.e("FirestoreError", e.message.toString())
+        }
     }
+//
+//    suspend fun addTalent(talent: Talent) {
+//        val uid = FirebaseAuth.getInstance().currentUser?.uid
+//            ?: throw Exception("User not logged in")
+//        val doc = collection.document()
+//        doc.set(talent.copy(id = doc.id, userId = uid, status = "PENDING")).await()
+//    }
 
     suspend fun likeTalent(talentId: String) {
         val doc = collection.document(talentId)

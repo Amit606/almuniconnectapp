@@ -50,7 +50,7 @@ class AlumniRepository {
 
             } else {
                 Result.failure(
-                    Exception(response.body()?.message ?: "Error")
+                    Exception(response.body()?.message ?: "No Pending Verifications found")
                 )
             }
 
