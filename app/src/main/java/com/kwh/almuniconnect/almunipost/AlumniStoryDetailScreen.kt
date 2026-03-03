@@ -66,14 +66,18 @@ fun AlumniStoryDetailScreen(
 
             // ✅ Safe Image Handling
             item {
+
+                val drawableId = getDrawableId(story.image)
+
                 val imageRes =
-                    if (story.imageRes != 0) story.imageRes
-                    else R.drawable.man   // Add placeholder in drawable
+                    if (drawableId != 0) drawableId
+                    else R.drawable.man   // fallback placeholder
 
                 Image(
                     painter = painterResource(id = imageRes),
                     contentDescription = "Alumni Cover",
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.Crop,   // better for profile cover
+                    alignment = Alignment.TopCenter,    // prevents head cut
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(260.dp)

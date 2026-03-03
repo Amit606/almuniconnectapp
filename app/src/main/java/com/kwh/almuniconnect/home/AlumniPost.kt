@@ -34,63 +34,71 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.almunipost.AlumniStory
+import com.kwh.almuniconnect.almunipost.getDrawableId
 import com.kwh.almuniconnect.jobposting.JobAPost
 // Alumni post
 @Composable
-fun AlumniPost(post: AlumniStory,
-     onClick: () -> Unit
-
+fun AlumniPost(
+    post: AlumniStory,
+    onClick: () -> Unit
 ) {
+
+    val drawableId = getDrawableId(post.image)
+
+    val imageRes =
+        if (drawableId != 0) drawableId
+        else R.drawable.girl   // fallback placeholder
+
     Card(
-        modifier = Modifier.width(250.dp)
+        modifier = Modifier
+            .width(250.dp)
             .height(120.dp)
-            .clickable{onClick()},
+            .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            post.imageRes?.let { url ->
-                AsyncImage(
-                    model = url,
-                    contentDescription = "avatar",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                )
-            } ?: Image(
-                painter = painterResource(id = R.drawable.girl),
+
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Image(
+                painter = painterResource(id = imageRes),
                 contentDescription = "avatar",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(60.dp)
                     .clip(CircleShape)
             )
+
             Spacer(modifier = Modifier.width(12.dp))
+
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = post?.name ?: "Unknown",
-                        color = Color.Black,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
+
+                Text(
+                    text = post.name,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = post?.title ?: "N/A",
-                    color = Color.Black,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = post?.companyOrStartup ?: "N/A",
+                    text = post.title,
                     color = Color.Black,
                     style = MaterialTheme.typography.bodySmall
                 )
 
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = post.companyOrStartup,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

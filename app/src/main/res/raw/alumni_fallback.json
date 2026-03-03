@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Pramod Rajput",
+    "batch": "B.Tech, Electrical Engineering 1985",
+    "title": "Senior Technical Director, National Informatics Centre",
+    "companyOrStartup": "National Informatics Centre (NIC)",
+    "category": "SUCCESS",
+    "story": "After graduating in engineering, Pramod Rajput advanced into leadership in government IT.",
+    "image": "ic_pk_rajput",
+    "featured": true
+  },
+  {
+    "name": "Radhe Shyam Saini",
+    "batch": "MCA 2014",
+    "title": "Founder & CEO",
+    "companyOrStartup": "Neroworx",
+    "category": "STARTUP",
+    "story": "Radhe Shyam Saini turned his final-year MCA project into a thriving fintech startup.",
+    "image": "ic_radhe",
+    "featured": true
+  }
+]

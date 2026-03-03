@@ -38,7 +38,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
-import com.kwh.almuniconnect.almunipost.alumniFeed
+import com.kwh.almuniconnect.almunipost.SuccessViewModel
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
@@ -64,6 +64,8 @@ import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.subscription.PremiumScreen
 import com.kwh.almuniconnect.profile.ApprovalPendingScreen
+import com.kwh.almuniconnect.tallent.AddTalentScreen
+import com.kwh.almuniconnect.tallent.HarcourtianTalentScreen
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -101,7 +103,13 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-           SplashScreen(navController)
+          // SplashScreen(navController)
+            HarcourtianTalentScreen(navController)
+
+        }
+        composable("add_talent") {
+            AddTalentScreen(navController)
+
 
 
         }
@@ -428,15 +436,15 @@ fun AppNavGraph(
         composable("story_detail/{name}") { backStackEntry ->
 
             val name = backStackEntry.arguments?.getString("name")
-           Log.e("Name", "Received name: $name")
-            val story = alumniFeed.firstOrNull {
-                it.name == name
-            }
-            Log.e("Name", "Received name: ${story?.name}")
+
+            val viewModel: SuccessViewModel = viewModel()
+            val alumniList by viewModel.alumniList.collectAsState()
+
+            val story = alumniList.firstOrNull { it.name == name }
 
             AlumniStoryDetailScreen(
                 navController = navController,
-                story = story   // already nullable safe
+                story = story
             )
         }
 //        composable(Routes.ENTRY) {

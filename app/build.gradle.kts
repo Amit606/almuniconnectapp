@@ -137,5 +137,6 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
 }

@@ -188,6 +188,7 @@ private fun handleNotificationIntent(
             navController.safeNavigate(Routes.EVENTS)
         }
 
+
         Routes.WHATSUP_CHANNEL -> {
             navController.safeNavigate(Routes.WHATSUP_CHANNEL)
         }

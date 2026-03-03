@@ -69,7 +69,7 @@ class AuthViewModel(
         setLoading(true)
 
         viewModelScope.launch {
-            repository.checkEmailAndGetUser(email)
+            repository.checkEmailAndGetUser(email, getApplication())
                 .onSuccess { user ->
                     if (user != null) {
                         setLoading(false)

@@ -10,6 +10,7 @@ import androidx.room.Query
 import com.google.common.reflect.TypeToken
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
+import com.kwh.almuniconnect.almunipost.AlumniStory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -34,6 +35,17 @@ class BranchRepository(
 
         dao.insertAll(branches.map { it.toEntity() })
     }
+    suspend fun fetchAlumni(): List<AlumniStory> {
+
+        remoteConfig.fetchAndActivate().await()
+
+        val json = remoteConfig.getString("alumni_feed_json")
+
+        val type = object : TypeToken<List<AlumniStory>>() {}.type
+
+        return Gson().fromJson(json, type)
+    }
+
 }
 
 

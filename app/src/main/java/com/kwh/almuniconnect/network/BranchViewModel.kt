@@ -10,10 +10,12 @@ import kotlinx.coroutines.launch
 
 class BranchViewModel(
     private val repository: BranchRepository
+
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
+
 
     val branches = repository.getBranches()
         .stateIn(

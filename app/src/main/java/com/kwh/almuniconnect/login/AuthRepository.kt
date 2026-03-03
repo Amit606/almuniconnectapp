@@ -1,10 +1,12 @@
 package com.kwh.almuniconnect.login
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.SignupRequest
 import com.kwh.almuniconnect.profile.ProfileResponse
+import com.kwh.almuniconnect.storage.TokenDataStore
 
 class AuthRepository(
     private val api: ApiService
@@ -61,9 +63,10 @@ class AuthRepository(
     /* ------------------------------------------------ */
 
     suspend fun checkEmailAndGetUser(
-        email: String
+        email: String,
+        context: Context
     ): Result<ExistingUserDto?> {
-
+      val tokenDataStore = TokenDataStore(context)
         return try {
 
             val response = api.checkEmailExist("amitsun.noida@gmail.com")//
@@ -80,8 +83,17 @@ class AuthRepository(
             if (!body.success) {
                 return Result.failure(Exception(body.message ?: "Unknown error"))
             }
+            tokenDataStore.saveTokens(
+                accessToken = body.data?.accessToken.orEmpty(),
+                refreshToken = body.data?.refreshToken.orEmpty(),
+                accessTokenExpiry = body.data?.accessTokenExpiry.orEmpty(),
+                refreshTokenExpiry = body.data?.refreshTokenExpiry.orEmpty()
+            )
 
+            Log.e("AuthRepository", "Access Token: ${body.data?.accessToken?.take(30)}...")
+            Log.e("AuthRepository", "Check Email Success: ${body.data}")
             val user = body.data?.userProfile
+
 
             if (user != null) {
                 Result.success(user)

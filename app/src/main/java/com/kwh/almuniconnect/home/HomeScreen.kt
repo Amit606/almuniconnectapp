@@ -39,7 +39,6 @@ import androidx.navigation.NavController
 import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.Routes
-import com.kwh.almuniconnect.almunipost.alumniFeed
 import com.kwh.almuniconnect.analytics.AnalyticsEvent
 import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.analytics.TrackScreen
@@ -52,6 +51,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kwh.almuniconnect.almunipost.SuccessViewModel
 import com.kwh.almuniconnect.evetns.Event
 import com.kwh.almuniconnect.evetns.EventsUiState
 import com.kwh.almuniconnect.evetns.EventsViewModel
@@ -64,6 +64,7 @@ import java.time.LocalDateTime
 @Composable
 fun HomeScreen(
     navController: NavController,
+    viewModel: SuccessViewModel=viewModel(),
 
     onOpenProfile: () -> Unit = {},
     onOpenMessages: () -> Unit = {},
@@ -79,7 +80,7 @@ fun HomeScreen(
     var showExitDialog by remember { mutableStateOf(false) }
     val activity = LocalActivity.current
 
-
+    val alumniList by viewModel.alumniList.collectAsState()
     val bottomBarState = remember { mutableStateOf(BottomNavItem.Home) }
     val userPrefs = remember { UserPreferences(context) }
     val user by userPrefs.getUser().collectAsState(
@@ -403,19 +404,34 @@ fun HomeScreen(
             }
 
             item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(alumniFeed) { post ->
-                        AlumniPost(post = post, onClick={
-                            AnalyticsManager.logEvent(
-                                AnalyticsEvent.ScreenView("story_clicked_${post.name}")
-                            )
-                            navController.navigate("story_detail/${post.name}")
 
-                        })
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    items(
+                        items = alumniList,
+                        key = { it.name }   // performance + stable key
+                    ) { post ->
+
+                        AlumniPost(
+                            post = post,
+                            onClick = {
+
+                                AnalyticsManager.logEvent(
+                                    AnalyticsEvent.ScreenView(
+                                        "story_clicked_${post.name}"
+                                    )
+                                )
+
+                                navController.navigate(
+                                    "story_detail/${post.name}"
+                                )
+                            }
+                        )
                     }
                 }
             }
-
 
             // News
             item {
