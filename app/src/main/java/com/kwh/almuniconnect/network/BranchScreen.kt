@@ -92,7 +92,7 @@ fun BranchScreen(
                             branch = branch,
                             onClick = {
                                 navController.navigate(
-                                    "year/${branch.id}/${branch.shortName}"
+                                    "year/${branch.id}/${branch.name}"
                                 )
                             }
                         )

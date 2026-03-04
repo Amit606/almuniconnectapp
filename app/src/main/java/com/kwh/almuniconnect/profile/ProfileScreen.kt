@@ -66,7 +66,6 @@ fun ProfileScreen(navController: NavController) {
 
 
 
-    var selectedBranch by remember { mutableStateOf<Branch?>(null) }
     var branch by remember { mutableStateOf("") }
     /* ---------- FORM STATE ---------- */
 
@@ -78,7 +77,6 @@ fun ProfileScreen(navController: NavController) {
     val totalYear = (1..30).toList()
     var job by remember { mutableStateOf("") }
     var cityName by remember { mutableStateOf("") }
-    var birthday by remember { mutableStateOf("") }
     var linkedin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
@@ -94,7 +92,6 @@ fun ProfileScreen(navController: NavController) {
     }
 
     LaunchedEffect(user) {
-
         name = user.name
         email = user.email
         mobile = user.mobile
@@ -102,10 +99,8 @@ fun ProfileScreen(navController: NavController) {
         year = user.year
         job = user.job
         cityName = user.cityName
-        birthday = user.birthday
         linkedin = user.linkedin
         totalExp = user.totalExp
-        Log.e("CityName", "City Name: ${user.cityName}")
     }
 
     /* ---------- HANDLE API SUCCESS ---------- */
@@ -130,7 +125,6 @@ fun ProfileScreen(navController: NavController) {
                         year = profile.passoutYear?.toString() ?: "",
                         job = profile.companyName ?: "",
                         cityName = profile.cityName?:"",
-                        birthday = profile.dateOfBirth ?: "",
                         linkedin = profile.linkedinUrl ?: "",
                         photo = profile.photoUrl ?: "",
                         totalExp = profile.totalExperience ?: 0,
@@ -324,7 +318,6 @@ fun ProfileScreen(navController: NavController) {
 
                             AppTextField("Location", cityName) { cityName = it }
 
-                            BirthdayPicker(birthday) { birthday = it }
 
                             LinkiedID("LinkedIn URL", linkedin) {
                                 linkedin = it
@@ -351,8 +344,7 @@ fun ProfileScreen(navController: NavController) {
                                     error = validateProfile(
                                         name, email, mobile,
                                         branch, year,
-                                        job, cityName,
-                                        birthday, linkedin
+                                        job, cityName,  linkedin
                                     )
                                     if (error == null) {
                                         viewModel.submitProfile(
@@ -362,7 +354,7 @@ fun ProfileScreen(navController: NavController) {
                                                 photoUrl= user.photo,
                                                 mobileNo = mobile,
                                                 email = email,
-                                                dateOfBirth = birthday,
+                                                dateOfBirth = "2026-04-25",
                                                 passoutYear = year.toIntOrNull() ?: 0,
                                                 courseId = selectedBranchId,
                                                 countryId = 81,
@@ -472,7 +464,6 @@ fun validateProfile(
     year: String,
     job: String,
     cityName: String,
-    birthday: String,
     linkedin: String
 ): String? {
 
@@ -500,8 +491,7 @@ fun validateProfile(
     if (cityName.isBlank())
         return "Please enter location"
 
-    if (birthday.isBlank())
-        return "Please select birthday"
+
 
     if (linkedin.isNotBlank() &&
         !linkedin.startsWith("http://") &&

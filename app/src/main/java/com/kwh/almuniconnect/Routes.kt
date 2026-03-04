@@ -73,5 +73,6 @@ object Routes {
     const val ROLES ="roles"
     const val TALENT_LIST="talent_list"
     const val ADD_TALENT_LIST="add_talent_list"
+    const val ADD_SOCIAL_CHANNEL="add_social_channel"
 
 }

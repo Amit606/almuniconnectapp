@@ -72,9 +72,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
-import com.kwh.almuniconnect.network.openUrl
 import com.kwh.almuniconnect.utils.CommonEmptyState
-import com.kwh.almuniconnect.utils.encodeRoute
 import com.kwh.almuniconnect.utils.getTimeAgo
 
 @RequiresApi(Build.VERSION_CODES.O)

@@ -45,7 +45,6 @@ class ProfileViewModel(
                         val profile = response.data.userProfile
 
 
-                        Log.e("ProfileViewModel", "Profile success: $profile")
 
                         _state.value = ProfileState.Success(profile)
 
@@ -73,7 +72,7 @@ class ProfileViewModel(
                 .onFailure { throwable ->
 
                     _state.value = ProfileState.Error(
-                        throwable.message ?: "Something went wrong"
+                        "Please check Branch Name"
                     )
                 }
         }

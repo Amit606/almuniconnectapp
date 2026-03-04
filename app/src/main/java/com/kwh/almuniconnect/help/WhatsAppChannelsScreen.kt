@@ -2,6 +2,7 @@ package com.kwh.almuniconnect.help
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,38 +49,109 @@ import com.kwh.almuniconnect.R
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.style.TextOverflow
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import org.json.JSONArray
 
-data class WhatsAppChannel(
+
+/* ------------------------------------------------ */
+/* SOCIAL TYPE ENUM */
+/* ------------------------------------------------ */
+
+enum class SocialType {
+    WHATSAPP,
+    FACEBOOK,
+    INSTAGRAM,
+    TWITTER,
+    YOUTUBE
+}
+
+/* ------------------------------------------------ */
+/* DATA MODEL */
+/* ------------------------------------------------ */
+
+data class SocialAppChannel(
+    val type: SocialType,
     val title: String,
     val description: String,
     val link: String
 )
 
-val channels = listOf(
-    WhatsAppChannel(
-        "Harcourtian MCA Alumni Official",
+/* ------------------------------------------------ */
+/* CHANNEL LIST */
+/* ------------------------------------------------ */
+
+val fallbackChannels = listOf(
+
+    SocialAppChannel(
+        SocialType.WHATSAPP,
+        "Harcourtians MCA Alumni Official",
         "Important alumni announcements and meet updates",
         "https://chat.whatsapp.com/FooywyRBD1CDtnhHY5U2lh"
     ),
-    WhatsAppChannel(
-        "Harcourtian: Startup Accelerator",
-        "Welcome to the HBTU Entrepreneurs’ Group - a space for alumni with ventures, ideas and ambitions",
-        "https://whatsapp.com/channel/mca_jobs"
-    ),
-    WhatsAppChannel(
-        "Harcourtian NCR",
-        "All alumni events, reunions & seminars",
-        "https://chat.whatsapp.com/KaA8C1V4Nnr1xE8mCQwaiv"
-    ),
-    WhatsAppChannel(
-        "Harcourtian ALUMNI Gurgaon Chapter",
-        "Students can connect with seniors for guidance",
-        "https://whatsapp.com/channel/student_connect"
+
+    SocialAppChannel(
+        SocialType.WHATSAPP,
+        "NCR Harcourtians' Family GT",
+        "Only messages related to GT are allowed in this group",
+        "https://chat.whatsapp.com/LJRioHnlitA2FVvSy4bNtl?mode=gi_t"
     )
+
 )
 
+/* ------------------------------------------------ */
+/* ICON MAPPER */
+/* ------------------------------------------------ */
+
+fun getSocialIcon(type: SocialType): Int {
+    return when (type) {
+        SocialType.WHATSAPP -> R.drawable.ic_whatsup
+        SocialType.FACEBOOK -> R.drawable.ic_facebook
+        SocialType.INSTAGRAM -> R.drawable.ic_insta
+        SocialType.TWITTER -> R.drawable.ic_twitter
+        SocialType.YOUTUBE -> R.drawable.ic_youtube
+    }
+}
+
+fun getSocialChannels(): List<SocialAppChannel> {
+
+    val remoteConfig = FirebaseRemoteConfig.getInstance()
+
+    val json = remoteConfig.getString("social_channels")
+    Log.e("Json", "Fetched social channels JSON: $json")
+    if (json.isBlank()) return fallbackChannels
+
+    return try {
+
+        val jsonArray = JSONArray(json)
+
+        val list = mutableListOf<SocialAppChannel>()
+
+        for (i in 0 until jsonArray.length()) {
+
+            val obj = jsonArray.getJSONObject(i)
+
+            val type = SocialType.valueOf(obj.getString("type"))
+
+            list.add(
+                SocialAppChannel(
+                    type = type,
+                    title = obj.getString("title"),
+                    description = obj.getString("description"),
+                    link = obj.getString("link")
+                )
+            )
+        }
+
+        if (list.isEmpty()) fallbackChannels else list
+
+    } catch (e: Exception) {
+        Log.e("SocialChannels", "Error parsing social channels JSON", e)
+        fallbackChannels
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WhatsAppChannelsScreen(navController: NavController) {
@@ -87,14 +159,51 @@ fun WhatsAppChannelsScreen(navController: NavController) {
     val context = LocalContext.current
     TrackScreen("whatsapp_channels_screen")
 
+    val channels = getSocialChannels()
+
     Scaffold(
         topBar = {
-            HBTUTopBar(
-                title = "Whats-up Community",
-                navController = navController
+
+            TopAppBar(
+                title = {
+                    Text("Social Community")
+                },
+
+                navigationIcon = {
+
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+
+                actions = {
+
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Routes.ADD_SOCIAL_CHANNEL)                        }
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Groups,
+                            contentDescription = "Add Channel"
+                        )
+                    }
+                },
+
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White
+                )
             )
         }
+
     ) { paddingValues ->
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -103,84 +212,188 @@ fun WhatsAppChannelsScreen(navController: NavController) {
         ) {
 
             item {
+
                 Text(
-                    "Choose a channel to stay connected",
+                    text = "Choose a channel to stay connected",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
             items(channels) { channel ->
-                WhatsAppChannelCard(channel, context)
+
+                SocialChannelCard(channel, context)
             }
         }
     }
 }
+//@Composable
+//fun WhatsAppChannelCard(channel: SocialAppChannel, context: Context) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp, vertical = 8.dp)
+//            .clickable {
+//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(channel.link))
+//                context.startActivity(intent)
+//            },
+//        shape = RoundedCornerShape(20.dp),
+//        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+//        colors = CardDefaults.cardColors(containerColor = Color.White)
+//    ) {
+//        Row(
+//            modifier = Modifier.padding(16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Icon(
+//                painter = painterResource(id = R.drawable.ic_whatsup),
+//                contentDescription = "title",
+//                modifier = Modifier.size(60.dp),   // 🔥 120dp size
+//                        tint = Color.Unspecified   // keep original WhatsApp green
+//            )
+//
+//
+//            Spacer(Modifier.width(12.dp))
+//
+//            Column(modifier = Modifier.weight(1f)) {
+//                Text(channel.title,
+//                    style = MaterialTheme.typography.titleMedium,
+//                    fontWeight = FontWeight.Bold,
+//                    maxLines = 2,
+//                    overflow = TextOverflow.Ellipsis)
+//                Text(channel.description,
+//                    style = MaterialTheme.typography.bodySmall,
+//                    color = Color(0xFF7A8194))
+//            }
+//
+//            Row(
+//                modifier = Modifier
+//                    .background(
+//                        color = Color(0xFF1E88E5), // Blue background
+//                        shape = RoundedCornerShape(20.dp)
+//                    )
+//                    .padding(horizontal = 14.dp, vertical = 8.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Outlined.GroupAdd,
+//                    contentDescription = "Join Network",
+//                    tint = Color.White,
+//                    modifier = Modifier.size(18.dp)
+//                )
+//
+//                Spacer(modifier = Modifier.width(6.dp))
+//
+//                Text(
+//                    text = "Join",
+//                    style = MaterialTheme.typography.titleMedium,
+//                    color = Color.White
+//                )
+//            }
+//
+//
+//                   }
+//    }
+//}
+/* ------------------------------------------------ */
+/* CARD */
+/* ------------------------------------------------ */
+
 @Composable
-fun WhatsAppChannelCard(channel: WhatsAppChannel, context: Context) {
+fun SocialChannelCard(channel: SocialAppChannel, context: Context) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(channel.link))
+
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(channel.link)
+                )
+
                 context.startActivity(intent)
             },
         shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
+
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_whatsup),
-                contentDescription = "title",
-                modifier = Modifier.size(60.dp),   // 🔥 120dp size
-                        tint = Color.Unspecified   // keep original WhatsApp green
-            )
 
+            Icon(
+                painter = painterResource(id = getSocialIcon(channel.type)),
+                contentDescription = channel.title,
+                modifier = Modifier.size(60.dp),
+                tint = Color.Unspecified
+            )
 
             Spacer(Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(channel.title,
+
+                Text(
+                    text = channel.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis)
-                Text(channel.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF7A8194))
-            }
-
-            Row(
-                modifier = Modifier
-                    .background(
-                        color = Color(0xFF1E88E5), // Blue background
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.GroupAdd,
-                    contentDescription = "Join Network",
-                    tint = Color.White,
-                    modifier = Modifier.size(18.dp)
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "Join",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
+                    text = channel.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF7A8194)
                 )
             }
 
+            JoinButton(channel.type)
+        }
+    }
+}
 
-                   }
+/* ------------------------------------------------ */
+/* JOIN BUTTON */
+/* ------------------------------------------------ */
+
+@Composable
+fun JoinButton(type: SocialType) {
+
+    val text = when (type) {
+        SocialType.WHATSAPP -> "Join"
+        SocialType.FACEBOOK -> "Like"
+        SocialType.INSTAGRAM -> "Follow"
+        SocialType.TWITTER -> "Follow"
+        SocialType.YOUTUBE -> "Subscribe"
+    }
+
+    Row(
+        modifier = Modifier
+            .background(
+                color = Color(0xFF1E88E5),
+                shape = RoundedCornerShape(20.dp)
+            )
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Icon(
+            imageVector = androidx.compose.material.icons.Icons.Outlined.GroupAdd,
+            contentDescription = text,
+            tint = Color.White,
+            modifier = Modifier.size(18.dp)
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White
+        )
     }
 }

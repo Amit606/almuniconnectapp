@@ -50,6 +50,7 @@ import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
 import com.kwh.almuniconnect.emergency.EmergencyRequestForm
 import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
+import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniListScreen
 import com.kwh.almuniconnect.network.AlumniRepository
@@ -197,7 +198,6 @@ fun AppNavGraph(
             val factory = remember {
                 AlumniViewModelFactory(repository)
             }
-
             // 🔥 CREATE VIEWMODEL
             val viewModel: AlumniViewModel = viewModel(factory = factory)
 
@@ -359,6 +359,9 @@ fun AppNavGraph(
         }
         composable(Routes.WHATSUP_CHANNEL) {
             WhatsAppChannelsScreen(navController)
+        }
+        composable(Routes.ADD_SOCIAL_CHANNEL) {
+            AddSocialChannelScreen(navController)
         }
 
 

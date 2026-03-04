@@ -11,9 +11,13 @@ import com.google.common.reflect.TypeToken
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
 import com.kwh.almuniconnect.almunipost.AlumniStory
+import com.kwh.almuniconnect.help.SocialAppChannel
+import com.kwh.almuniconnect.help.SocialType
+import com.kwh.almuniconnect.help.fallbackChannels
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import org.json.JSONArray
 
 class BranchRepository(
     private val dao: BranchDao,
@@ -45,6 +49,7 @@ class BranchRepository(
 
         return Gson().fromJson(json, type)
     }
+
 
 }
 
