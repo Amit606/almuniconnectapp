@@ -150,7 +150,7 @@ fun SplashScreen(navController: NavController) {
             )
 
             Text(
-                "Your Professional Alumni Network",
+                "Connecting Harcourtians Worldwide.",
                 color = Color(0xFFD6E3FF),
                 fontSize = 14.sp,
                 modifier = Modifier.alpha(alpha.value)

@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect
 
 import AlumniViewModel
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -43,6 +44,7 @@ import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductDetailsScreen
 import com.kwh.almuniconnect.branding.ProductServiceDummyScreen
+import com.kwh.almuniconnect.branding.WebViewScreen
 import com.kwh.almuniconnect.emergency.DonateAmountScreen
 import com.kwh.almuniconnect.emergency.DonationSuccessScreen
 import com.kwh.almuniconnect.emergency.EmergencyDetailScreen
@@ -223,7 +225,28 @@ fun AppNavGraph(
 
         composable(Routes.USER_PROFILE)
         {
-            ProfileScreen(navController)
+            val context = LocalContext.current
+
+            val database = remember {
+                AppDatabase.getDatabase(context)
+            }
+
+            val dao = remember {
+                database.branchDao()
+            }
+
+            val remoteConfig = remember {
+                FirebaseRemoteConfig.getInstance()
+            }
+
+            val repository = remember {
+                BranchRepository(dao, remoteConfig)
+            }
+
+            val viewModel: BranchViewModel = viewModel(
+                factory = BranchViewModelFactory(repository)
+            )
+            ProfileScreen(navController,viewModel)
         }
         composable(Routes.APPROVAL_PENDING) {
             ApprovalPendingScreen()
@@ -367,7 +390,17 @@ fun AppNavGraph(
 
         // 🟩 Login
 //
+        composable(
+            route = "webview/{url}"
+        ) { backStackEntry ->
 
+            val url = Uri.decode(backStackEntry.arguments?.getString("url") ?: "")
+
+            WebViewScreen(
+                url = url,
+                navController = navController
+            )
+        }
 
 
 
@@ -422,6 +455,7 @@ fun AppNavGraph(
 
             ProductDetailsScreen(navController,title, location,"","")
         }
+
 
         composable(Routes.JOB_DETAILS){
             JobListingScreen(navController)

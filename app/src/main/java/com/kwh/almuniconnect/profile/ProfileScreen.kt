@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -42,19 +43,24 @@ import com.kwh.almuniconnect.jobposting.AppTextField
 import com.kwh.almuniconnect.jobposting.LinkiedID
 import com.kwh.almuniconnect.jobposting.SectionTitle
 import com.kwh.almuniconnect.login.AuthRepository
+import com.kwh.almuniconnect.network.BranchViewModel
 import com.kwh.almuniconnect.storage.*
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController,
+                  viewModel: BranchViewModel) {
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-
+    val branches by viewModel.branches.collectAsState()
+    var branch by remember { mutableStateOf("") }
+    var selectedBranchId by remember { mutableStateOf<Int?>(null) }
     val apiService = remember { NetworkClient.createService(ApiService::class.java) }
     val repository = remember { AuthRepository(apiService) }
     val tokenDataStore = TokenDataStore(context)
+    var isMobilePublic by remember { mutableStateOf(false) }
 
     val viewModel: ProfileViewModel =
         viewModel(factory = ProfileViewModelFactory(repository,tokenDataStore))
@@ -66,7 +72,6 @@ fun ProfileScreen(navController: NavController) {
 
 
 
-    var branch by remember { mutableStateOf("") }
     /* ---------- FORM STATE ---------- */
 
     var name by remember { mutableStateOf("") }
@@ -81,11 +86,6 @@ fun ProfileScreen(navController: NavController) {
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
     val years = (1972..2026).map { it.toString() }
-    val branchNames = branches.map { it.name }
-    var selectedBranchId by remember { mutableStateOf<Int?>(null) }
-
-
-
     val safeYear = if (year in years) year else ""
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
@@ -122,14 +122,12 @@ fun ProfileScreen(navController: NavController) {
                         mobile = profile.mobileNo ?: "",
                         branch = profile.courseName ?: "",
                         branchId = profile.courseId ?: 0,
-                        year = profile.passoutYear?.toString() ?: "",
+                        year = profile.passoutYear.toString()?:"",
                         job = profile.companyName ?: "",
                         cityName = profile.cityName?:"",
                         linkedin = profile.linkedinUrl ?: "",
                         photo = profile.photoUrl ?: "",
                         totalExp = profile.totalExperience ?: 0,
-
-
                     )
                 )
                 if(profile.isVerified==true){
@@ -280,27 +278,50 @@ fun ProfileScreen(navController: NavController) {
                                 readOnly = true,
                             ) { email = it }
 
-                            AppTextField(
-                                label = "Mobile",
-                                value = mobile,
-                                keyboardType = KeyboardType.Number
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                if (it.all(Char::isDigit) && it.length <= 10)
-                                    mobile = it
+
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    AppTextField(
+                                        label = "Mobile",
+                                        value = mobile,
+                                        keyboardType = KeyboardType.Number
+                                    ) {
+                                        if (it.all(Char::isDigit) && it.length <= 10)
+                                            mobile = it
+                                    }
+                                }
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = isMobilePublic,
+                                        onCheckedChange = { isMobilePublic = it }
+                                    )
+
+                                    Text(
+                                        text = "Public",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
 
                             SectionTitle("Professional Details")
                             DropdownFieldYear(
                                 label = "Branch",
                                 selected = branch,
-                                items = branchNames,
+                                items = branches.map { it.name },
                                 onSelect = { selectedName ->
 
                                     branch = selectedName
 
-                                    // find full object from name
                                     val branchObj = branches.find { it.name == selectedName }
-                                    selectedBranchId = branchObj?.id
+                                    selectedBranchId = branchObj?.id   // safe call
                                 }
                             )
 
@@ -366,7 +387,7 @@ fun ProfileScreen(navController: NavController) {
                                                 cityName = cityName,
                                                 deviceId = DeviceUtils.getDeviceId(context),
                                                 fcmToken = fcmToken,
-                                                appVersion = "1.0.6",
+                                                appVersion = "1.2.0",
                                                 advertisementId = "",
                                                 userAgent = "android"
                                             )

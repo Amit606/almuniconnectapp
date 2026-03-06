@@ -23,7 +23,7 @@ import com.google.android.play.integrity.internal.u
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddSocialChannelScreen(navController: NavController) {
 

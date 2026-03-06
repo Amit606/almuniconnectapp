@@ -29,7 +29,6 @@ class AuthRepository(
                 val body = response.body()
 
                 if (body != null) {
-                    Log.e("AuthRepository", "Signup Success: $body")
                     Result.success(body)
                 } else {
                     Result.failure(Exception("Empty response body"))
@@ -39,10 +38,7 @@ class AuthRepository(
 
                 val errorMsg = response.errorBody()?.string()
 
-                Log.e(
-                    "AuthRepository",
-                    "Signup Failed: ${response.code()} $errorMsg"
-                )
+
 
                 Result.failure(
                     Exception("HTTP ${response.code()}: $errorMsg")
@@ -51,7 +47,6 @@ class AuthRepository(
 
         } catch (e: Exception) {
 
-            Log.e("AuthRepository", "Signup Exception: ${e.message}")
 
             Result.failure(e)
         }
@@ -90,8 +85,6 @@ class AuthRepository(
                 refreshTokenExpiry = body.data?.refreshTokenExpiry.orEmpty()
             )
 
-            Log.e("AuthRepository", "Access Token: ${body.data?.accessToken?.take(30)}...")
-            Log.e("AuthRepository", "Check Email Success: ${body.data}")
             val user = body.data?.userProfile
 
 

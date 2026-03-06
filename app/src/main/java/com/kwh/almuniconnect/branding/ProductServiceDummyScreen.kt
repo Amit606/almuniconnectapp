@@ -1,4 +1,6 @@
 package com.kwh.almuniconnect.branding
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,46 +28,96 @@ import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.items
-
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun ProductServiceDummyScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: ProductServiceViewModel = viewModel()
+
 ) {
-    val context = LocalContext.current
 
     TrackScreen("product_details_screen")
+
+    val products by viewModel.products.collectAsState()
+    val loading by viewModel.loading.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadProducts()
+    }
 
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Service Details",
+                title = "Product/Service Details",
                 navController = navController
             )
         }
     ) { paddingValues ->
 
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(paddingValues)
         ) {
 
+            when {
 
+                loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
+                products.isEmpty() -> {
+                    Text(
+                        text = "No products available",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+
+                        items(products) { item ->
+                            ProductServiceCard(item,
+                                onClick =
+                                    {
+                                        navController.navigate("webview/${Uri.encode(item.link)}")
+                                    }
+                            )
+                        }
+
+                    }
+                }
+            }
         }
     }
 }
+
 @Composable
 fun ProductServiceCard(
-    item: ProductServiceItem
+    item: ProductServiceItem,
+    onClick: () -> Unit = { }
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {},
+            .clickable { onClick()},
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -87,7 +139,7 @@ fun ProductServiceCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
+                    .aspectRatio(16f / 9f)
             )
 
             Column(modifier = Modifier.padding(16.dp)) {

@@ -19,8 +19,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 19
-        versionName = "1.1.9"
+        versionCode = 21
+        versionName = "1.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -133,7 +133,6 @@ dependencies {
 
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
 
-    implementation ("com.drivemetadata:dmd-android-sdk:1.4.0") //dmd_1.3.7.aar
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")

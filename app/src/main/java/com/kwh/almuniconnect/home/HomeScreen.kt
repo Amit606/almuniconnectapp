@@ -3,6 +3,7 @@
 // Features: top app bar with search & notifications, banner, horizontal lists (Events, Jobs), feed (alumni posts), FAB, and bottom navigation.
 
 package com.kwh.almuniconnect.home
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.pager.HorizontalPager
@@ -52,6 +53,8 @@ import androidx.activity.compose.LocalActivity
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.almunipost.SuccessViewModel
+import com.kwh.almuniconnect.branding.ProductServiceCard
+import com.kwh.almuniconnect.branding.ProductServiceViewModel
 import com.kwh.almuniconnect.evetns.Event
 import com.kwh.almuniconnect.evetns.EventsUiState
 import com.kwh.almuniconnect.evetns.EventsViewModel
@@ -65,6 +68,7 @@ import java.time.LocalDateTime
 fun HomeScreen(
     navController: NavController,
     viewModel: SuccessViewModel=viewModel(),
+    pviewModel: ProductServiceViewModel = viewModel(),
 
     onOpenProfile: () -> Unit = {},
     onOpenMessages: () -> Unit = {},
@@ -86,6 +90,13 @@ fun HomeScreen(
     val user by userPrefs.getUser().collectAsState(
         initial = UserLocalModel()
     )
+    val products by pviewModel.products.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        pviewModel.loadProducts()
+    }
+
     RequestNotificationPermission(
         onPermissionGranted = {
             // 🔔 Notifications enabled
@@ -370,27 +381,27 @@ fun HomeScreen(
 
 
             // Jobs section
-//            item {
-//                SectionTitle(title = "Jobs & Opportunities", actionText = "More", onAction = {
-//                    AnalyticsManager.logEvent(
-//                        AnalyticsEvent.ScreenView("jobs_view_all")
-//                    )
-//                    navController.navigate(Routes.JOB_DETAILS)
-//                })
-//            }
+            item {
+                SectionTitle(title = "Product & Services", actionText = "More", onAction = {
+                    AnalyticsManager.logEvent(
+                        AnalyticsEvent.ScreenView("product_view_all")
+                    )
+                    navController.navigate(Routes.PRODUCT_SCREEN)
+                })
+            }
 
-//            item {
-//                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//                    items(dummyJobPosts) { job ->
-//                        JobMiniCard(job = job, onClick = {
-//                            AnalyticsManager.logEvent(
-//                                AnalyticsEvent.ScreenView("jobs_clicked_${job.title}")
-//                            )
-//                            navController.navigate("job_details/${job.jobId}")
-//                        })
-//                    }
-//                }
-//            }
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(products) { item ->
+                        ProductServiceCardNew(item,
+                            onClick =
+                                {
+                                    navController.navigate("webview/${Uri.encode(item.link)}")
+                                }
+                        )
+                    }
+                }
+            }
 
             // Feed
             item {

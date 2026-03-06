@@ -138,7 +138,7 @@ fun AlumniProfileScreen(
                         icon = Icons.Default.Phone,
                         label = "Mobile",
                         value = alumni.mobileNo.toString(),
-                        onClick = { callPhone(context, alumni.mobileNo.toString()) }
+                        onClick = {}
                     )
 
                     Divider()

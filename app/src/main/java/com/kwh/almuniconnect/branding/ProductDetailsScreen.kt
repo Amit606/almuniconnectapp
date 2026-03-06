@@ -62,7 +62,7 @@ fun ProductDetailsScreen(
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Service Details",
+                title = "Product/Service Details",
                 navController = navController
             )
         }

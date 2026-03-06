@@ -51,12 +51,11 @@ fun YearGridScreen(
         viewModel.getYearsByBranch(branchShort)
     }
 
-   // val years = viewModel.getYearsByBranch(branchShort)
 
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "$branchShort Alumni Network",
+                title = "$branchShort",
                 navController = navController,
             )
         }
