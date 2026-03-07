@@ -13,12 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
@@ -67,17 +70,8 @@ fun AlumniStoryDetailScreen(
             // ✅ Safe Image Handling
             item {
 
-                val drawableId = getDrawableId(story.image)
-
-                val imageRes =
-                    if (drawableId != 0) drawableId
-                    else R.drawable.man   // fallback placeholder
-
-                Image(
-                    painter = painterResource(id = imageRes),
-                    contentDescription = "Alumni Cover",
-                    contentScale = ContentScale.Crop,   // better for profile cover
-                    alignment = Alignment.TopCenter,    // prevents head cut
+                SafeImage(
+                    image = story.image,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(260.dp)
@@ -194,4 +188,34 @@ fun CategoryChip(category: StoryCategory?) {
             fontWeight = FontWeight.Medium
         )
     }
+}
+@Composable
+fun SafeImage(
+    image: String?,
+    modifier: Modifier = Modifier
+) {
+
+    val context = LocalContext.current
+
+    val drawableId = if (!image.isNullOrEmpty()) getDrawableId(image) else 0
+
+    val model: Any =
+        when {
+            image.isNullOrBlank() -> R.drawable.man
+            image.startsWith("http") -> image
+            drawableId != 0 -> drawableId
+            else -> R.drawable.man
+        }
+
+    AsyncImage(
+        model = ImageRequest.Builder(context)
+            .data(model)
+            .crossfade(true)
+            .build(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(R.drawable.man),
+        error = painterResource(R.drawable.man),
+        modifier = modifier
+    )
 }

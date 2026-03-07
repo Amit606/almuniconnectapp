@@ -25,6 +25,10 @@ import androidx.navigation.NavController
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.analytics.TrackScreen
 import androidx.compose.runtime.getValue
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.kwh.almuniconnect.R
+
 @Composable
 fun AlumniStoriesScreen(
     navController: NavController,
@@ -62,12 +66,18 @@ fun AlumniStoriesScreen(
         }
     }
 }
+
+
 @Composable
 fun AlumniStoryCard(
     story: AlumniStory,
     onClick: () -> Unit
 ) {
-    val imageRes = getDrawableId(story.image)
+
+    val imageModel = when {
+        story.image.startsWith("http") -> story.image
+        else -> getDrawableId(story.image)
+    }
 
     Card(
         onClick = onClick,
@@ -83,14 +93,18 @@ fun AlumniStoryCard(
         ) {
 
             // 🔥 Blurred Background
-            Image(
-                painter = painterResource(id = imageRes),
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageModel)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                alignment = Alignment.TopCenter,   // prevents head cut
                 modifier = Modifier
                     .matchParentSize()
-                    .blur(20.dp)
+                    .blur(20.dp),
+                error = painterResource(R.drawable.man),
+                placeholder = painterResource(R.drawable.man)
             )
 
             Box(
@@ -105,14 +119,16 @@ fun AlumniStoryCard(
                     .padding(20.dp)
             ) {
 
-                Image(
-                    painter = painterResource(id = imageRes),
+                AsyncImage(
+                    model = imageModel,
                     contentDescription = story.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(90.dp)
                         .clip(CircleShape)
-                        .border(3.dp, Color.White, CircleShape)
+                        .border(3.dp, Color.White, CircleShape),
+                    error = painterResource(R.drawable.man),
+                    placeholder = painterResource(R.drawable.man)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -140,6 +156,7 @@ fun AlumniStoryCard(
                 )
 
                 if (story.featured) {
+
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Box(
