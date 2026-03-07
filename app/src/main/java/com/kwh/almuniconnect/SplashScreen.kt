@@ -82,7 +82,7 @@ fun SplashScreen(navController: NavController) {
 
         // 🔥 Navigation Decision
 
-        if (!isLoggedIn) {
+        if (isLoggedIn) { //!isLoggedIn
             navController.navigate(Routes.INTRO) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
             }

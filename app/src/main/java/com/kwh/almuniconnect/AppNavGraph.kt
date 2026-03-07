@@ -341,20 +341,35 @@ fun AppNavGraph(
 
 
         val pages = listOf(
+
             IntroPage(
-                "Connect with Alumni",
-                "Stay connected with batchmates, seniors, and the global Harcourtian alumni network.",
-                R.drawable.first
+                "Once a Harcourtian, Always a Harcourtian",
+                "Your journey at Harcourt never truly ends. Reconnect with the people who shared your classrooms, hostels, memories, and dreams.",
+                R.drawable.ic_first
             ),
+
             IntroPage(
-                "Explore Opportunities",
-                "Access jobs, referrals, events, and mentorship opportunities from alumni.",
-                R.drawable.second
+                "Reconnect with the Alumni Network",
+                "Stay connected with batchmates, seniors, juniors, and Harcourtians across the globe. Build meaningful relationships that last beyond campus.",
+                R.drawable.ic_second
             ),
+
             IntroPage(
-                "Give Back to Harcourtian",
-                "Contribute to students, campus initiatives, and the future of Harcourtian.",
-                R.drawable.third
+                "Discover Talent, Products & Services",
+                "Explore startups, innovations, products, and professional services created by fellow Harcourtians. Support alumni talent and collaborate together.",
+                R.drawable.ic_third
+            ),
+
+            IntroPage(
+                "Opportunities & Mentorship",
+                "Find jobs, referrals, internships, and mentorship from experienced alumni. Grow your career with guidance from the Harcourtian network.",
+                R.drawable.ic_fourth
+            ),
+
+            IntroPage(
+                "Give Back to the Community",
+                "Share opportunities, guide students, support alumni ventures, and help strengthen the Harcourtian legacy for the next generation.",
+                R.drawable.ic_fifth
             )
 
         )
