@@ -86,17 +86,20 @@ fun ProfileScreen(navController: NavController,
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
     val years = (1972..2026).map { it.toString() }
-    val safeYear = if (year in years) year else ""
+    val safeYear = year.trim().takeIf { it in years } ?: ""
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
     }
-
+    LaunchedEffect(branches, branch) {
+        val branchObj = branches.find { it.name == branch }
+        selectedBranchId = branchObj?.id
+    }
     LaunchedEffect(user) {
         name = user.name
         email = user.email
         mobile = user.mobile
         branch = user.branch
-        year = user.year
+        year = user.year.trim()
         job = user.job
         cityName = user.cityName
         linkedin = user.linkedin
@@ -122,7 +125,7 @@ fun ProfileScreen(navController: NavController,
                         mobile = profile.mobileNo ?: "",
                         branch = profile.courseName ?: "",
                         branchId = profile.courseId ?: 0,
-                        year = profile.passoutYear.toString()?:"",
+                        year = profile.passoutYear.toString() ,    // FIX
                         job = profile.companyName ?: "",
                         cityName = profile.cityName?:"",
                         linkedin = profile.linkedinUrl ?: "",
@@ -296,19 +299,6 @@ fun ProfileScreen(navController: NavController,
                                     }
                                 }
 
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Checkbox(
-                                        checked = isMobilePublic,
-                                        onCheckedChange = { isMobilePublic = it }
-                                    )
-
-                                    Text(
-                                        text = "Public",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
                             }
 
                             SectionTitle("Professional Details")
