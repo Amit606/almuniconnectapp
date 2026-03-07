@@ -154,27 +154,46 @@ fun HarcourtianTalentScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+
                 items(
                     items = talents,
-                    key = { it.id }   // better performance
+                    key = { it.id }
                 ) { talent ->
+
+                    val isYoutube = talent.videoLink.contains("youtube.com") ||
+                            talent.videoLink.contains("youtu.be")
 
                     TalentYoutubeStyleCard(
                         talent = talent,
                         onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, talent.videoLink.toUri())
-                            intent.setPackage("com.google.android.youtube") // Try YouTube app first
 
-                            try {
-                                context.startActivity(intent)
-                            } catch (e: ActivityNotFoundException) {
-                                // If YouTube app not installed → open in browser
-                                val browserIntent = Intent(Intent.ACTION_VIEW,
-                                    talent.videoLink.toUri())
-                                context.startActivity(browserIntent)
+                            if (isYoutube) {
+
+                                val intent = Intent(Intent.ACTION_VIEW, talent.videoLink.toUri())
+                                intent.setPackage("com.google.android.youtube")
+
+                                try {
+                                    context.startActivity(intent)
+                                } catch (e: ActivityNotFoundException) {
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW, talent.videoLink.toUri())
+                                    )
+                                }
+
+                            } else {
+
+                                val intent = Intent(Intent.ACTION_VIEW, talent.videoLink.toUri())
+                                intent.setPackage("com.android.chrome")
+
+                                try {
+                                    context.startActivity(intent)
+                                } catch (e: ActivityNotFoundException) {
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW, talent.videoLink.toUri())
+                                    )
+                                }
                             }
                         }
-
                     )
                 }
             }
@@ -229,9 +248,9 @@ fun TalentYoutubeStyleCard(
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    error = painterResource(R.drawable.third_screen),
-                    placeholder = painterResource(R.drawable.third_screen),
-                    fallback = painterResource(R.drawable.third_screen)
+                    error = painterResource(R.drawable.ic_second),
+                    placeholder = painterResource(R.drawable.ic_second),
+                    fallback = painterResource(R.drawable.ic_second)
                 )
 
 

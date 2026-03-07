@@ -65,7 +65,7 @@ class AuthRepository(
         return try {
 
             val response = api.checkEmailExist(email)//
-          //  val response = api.checkEmailExist("amitsun.noida@gmail.com")//
+           // val response = api.checkEmailExist("amitsun.noida@gmail.com")//
 
 
             if (!response.isSuccessful) {

@@ -47,10 +47,6 @@ fun AddTalentScreen(
 
     val viewModel: TalentViewModel = viewModel()
     val context = LocalContext.current
-    var name by remember { mutableStateOf("") }
-    var branch by remember { mutableStateOf("") }
-    var year by remember { mutableStateOf("") }
-    var talent by remember { mutableStateOf("") }
     var link by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }

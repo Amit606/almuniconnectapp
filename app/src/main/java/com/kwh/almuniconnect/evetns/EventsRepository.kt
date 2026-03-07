@@ -23,7 +23,7 @@ fun EventDto.toUiEvent(): Event {
         date = startAt.substring(0, 10), // simple formatting
         price = "Free",
         description = description,
-        image = R.drawable.first, // local drawable
+        image = R.drawable.ic_demo_events, // local drawable
         startAt = startAt,
         endAt = endAt
     )

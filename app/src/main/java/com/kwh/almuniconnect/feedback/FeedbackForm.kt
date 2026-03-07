@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.storage.UserLocalModel
@@ -126,9 +127,11 @@ fun submitFeedback(
 
     val versionName = packageInfo.versionName
     val versionCode = packageInfo.longVersionCode
-
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+        ?: throw Exception("User not logged in")
     val feedbackData = hashMapOf(
-        "userId" to userId,
+        "userId" to uid,
+        "uid" to userId,
         "name" to name,
         "email" to email,
         "message" to message,
