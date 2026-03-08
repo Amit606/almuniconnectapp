@@ -26,5 +26,38 @@ sealed class AnalyticsEvent(
         AnalyticsEvent("event_registered", mapOf("event_id" to eventId))
 
     // Engagement
-    object NotificationOpened : AnalyticsEvent("notification_opened")
+    // Notifications
+    data class NotificationReceived(
+        val type: String?,
+        val destination: String?
+    ) : AnalyticsEvent(
+        "notification_received",
+        mapOf(
+            "type" to (type ?: ""),
+            "destination" to (destination ?: "")
+        )
+    )
+
+    data class NotificationOpened(
+        val type: String?,
+        val destination: String?
+    ) : AnalyticsEvent(
+        "notification_opened",
+        mapOf(
+            "type" to (type ?: ""),
+            "destination" to (destination ?: "")
+        )
+    )
+
+    data class NotificationCTAClicked(
+        val type: String?,
+        val destination: String?
+    ) : AnalyticsEvent(
+        "notification_cta_clicked",
+        mapOf(
+            "type" to (type ?: ""),
+            "destination" to (destination ?: "")
+        )
+    )
+
 }

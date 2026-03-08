@@ -16,6 +16,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
+import com.kwh.almuniconnect.analytics.AnalyticsEvent
+import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.ui.theme.LinkedTheme
 import kotlinx.coroutines.CoroutineScope
@@ -117,6 +119,12 @@ private fun handleNotificationIntent(
     if (intent == null) return
 
     val fromNotification = intent.getBooleanExtra("from_notification", false)
+    AnalyticsManager.logEvent(
+        AnalyticsEvent.NotificationOpened(
+            type = intent.getStringExtra("type"),
+            destination = intent.getStringExtra("destination")
+        )
+    )
     if (!fromNotification) return
 
     val destination = intent.getStringExtra("destination")

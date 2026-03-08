@@ -125,7 +125,6 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-perf")
-    implementation ("com.github.bumptech.glide:glide:5.0.5")
     implementation ("com.android.billingclient:billing-ktx:6.2.1")
 
     implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
@@ -138,4 +137,8 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
+
+
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
 }

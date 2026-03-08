@@ -105,23 +105,23 @@ fun JobListingScreen(navController: NavController) {
                 title = "Job Listings",
                 navController = navController,
 
-//                rightAction = {
-//                    IconButton(
-//                        onClick = {
-//                            if (false) {
-//                                navController.navigate(Routes.JOB_POST)
-//                            } else {
-//                                showSubscriptionDialog = true
-//                            }
-//                        }
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.PostAdd,
-//                            contentDescription = "Add Job"
-//                        )
-//                    }
-//
-//                    }
+                rightAction = {
+                    IconButton(
+                        onClick = {
+                            if (true) {
+                                navController.navigate(Routes.JOB_POST)
+                            } else {
+                                showSubscriptionDialog = true
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PostAdd,
+                            contentDescription = "Add Job"
+                        )
+                    }
+
+                    }
 
             )
         }
