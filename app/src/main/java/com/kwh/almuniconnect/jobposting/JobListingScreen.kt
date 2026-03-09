@@ -72,6 +72,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.network.openUrl
 import com.kwh.almuniconnect.utils.CommonEmptyState
 import com.kwh.almuniconnect.utils.getTimeAgo
 
@@ -248,17 +249,19 @@ fun JobCard(job:JobAPost,navController: NavController) {
                     color = Color.Gray
                 )
 
-//                Button(
-//                    onClick = { openUrl(context,"https://www.google.com") },
-//                    shape = RoundedCornerShape(8.dp),
-//                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
-//                ) {
-//                    Text(
-//                        text = "Apply Now",
-//                        style = MaterialTheme.typography.bodySmall,
-//                        fontWeight = FontWeight.SemiBold
-//                    )
-//                }
+                Button(
+                    onClick = {
+                        navController.navigate("job_details/${job.jobId}")
+                              },
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "Explore Job",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
 
         }

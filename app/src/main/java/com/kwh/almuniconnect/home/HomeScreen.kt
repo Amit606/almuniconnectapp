@@ -132,13 +132,13 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
-//                    IconButton(onClick = {  navController.navigate(Routes.FEED) }) {
-//                        Icon(
-//                            Icons.Default.Emergency,
-//                            tint = Color.Red, // Gold highlight
-//                            contentDescription = "Emergency Help"
-//                        )
-//                    }
+                    IconButton(onClick = {  navController.navigate(Routes.NEARBY_HARCOURTIANS) }) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            tint = Color.Red, // Gold highlight
+                            contentDescription = "Emergency Help"
+                        )
+                    }
 //                    IconButton(onClick = { navController.navigate(Routes.SUBSCRIPTION) }) {
 //                        Icon(
 //                            Icons.Default.WorkspacePremium,

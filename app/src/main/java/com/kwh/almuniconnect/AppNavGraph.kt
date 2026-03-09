@@ -110,9 +110,12 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-         // SplashScreen(navController)
-            NearbyHarcourtianScreen()
+         SplashScreen(navController)
+           // NearbyHarcourtianScreen()
 
+        }
+        composable(Routes.NEARBY_HARCOURTIANS) {
+            NearbyHarcourtianScreen(navController)
         }
 
         composable(Routes.TALENT_LIST) {
@@ -489,19 +492,15 @@ fun AppNavGraph(
             )
         ) { backStackEntry ->
 
-//            val jobId = backStackEntry.arguments?.getString("jobId")
-//
-//
-//
-//            job?.let {
-//                JobDetailScreen(
-//                    navController = navController,
-//                    job = it
-//                )
-//            }
+            val jobId = backStackEntry.arguments?.getString("jobId")
+            Log.e("JobDetail", "Received jobId: $jobId")
+            jobId?.let {
+                JobDetailScreen(
+                    navController = navController,
+                    jobId = it
+                )
+            }
         }
-
-
 
         composable(Routes.JOB_POST){
             JobPostScreen(navController)

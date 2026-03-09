@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.jobposting
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -19,15 +20,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.analytics.TrackScreen
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobDetailScreen(navController: NavController,job: JobAPost) {
+fun JobDetailScreen(
+    navController: NavController,
+    jobId: String
+) {
 
     TrackScreen("job_detail_screen")
+
+    val apiService = remember {
+        NetworkClient.createService(ApiService::class.java)
+    }
+
+    val repository = remember { JobRepository(apiService) }
+
+    val viewModel: JobViewModel = viewModel(
+        factory = JobViewModelFactory(repository)
+    )
+
+    val state = viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadJobs()
+    }
 
     Scaffold(
         topBar = {
@@ -37,85 +65,169 @@ fun JobDetailScreen(navController: NavController,job: JobAPost) {
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color.White)
-                .padding(16.dp)
-        ) {
 
-            item {
-                Text(
-                    text = job.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
+        when (val result = state.value) {
 
-                Text(job.description,  style = MaterialTheme.typography.labelMedium)
+            is JobState.Loading -> {
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
 
-            item {
-                InfoRow("📍 Location", job.location)
-                InfoRow("💼 Experience", job.totalExperience)
-                InfoRow("💰 Salary", job.salary)
-                InfoRow("🕒 Job Type", job.employmentType)
+            is JobState.Error -> {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(result.message)
+                }
             }
 
+            is JobState.Success -> {
 
-            item {
-                SectionTitle("Job Description")
-                Text(job.description,  style = MaterialTheme.typography.labelSmall,
-                )
-            }
-            item {
-                SectionTitle("Job Referer by")
-                Text("Amit Kumar Gupta",  style = MaterialTheme.typography.labelSmall,)
-                Text("Datability Technology",  style = MaterialTheme.typography.labelSmall,)
+                val job = result.jobs.find { it.jobId == jobId }
 
-            }
+                if (job == null) {
 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Job not found")
+                    }
 
+                } else {
 
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                ApplyButton()
+                    JobDetailContent(job, paddingValues)
+
+                }
             }
         }
     }
 }
 @Composable
+fun JobDetailContent(job: JobAPost, paddingValues: PaddingValues) {
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+
+        item {
+
+            Text(
+                text = job.title,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = job.description,
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        item {
+
+            InfoRow("📍 Location", job.location)
+            InfoRow("💼 Experience", job.totalExperience)
+            InfoRow("💰 Salary", job.salary)
+            InfoRow("🕒 Job Type", job.employmentType)
+
+        }
+
+        item {
+
+            SectionTitle("Job Description")
+
+            Text(
+                text = job.description,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+
+        item {
+
+            SectionTitle("Job Referred By")
+
+            Text("Amit Kumar Gupta")
+            Text("Datability Technology")
+        }
+
+        item {
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            ApplyButton()
+        }
+    }
+}
+@Composable
 fun InfoRow(label: String, value: String) {
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.bodySmall)
-        Text(value,  style = MaterialTheme.typography.bodySmall)
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
+
     Spacer(modifier = Modifier.height(8.dp))
 }
+
 @Composable
 fun SectionTitle(title: String) {
+
     Spacer(modifier = Modifier.height(16.dp))
+
     Text(
         text = title,
         style = MaterialTheme.typography.bodySmall
     )
+
     Spacer(modifier = Modifier.height(8.dp))
 }
 
-
 @Composable
 fun ApplyButton() {
+
     Button(
         onClick = {
-            // TODO: open email / web / WhatsApp
+            // TODO open WhatsApp / Email / Apply link
         },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text("Apply Now", style = MaterialTheme.typography.bodyMedium)
+
+        Text(
+            text = "Apply Now",
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }

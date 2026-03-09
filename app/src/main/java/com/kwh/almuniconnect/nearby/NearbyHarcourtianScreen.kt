@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
 import com.google.accompanist.permissions.*
@@ -89,6 +90,7 @@ var alumniList by mutableStateOf(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NearbyHarcourtianScreen(
+    navController: NavController,
     viewModel: NearbyAlumniViewModel = viewModel()
 ) {
 
@@ -103,7 +105,7 @@ fun NearbyHarcourtianScreen(
                     Text("Nearby Harcourtians")
                 },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { navController.popBackStack()}) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
