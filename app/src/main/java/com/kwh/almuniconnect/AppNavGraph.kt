@@ -30,7 +30,6 @@ import com.kwh.almuniconnect.intro.IntroScreen
 import com.kwh.almuniconnect.intro.NetworkUtils
 import com.kwh.almuniconnect.jobposting.JobDetailScreen
 import com.kwh.almuniconnect.jobposting.JobListingScreen
-import com.kwh.almuniconnect.jobposting.JobPostScreen
 import com.kwh.almuniconnect.login.LoginRoute
 import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
@@ -53,6 +52,7 @@ import com.kwh.almuniconnect.emergency.EmergencyRequestForm
 import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
+import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
 import com.kwh.almuniconnect.nearby.NearbyHarcourtianScreen
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniListScreen
@@ -503,7 +503,7 @@ fun AppNavGraph(
         }
 
         composable(Routes.JOB_POST){
-            JobPostScreen(navController)
+            JobPostByEmailScreen(navController)
         }
         composable(Routes.PRODUCT_SCREEN){
             ProductServiceDummyScreen(navController)

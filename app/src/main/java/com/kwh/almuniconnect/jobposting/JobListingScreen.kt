@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CurrencyRupee
@@ -68,8 +69,13 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.network.openUrl
@@ -182,8 +188,8 @@ fun JobListingScreen(navController: NavController) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun JobCard(job:JobAPost,navController: NavController) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+fun JobCard(job: JobAPost, navController: NavController) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -194,11 +200,12 @@ fun JobCard(job:JobAPost,navController: NavController) {
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
+
         Column(modifier = Modifier.padding(16.dp)) {
 
             // Title
             Text(
-                text = "${job.title} | ${job.totalExperience} | ${job.location}",
+                text = "${job.title} | ${job.totalExperience ?: "Not specified"} | ${job.location ?: "Remote"}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -210,30 +217,39 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                InfoItem(Icons.Default.Work, job.totalExperience)
-                InfoItem(Icons.Default.CurrencyRupee, "Not disclosed")
-                InfoItem(Icons.Default.LocationOn, job.location)
 
+                InfoItem(
+                    Icons.Default.Work,
+                    job.totalExperience ?: "Not specified"
+                )
+
+                InfoItem(
+                    Icons.Default.CurrencyRupee,
+                    job.salary ?: "Not disclosed"
+                )
+
+                InfoItem(
+                    Icons.Default.LocationOn,
+                    job.location ?: "Remote"
+                )
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            InfoItem(Icons.Default.Timer, job.employmentType)
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Skills
+            InfoItem(
+                Icons.Default.Timer,
+                job.employmentType ?: "Full Time"
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Description
             Text(
                 text = job.description,
                 style = MaterialTheme.typography.bodySmall
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
-//            InfoItemClick(Icons.Default.ChevronRight, " Job Posted By Amit Kumar Gupta"){
-//                navController.navigate(Routes.HOME)
-//            }
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-
 
             // Footer
             Row(
@@ -243,6 +259,7 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Text(
                     text = getTimeAgo(job.createdAtUtc),
                     style = MaterialTheme.typography.bodySmall,
@@ -252,9 +269,12 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 Button(
                     onClick = {
                         navController.navigate("job_details/${job.jobId}")
-                              },
+                    },
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
+                    contentPadding = PaddingValues(
+                        horizontal = 20.dp,
+                        vertical = 8.dp
+                    )
                 ) {
                     Text(
                         text = "Explore Job",
@@ -262,10 +282,32 @@ fun JobCard(job:JobAPost,navController: NavController) {
                         fontWeight = FontWeight.SemiBold
                     )
                 }
+
             }
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(job.photoUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Alumni Photo",
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape),
+                    placeholder = painterResource(R.drawable.man),
+                    error = painterResource(R.drawable.man),
+                    fallback = painterResource(R.drawable.man)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Posted by ${job.alumniName}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
-
     }
 }
 

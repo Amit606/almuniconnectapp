@@ -79,7 +79,7 @@ fun ProfileScreen(navController: NavController,
     var mobile by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
     var totalExp by remember { mutableStateOf<Int?>(null) }
-    val totalYear = (1..30).toList()
+    val totalYear = (1..60).toList()
     var job by remember { mutableStateOf("") }
     var cityName by remember { mutableStateOf("") }
     var linkedin by remember { mutableStateOf("") }

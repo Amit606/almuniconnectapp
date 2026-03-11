@@ -1,78 +1,37 @@
 package com.kwh.almuniconnect.jobposting
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.kwh.almuniconnect.api.JobPostRequest
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
-import android.util.Patterns
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobPostScreen(
+fun JobPostByEmailScreen(
     navController: NavController,
     viewModel: JobPostViewModel = viewModel(),
     onSubmit: (JobPost) -> Unit = {}
 ) {
-    val jobTypes = listOf("Full-time", "Part-time", "Remote", "Hybrid", "Internship", "Contract")
-
-    var title by remember { mutableStateOf("") }
-    var company by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var experience by remember { mutableStateOf("") }
-    var salary by remember { mutableStateOf("") }
-    var jobType by remember { mutableStateOf("") }
-    var skills by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var applyEmail by remember { mutableStateOf("") }
-    var websiteUrl by remember { mutableStateOf("") }
-    var linkedinUrl by remember { mutableStateOf("") }
-
-    var showErrors by remember { mutableStateOf(false) }
-
-    val isFormValid =
-        title.isNotBlank() &&
-                company.isNotBlank() &&
-                location.isNotBlank() &&
-                experience.isNotBlank() &&
-                jobType.isNotBlank() &&
-                skills.isNotBlank() &&
-                description.isNotBlank() &&
-                isValidEmail(applyEmail) &&
-                isValidUrl(websiteUrl) &&
-                isValidUrl(linkedinUrl)
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -88,154 +47,73 @@ fun JobPostScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(15.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(14.dp))
 
-            SectionHeader("Job Information")
-
-            AppTextField(
-                "Job Title",
-                title,
-                { title = it },
-                isError = showErrors && title.isBlank(),
-                errorText = "Job title required"
-            )
-
-            AppTextField(
-                "Company Name",
-                company,
-                { company = it },
-                isError = showErrors && company.isBlank(),
-                errorText = "Company name required"
-            )
-
-            AppTextField(
-                "Location",
-                location,
-                { location = it },
-                isError = showErrors && location.isBlank(),
-                errorText = "Location required"
-            )
-
-            AppTextField(
-                "Experience (e.g. 2–5 Years)",
-                experience,
-                { experience = it },
-                isError = showErrors && experience.isBlank(),
-                errorText = "Experience required"
-            )
-
-            AppTextField("Salary (Optional)", salary, { salary = it })
-
-            AppTextField(
-                "Job Type (Full-time / Remote)",
-                jobType,
-                { jobType = it },
-                isError = showErrors && jobType.isBlank(),
-                errorText = "Job type required"
-            )
-
-            SectionHeader("Skills & Description")
-
-            AppTextField(
-                "Skills (comma separated)",
-                skills,
-                { skills = it },
-                isError = showErrors && skills.isBlank(),
-                errorText = "Skills required"
-            )
-
-            AppTextField(
-                "Job Description",
-                description,
-                { description = it },
-                isError = showErrors && description.isBlank(),
-                errorText = "Description required",
-                maxLines = 4
-            )
-
-            SectionHeader("Apply Details")
-
-            AppTextField(
-                "Apply Email",
-                applyEmail,
-                { applyEmail = it },
-                keyboardType = KeyboardType.Email,
-                isError = showErrors && !isValidEmail(applyEmail),
-                errorText = "Valid email required"
-            )
-
-            AppTextField(
-                "Company Website URL",
-                websiteUrl,
-                { websiteUrl = it },
-                keyboardType = KeyboardType.Uri,
-                isError = showErrors && !isValidUrl(websiteUrl),
-                errorText = "Invalid website URL"
-            )
-
-            AppTextField(
-                "LinkedIn Job URL",
-                linkedinUrl,
-                { linkedinUrl = it },
-                keyboardType = KeyboardType.Uri,
-                isError = showErrors && !isValidUrl(linkedinUrl),
-                errorText = "Invalid LinkedIn URL"
+            Text(
+                text = "🤝 One Opportunity Can Change Someone’s Life\n\n" +
+                        "Many Harcourtians are looking for the right opportunity to grow in their careers. " +
+                        "If you know about any job opening in your company or network, please share it with us.\n\n" +
+                        "Our team will verify the job details and publish it in the app so fellow alumni can apply. " +
+                        "Your small effort can help a Harcourtians take the next big step in life.",
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                color = Color.Black
             )
 
             Spacer(modifier = Modifier.height(24.dp))
+
+
+
+//            Button(
+//                onClick = {
+//                    val message = "Job Opportunity"
+//
+//                    val intent = Intent(Intent.ACTION_VIEW)
+//                    intent.data = Uri.parse("https://wa.me/?text=${Uri.encode(message)}")
+//
+//                    context.startActivity(intent)
+//                },
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text("Share Job via WhatsApp", fontSize = 16.sp)
+//            }
+
 
             Button(
                 onClick = {
-                    showErrors = true
-                    if (isFormValid) {
-                        viewModel.postJob(
-                            JobPostRequest(
-                                title = title,
-                                description = description,
-                                company = company,
-                                location = location,
-                                employmentType = jobType,
-                                totalExperience = experience,
-                                salary = salary,
-                                expiresAt = "2026-01-31" // TODO: DatePicker later
-                            )
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = "mailto:".toUri()
+
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf("support@appschance.com"))
+                        putExtra(Intent.EXTRA_BCC, arrayOf("amitsun.noida@gmail.com"))
+
+                        putExtra(Intent.EXTRA_SUBJECT, "Job Opportunity from Alumni")
+
+                        putExtra(
+                            Intent.EXTRA_TEXT,
+                            """
+Job Opportunity Details
+
+
+Shared by Alumni via Harcourtian Alumni Connect App
+                """.trimIndent()
                         )
                     }
+
+                    context.startActivity(intent)
                 },
-                enabled = isFormValid && !viewModel.loading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (viewModel.loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = Color.White
-                    )
-                } else {
-                    Text("Publish Job", fontSize = 16.sp)
-                }
-            }
-            LaunchedEffect(viewModel.success) {
-                if (viewModel.success) {
-                    Toast.makeText(
-                        navController.context,
-                        "Job posted successfully!",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    navController.popBackStack()
-                }
+                Text("Share Job via Email", fontSize = 16.sp)
             }
 
-            viewModel.error?.let {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
+
+
+
+
         }
     }
 }
