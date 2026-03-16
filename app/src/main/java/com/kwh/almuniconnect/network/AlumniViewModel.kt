@@ -69,7 +69,7 @@ class AlumniViewModel(
 
             val result = repository.getAlumniList(
                 pageNumber = 1,
-                pageSize = 100,
+                pageSize = 500,
                 ascending = false
             )
 
@@ -83,6 +83,7 @@ class AlumniViewModel(
             }
         }
     }
+
 
     /* ---------------- YEAR GROUPING ---------------- */
 

@@ -20,7 +20,7 @@ class BranchViewModel(
     val branches = repository.getBranches()
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
+            SharingStarted.WhileSubscribed(2000),
             emptyList()
         )
 

@@ -54,6 +54,8 @@ import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
 import com.kwh.almuniconnect.nearby.NearbyHarcourtianScreen
+import com.kwh.almuniconnect.network.AlumniBatchViewModel
+import com.kwh.almuniconnect.network.AlumniBatchViewModelFactory
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniListScreen
 import com.kwh.almuniconnect.network.AlumniRepository
@@ -185,28 +187,26 @@ fun AppNavGraph(
             )
         ) { backStackEntry ->
 
-            val branchId =
-                backStackEntry.arguments?.getInt("branchId") ?: return@composable
+            val branchId = backStackEntry.arguments?.getInt("branchId") ?: 0
+            val branchShort = backStackEntry.arguments?.getString("branchShort") ?: ""
 
-            val branchShort =
-                backStackEntry.arguments?.getString("branchShort") ?: return@composable
-            // 🔥 CREATE REPOSITORY
-            // ✅ Create ApiService from NetworkClient
+            // Create ApiService
             val apiService = remember {
                 NetworkClient.createService(ApiService::class.java)
             }
-            // 🔥 CREATE FACTORY
-            // ✅ Create Repository
+
+            // Create Repository
             val repository = remember {
                 AlumniRepository(apiService)
             }
 
-            // ✅ Create Factory
+            // Create ViewModel Factory
             val factory = remember {
-                AlumniViewModelFactory(repository)
+                AlumniBatchViewModelFactory(repository)
             }
-            // 🔥 CREATE VIEWMODEL
-            val viewModel: AlumniViewModel = viewModel(factory = factory)
+
+            // Create ViewModel
+            val viewModel: AlumniBatchViewModel = viewModel(factory = factory)
 
             YearGridScreen(
                 navController = navController,

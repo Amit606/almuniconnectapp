@@ -146,6 +146,14 @@ interface ApiService {
         @Query("ascending") ascending: Boolean = false
     ): Response<AlumniApiResponse>
 
+    @GET("alumni/alumni-count")
+    suspend fun getAlumniCount(
+        @Query("courseId") courseId: Int
+    ): Response<AlumniCountResponse>
+
+
+
+
     @GET("auth/{email}/is-email-exist")
     suspend fun checkEmailExist(
         @Path(value = "email", encoded = true) email: String
@@ -207,3 +215,13 @@ data class VerifyProfileResponse(
 )
 
 
+data class AlumniCountResponse(
+    val success: Boolean,
+    val data: List<BatchCount>,
+    val message: String = ""
+)
+
+data class BatchCount(
+    val batch: Int,
+    val count: Int
+)
