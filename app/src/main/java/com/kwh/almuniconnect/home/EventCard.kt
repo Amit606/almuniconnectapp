@@ -104,9 +104,9 @@ fun EventCard(
                 model = ImageRequest.Builder(context)
                     .data(event.imageUrl?.takeIf { it.isNotBlank() })
                     .crossfade(true)
-                    .placeholder(R.drawable.ic_holi)      // While loading
-                    .error(R.drawable.ic_holi)        // Broken URL
-                    .fallback(R.drawable.ic_holi)       // Null / Blank URL
+                    .placeholder(R.drawable.ic_demo_events)      // While loading
+                    .error(R.drawable.ic_demo_events)        // Broken URL
+                    .fallback(R.drawable.ic_demo_events)       // Null / Blank URL
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,

@@ -28,7 +28,6 @@ import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
-
 @Composable
 fun AlumniListScreen(
     navController: NavController,
@@ -55,6 +54,7 @@ fun AlumniListScreen(
     }
 
     val allAlumni = viewModel.allAlumni
+    val isLoading = viewModel.isLoading
 
     val filteredList = remember(allAlumni, branchShort, year) {
         viewModel.getAlumniByBranchAndYear(branchShort, year)
@@ -70,7 +70,9 @@ fun AlumniListScreen(
     ) { paddingValues ->
 
         when {
-            allAlumni.isEmpty() -> {
+
+            // ✅ 1. Loading State
+            isLoading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -81,6 +83,7 @@ fun AlumniListScreen(
                 }
             }
 
+            // ✅ 2. No Data Found
             filteredList.isEmpty() -> {
                 Box(
                     modifier = Modifier
@@ -88,10 +91,14 @@ fun AlumniListScreen(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No Alumni Found")
+                    Text(
+                        text = "No Alumni Found 😔",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
 
+            // ✅ 3. Data Available
             else -> {
                 LazyColumn(
                     modifier = Modifier
@@ -122,6 +129,99 @@ fun AlumniListScreen(
         }
     }
 }
+//@Composable
+//fun AlumniListScreen(
+//    navController: NavController,
+//    branchShort: String,
+//    year: Int,
+//    modifier: Modifier = Modifier
+//) {
+//
+//    val apiService = remember {
+//        NetworkClient.createService(ApiService::class.java)
+//    }
+//
+//    val repository = remember {
+//        AlumniRepository(apiService)
+//    }
+//
+//    val viewModel: AlumniViewModel = viewModel(
+//        factory = AlumniViewModelFactory(repository)
+//    )
+//
+//    // 🔥 Load data once
+//    LaunchedEffect(Unit) {
+//        viewModel.loadAllAlumni()
+//    }
+//
+//    val allAlumni = viewModel.allAlumni
+//
+//    val filteredList = remember(allAlumni, branchShort, year) {
+//        viewModel.getAlumniByBranchAndYear(branchShort, year)
+//    }
+//
+//    Scaffold(
+//        topBar = {
+//            HBTUTopBar(
+//                title = "$branchShort - $year",
+//                navController = navController
+//            )
+//        }
+//    ) { paddingValues ->
+//
+//        when {
+//            allAlumni.isEmpty() -> {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .padding(paddingValues),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    CircularProgressIndicator()
+//                }
+//            }
+//
+//            filteredList.isEmpty() -> {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .padding(paddingValues),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Text("No Alumni Found")
+//                }
+//            }
+//
+//            else -> {
+//                LazyColumn(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .padding(paddingValues)
+//                        .padding(16.dp),
+//                    verticalArrangement = Arrangement.spacedBy(12.dp)
+//                ) {
+//
+//                    items(
+//                        items = filteredList,
+//                        key = { it.alumniId ?: it.hashCode() }
+//                    ) { alumni ->
+//
+//                        AlumniCard1(
+//                            alumni = alumni,
+//                            onClick = {
+//                                navController.currentBackStackEntry
+//                                    ?.savedStateHandle
+//                                    ?.set("alumni", alumni)
+//
+//                                navController.navigate("profile")
+//                            }
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 @Composable
 fun AlumniCard1(alumni: AlumniDto, onClick: () -> Unit) {
 

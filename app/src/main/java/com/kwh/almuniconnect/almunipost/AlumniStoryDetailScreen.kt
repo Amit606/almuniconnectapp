@@ -142,19 +142,19 @@ fun AlumniStoryDetailScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = "Message to Juniors",
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "“Stay curious, stay humble, and never forget your roots.”",
-                        fontSize = 15.sp,
-                        fontStyle = FontStyle.Italic
-                    )
+//                    Text(
+//                        text = "Message to Juniors",
+//                        fontSize = 17.sp,
+//                        fontWeight = FontWeight.Medium
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(6.dp))
+//
+//                    Text(
+//                        text = "“Stay curious, stay humble, and never forget your roots.”",
+//                        fontSize = 15.sp,
+//                        fontStyle = FontStyle.Italic
+//                    )
 
                     Spacer(modifier = Modifier.height(32.dp))
                 }

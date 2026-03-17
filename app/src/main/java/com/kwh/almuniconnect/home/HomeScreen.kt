@@ -92,7 +92,8 @@ fun HomeScreen(
     )
     val products by pviewModel.products.collectAsState()
 
-
+    val viewModel: NewsViewModel = viewModel()
+    val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) {
         pviewModel.loadProducts()
     }
@@ -446,16 +447,47 @@ fun HomeScreen(
 
             // News
             item {
-                SectionTitle(title = "News", actionText = "", onAction = {
-                    navController.navigate(Routes.ALMUNI_POST)
-                })
+                SectionTitle(
+                    title = "News",
+                    actionText = "",
+                    onAction = {
+                        navController.navigate(Routes.NEWS)
+                    }
+                )
             }
 
-            items(sampleNews()) { post ->
-                AlumniNews(post = post,onClick = {navController.navigate(Routes.NEWS)})
-                Spacer(modifier = Modifier.height(8.dp)) // 👈 space below title
+            when {
+                state.isLoading -> {
+                    item {
+                        Text("Loading...")
+                    }
+                }
 
+                state.error != null -> {
+                    item {
+                        Text("Error: ${state.error}")
+                    }
+                }
+
+                state.news.isEmpty() -> {
+                    item {
+                        Text("No news available")
+                    }
+                }
+
+                else -> {
+                    items(state.news) { post ->
+                        AlumniNews(
+                            post = post,
+                            onClick = {
+                                navController.navigate(Routes.NEWS)
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
             }
+        }
 
 
 
@@ -483,7 +515,7 @@ fun HomeScreen(
         }
 
     }
-}
+
 @Composable
 fun PagerDotsIndicator(
     pagerState: PagerState,
@@ -588,21 +620,6 @@ fun BottomAppBarWithNav(
 
 
 
-private fun sampleNews(): List<UniversityNews> {
-    return listOf(
-        UniversityNews(
-            id = "1",
-            title = "Harcourtian Holi Milan Announced 15 March 2026 🎉",
-            description = "The grand Harcourtian Holi Milan will be held on 15 March 2026. Registrations are open now.",
-            date = "15 march 2026",
-            imageUrl = "https://yourdomain.com/holi_banner.jpg",
-            category = "Alumni Event",
-            authorName = "Delhi/NCR Alumni Association",
-            authorImage = "https://yourdomain.com/logo.jpg"
-        )
-
-    )
-}
 data class UniversityNews(
     val id: String,
 

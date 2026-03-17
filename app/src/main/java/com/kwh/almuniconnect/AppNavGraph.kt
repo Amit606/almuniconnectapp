@@ -1,6 +1,5 @@
 package com.kwh.almuniconnect
 
-import AlumniViewModel
 import android.net.Uri
 import android.os.Build
 import android.util.Log

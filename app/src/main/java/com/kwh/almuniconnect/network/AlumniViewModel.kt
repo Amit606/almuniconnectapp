@@ -35,7 +35,8 @@ class AlumniViewModel(
 ) : ViewModel() {
 
     /* ---------------- PAGING SECTION ---------------- */
-
+    var isLoading by mutableStateOf(true)
+        private set
     private var ascendingOrder = false
 
     val alumniPagingFlow = Pager(
@@ -65,8 +66,9 @@ class AlumniViewModel(
         allAlumni = list
     }
     fun loadAllAlumni() {
-        viewModelScope.launch {
 
+        viewModelScope.launch {
+            isLoading=true
             val result = repository.getAlumniList(
                 pageNumber = 1,
                 pageSize = 500,
@@ -81,6 +83,8 @@ class AlumniViewModel(
             result.onFailure {
                 Log.e("VM_ERROR", it.message ?: "Unknown error")
             }
+            isLoading = false
+
         }
     }
 
