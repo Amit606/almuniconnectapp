@@ -115,48 +115,33 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
+
                 title = {
                     Text(
                         "Home",
                         color = Color.Black,
                         fontWeight = FontWeight.SemiBold,
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontSize = 20.sp   // 👈 change size here
+                            fontSize = 20.sp
                         )
-                        )
+                    )
                 },
-                actions = {
-                    IconButton(onClick = { navController.navigate(Routes.TALENT_LIST) }) {
-                        Icon(
-                            Icons.Default.Mic,
-                            tint = Color.Blue, // Gold highlight
-                            contentDescription = "Notifications"
-                        )
-                    }
-//                    IconButton(onClick = {  navController.navigate(Routes.NEARBY_HARCOURTIANS) }) {
-//                        Icon(
-//                            Icons.Default.LocationOn,
-//                            tint = Color.Red, // Gold highlight
-//                            contentDescription = "Emergency Help"
-//                        )
-//                    }
-//                    IconButton(onClick = { navController.navigate(Routes.SUBSCRIPTION) }) {
-//                        Icon(
-//                            Icons.Default.WorkspacePremium,
-//                            tint = Color.Blue, // Gold highlight
-//                            contentDescription = "Premium Access"
-//                        )
-//                    }
 
-                    IconButton(onClick = {
-                        navController.navigate(Routes.USER_PROFILE)
-                    }) {
+                // 👈 LEFT SIDE PROFILE
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Routes.USER_PROFILE)
+                        },
+                        modifier = Modifier.padding(start = 12.dp) // 👈 LEFT SPACE
+
+                    ) {
                         if (user.photo.isNotEmpty()) {
                             AsyncImage(
                                 model = user.photo,
                                 contentDescription = "Profile photo",
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(40.dp)
                                     .clip(CircleShape),
                                 contentScale = ContentScale.Crop
                             )
@@ -172,10 +157,35 @@ fun HomeScreen(
                         }
                     }
                 },
+
+                // 👉 RIGHT SIDE ACTIONS
+                actions = {
+
+                    // 🎤 Mic
+                    IconButton(
+                        onClick = { navController.navigate(Routes.TALENT_LIST) }
+                    ) {
+                        Icon(
+                            Icons.Default.Mic,
+                            tint = Color.Blue,
+                            contentDescription = "Mic"
+                        )
+                    }
+
+                    // ⚙️ Settings
+                    IconButton(
+                        onClick = { navController.navigate(Routes.SETTINGS) }
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings"
+                        )
+                    }
+                },
+
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
-                ),
-
+                )
             )
         },
 
@@ -189,8 +199,7 @@ fun HomeScreen(
                     }
                     BottomNavItem.JOBS -> onOpenMessages()
                     BottomNavItem.ChANNEL -> {navController.navigate(Routes.WHATSUP_CHANNEL)}
-
-                    BottomNavItem.Settings -> {navController.navigate(Routes.SETTINGS)}
+                    BottomNavItem.More -> {navController.navigate(Routes.MORE_FEATURES)}
                 }
             }
         },
@@ -564,7 +573,7 @@ private fun SectionTitle(title: String, actionText: String, onAction: () -> Unit
 
 
 // Bottom navigation items
-enum class BottomNavItem { Home, Network, JOBS,ChANNEL, Settings }
+enum class BottomNavItem { Home, Network, JOBS,ChANNEL,More }
 
 @Composable
 fun BottomAppBarWithNav(
@@ -603,10 +612,10 @@ fun BottomAppBarWithNav(
         )
 
         NavigationBarItem(
-            selected = selected == BottomNavItem.Settings,
-            onClick = { onSelect(BottomNavItem.Settings) },
-            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-            label = { Text("Settings") }
+            selected = selected == BottomNavItem.More,
+            onClick = { onSelect(BottomNavItem.More) },
+            icon = { Icon(Icons.Default.More, contentDescription = null) },
+            label = { Text("More") }
         )
     }}
 }

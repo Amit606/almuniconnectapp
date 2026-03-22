@@ -52,6 +52,9 @@ import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
+import com.kwh.almuniconnect.jobposting.jobprofile.CreateJobProfileScreen
+import com.kwh.almuniconnect.morefeature.MediaScreen
+import com.kwh.almuniconnect.morefeature.MoreFeaturesScreen
 import com.kwh.almuniconnect.nearby.NearbyHarcourtianScreen
 import com.kwh.almuniconnect.network.AlumniBatchViewModel
 import com.kwh.almuniconnect.network.AlumniBatchViewModelFactory
@@ -112,6 +115,10 @@ fun AppNavGraph(
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
          SplashScreen(navController)
+//            CreateJobProfileScreen { profile ->
+//                // Save to Firebase / Room
+//
+//            }
            // NearbyHarcourtianScreen()
 
         }
@@ -214,10 +221,14 @@ fun AppNavGraph(
                 viewModel = viewModel
             )
         }
-
         composable(Routes.NEWS) {
             NewsListingScreen(navController)
-
+        }
+        composable(Routes.MORE_FEATURES) {
+            MoreFeaturesScreen(navController)
+        }
+        composable(Routes.MEDIA_FEATURE) {
+            MediaScreen(navController)
         }
         composable(Routes.Internet_Splash) {
             NoInternetDialog(
