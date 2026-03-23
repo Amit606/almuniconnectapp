@@ -24,6 +24,14 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.staggeredgrid.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import coil.request.ImageRequest
+import coil.request.videoFrameMillis
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+
 data class MediaItem(
     val url: String = "",
     val type: String = "",
@@ -150,14 +158,94 @@ fun StaggeredMediaItem(item: MediaItem) {
 
         // ▶️ Video icon
         if (item.type == "video") {
-            Icon(
-                Icons.Default.PlayCircle,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(32.dp)
-                    .align(Alignment.Center)
-            )
+            YoutubeThumbnail(item.url)
+//            VideoThumbnailItem(
+//                thumbnailUrl = item.url,
+//                duration = item.title
+//            )
+//            Icon(
+//                Icons.Default.PlayCircle,
+//                contentDescription = null,
+//                tint = Color.White,
+//                modifier = Modifier
+//                    .size(32.dp)
+//                    .align(Alignment.Center)
+//            )
         }
+    }
+}
+@Composable
+fun YoutubeThumbnail(videoUrl: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .clip(RoundedCornerShape(12.dp))
+    ) {
+
+        AsyncImage(
+            model = getYoutubeThumbnail(videoUrl),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
+        )
+
+        Icon(
+            Icons.Default.PlayCircle,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier
+                .size(50.dp)
+                .align(Alignment.Center)
+        )
+    }
+}
+fun getYoutubeThumbnail(url: String): String {
+    return try {
+        val videoId = when {
+            url.contains("youtu.be") ->
+                url.substringAfter("youtu.be/").substringBefore("?")
+
+            url.contains("watch?v=") ->
+                url.substringAfter("v=").substringBefore("&")
+
+            else -> ""
+        }
+        "https://img.youtube.com/vi/$videoId/0.jpg"
+    } catch (e: Exception) {
+        ""
+    }
+}
+@Composable
+fun YouTubePlayerScreen(videoId: String) {
+
+    val context = LocalContext.current
+
+    AndroidView(
+        factory = {
+            YouTubePlayerView(context).apply {
+
+                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                    override fun onReady(player: YouTubePlayer) {
+                        player.loadVideo(videoId, 0f)
+                    }
+                })
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp)
+    )
+}
+
+fun extractYoutubeId(url: String): String {
+    return when {
+        url.contains("youtu.be") ->
+            url.substringAfter("youtu.be/").substringBefore("?")
+
+        url.contains("v=") ->
+            url.substringAfter("v=").substringBefore("&")
+
+        else -> ""
     }
 }
