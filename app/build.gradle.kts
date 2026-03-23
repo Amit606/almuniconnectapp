@@ -5,10 +5,7 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
     id("kotlin-kapt")
-
-
     id("com.google.gms.google-services") // ✅ MUST
-
 }
 
 android {
@@ -19,9 +16,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 24
-        versionName = "1.2.4"
-
+        versionCode = 25
+        versionName = "1.2.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

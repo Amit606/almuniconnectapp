@@ -1,8 +1,10 @@
 package com.kwh.almuniconnect
 
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +36,7 @@ import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
 import com.kwh.almuniconnect.almunipost.AlumniStoryDetailScreen
@@ -53,8 +56,10 @@ import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
 import com.kwh.almuniconnect.jobposting.jobprofile.CreateJobProfileScreen
+import com.kwh.almuniconnect.morefeature.ComingSoonScreen
 import com.kwh.almuniconnect.morefeature.MediaScreen
 import com.kwh.almuniconnect.morefeature.MoreFeaturesScreen
+import com.kwh.almuniconnect.morefeature.YoutubePlayerScreen
 import com.kwh.almuniconnect.nearby.NearbyHarcourtianScreen
 import com.kwh.almuniconnect.network.AlumniBatchViewModel
 import com.kwh.almuniconnect.network.AlumniBatchViewModelFactory
@@ -224,6 +229,12 @@ fun AppNavGraph(
         composable(Routes.NEWS) {
             NewsListingScreen(navController)
         }
+        composable("player/{videoId}") { backStackEntry ->
+            val videoId = Uri.decode(
+                backStackEntry.arguments?.getString("videoId") ?: ""
+            )
+            YoutubePlayerScreen(videoId,navController)
+        }
         composable(Routes.MORE_FEATURES) {
             MoreFeaturesScreen(navController)
         }
@@ -318,7 +329,6 @@ fun AppNavGraph(
                 ?.savedStateHandle
                 ?.get<AlumniDto>("alumni")
 
-            Log.e("AlumniProfile", "Received alumni: $alumni")
             alumni?.let {
                 AlumniProfileScreen(
                     alumni = it,
@@ -338,6 +348,38 @@ fun AppNavGraph(
         {
             FeedbackForm(navController)
 
+        }
+        composable(Routes.COMING_SOON)
+        {
+            ComingSoonScreen(
+                navController,
+                onNotifyClick = {
+
+                    if (isSubscribed(context)) {
+                        Toast.makeText(
+                            context,
+                            "Already subscribed ✅",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@ComingSoonScreen
+                    }
+
+                    FirebaseMessaging.getInstance().subscribeToTopic("coming_soon")
+                        .addOnCompleteListener { task ->
+
+                            if (task.isSuccessful) {
+
+                                setSubscribed(context) // ✅ save state
+
+                                Toast.makeText(
+                                    context,
+                                    "You’ll be notified 🚀",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                }
+            )
         }
 
         composable(Routes.LOGIN)
@@ -503,7 +545,6 @@ fun AppNavGraph(
         ) { backStackEntry ->
 
             val jobId = backStackEntry.arguments?.getString("jobId")
-            Log.e("JobDetail", "Received jobId: $jobId")
             jobId?.let {
                 JobDetailScreen(
                     navController = navController,
@@ -642,4 +683,13 @@ fun AppNavGraph(
 
 
     }
+}
+fun isSubscribed(context: Context): Boolean {
+    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    return prefs.getBoolean("coming_soon_subscribed", false)
+}
+
+fun setSubscribed(context: Context) {
+    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    prefs.edit().putBoolean("coming_soon_subscribed", true).apply()
 }

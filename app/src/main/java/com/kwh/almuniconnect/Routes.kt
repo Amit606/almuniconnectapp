@@ -77,5 +77,7 @@ object Routes {
     const val NEARBY_HARCOURTIANS ="nearby_harcourtians"
     const val MORE_FEATURES="more_features"
     const val MEDIA_FEATURE = "media_feature"
+    const val COMING_SOON = "coming_soon"
+
 
 }

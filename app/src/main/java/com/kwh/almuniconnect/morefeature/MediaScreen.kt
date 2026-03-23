@@ -1,4 +1,11 @@
 package com.kwh.almuniconnect.morefeature
+import android.R.attr.onClick
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import android.webkit.WebView
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,13 +31,18 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.foundation.lazy.staggeredgrid.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.request.ImageRequest
 import coil.request.videoFrameMillis
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import androidx.core.net.toUri
 
 data class MediaItem(
     val url: String = "",
@@ -96,7 +108,7 @@ fun MediaScreen(navController: NavController) {
                 ) {
 
                     items(filteredList) { item ->
-                        StaggeredMediaItem(item)
+                        StaggeredMediaItem(item,navController)
                     }
                 }
             }
@@ -108,7 +120,7 @@ fun MediaScreen(navController: NavController) {
     }
 }
 @Composable
-fun StaggeredMediaItem(item: MediaItem) {
+fun StaggeredMediaItem(item: MediaItem,navController: NavController) {
 
     val randomHeight = listOf(140.dp, 180.dp, 220.dp).random()
 
@@ -158,29 +170,31 @@ fun StaggeredMediaItem(item: MediaItem) {
 
         // ▶️ Video icon
         if (item.type == "video") {
-            YoutubeThumbnail(item.url)
-//            VideoThumbnailItem(
-//                thumbnailUrl = item.url,
-//                duration = item.title
-//            )
-//            Icon(
-//                Icons.Default.PlayCircle,
-//                contentDescription = null,
-//                tint = Color.White,
-//                modifier = Modifier
-//                    .size(32.dp)
-//                    .align(Alignment.Center)
-//            )
+            YoutubeThumbnail(
+                videoUrl = item.url,
+                onClick = { videoId ->
+                    // 🔥 Navigate to player screen
+                    navController.navigate("player/${Uri.encode(videoId)}")
+                   // navController.navigate("player/$videoId")
+                }
+            )
         }
     }
 }
 @Composable
-fun YoutubeThumbnail(videoUrl: String) {
+fun YoutubeThumbnail(
+    videoUrl: String,
+    onClick: (String) -> Unit
+) {
+    val videoId = extractYoutubeId(videoUrl)
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
             .clip(RoundedCornerShape(12.dp))
+            .clickable {
+                onClick(videoId) // 🔥 trigger click
+            }
     ) {
 
         AsyncImage(
@@ -216,36 +230,105 @@ fun getYoutubeThumbnail(url: String): String {
         ""
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YouTubePlayerScreen(videoId: String) {
-
+fun YoutubePlayerScreen(
+    videoId: String,
+    navController: NavController
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    AndroidView(
-        factory = {
-            YouTubePlayerView(context).apply {
-
-                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                    override fun onReady(player: YouTubePlayer) {
-                        player.loadVideo(videoId, 0f)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Video Player") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                })
+                }
+            )
+        }
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+
+            // 🎬 YouTube Player (top like YouTube app)
+            AndroidView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f), // ✅ FIX
+
+                factory = { ctx ->
+                    val view = YouTubePlayerView(ctx)
+
+                    lifecycleOwner.lifecycle.addObserver(view)
+
+                    view.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+
+                        override fun onReady(player: YouTubePlayer) {
+                            if (videoId.isNotEmpty()) {
+                                player.loadVideo(videoId, 0f)
+                            }
+                        }
+
+                        override fun onError(
+                            player: YouTubePlayer,
+                            error: PlayerConstants.PlayerError
+                        ) {
+                            openInYoutube(context, videoId)
+                        }
+                    })
+
+                    view
+                }
+            )
+
+            // 📄 Below area (optional content)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Video Description / Comments here",
+                modifier = Modifier.padding(16.dp)
+            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                Button(
+                    onClick = { openInYoutube(context, videoId) },
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
+                    Text("Open in YouTube")
+                }
             }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp)
-    )
+        }
+
+        // 🔥 Floating fallback button
+
+    }
+}
+fun openInYoutube(context: Context, videoId: String) {
+    try {
+        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+        appIntent.setPackage("com.google.android.youtube")
+        context.startActivity(appIntent)
+    } catch (e: Exception) {
+        val webIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://www.youtube.com/watch?v=$videoId")
+        )
+        context.startActivity(webIntent)
+    }
 }
 
 fun extractYoutubeId(url: String): String {
-    return when {
-        url.contains("youtu.be") ->
-            url.substringAfter("youtu.be/").substringBefore("?")
-
-        url.contains("v=") ->
-            url.substringAfter("v=").substringBefore("&")
-
-        else -> ""
-    }
+    val regex = "v=([^&]+)|youtu.be/([^?]+)".toRegex()
+    val match = regex.find(url)
+    return match?.groups?.get(1)?.value
+        ?: match?.groups?.get(2)?.value
+        ?: ""
 }

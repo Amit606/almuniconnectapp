@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.R
@@ -53,18 +54,23 @@ import com.kwh.almuniconnect.subscription.FeatureCard
 fun MoreFeaturesScreen(navController: NavController) {
 
     val features = listOf(
-        FeatureModel("Mentorship", Icons.Default.School),
-        FeatureModel("Thoughts", Icons.Default.Edit),
-        FeatureModel("Chat", Icons.Default.Chat),
+      //  FeatureModel("Mentorship", Icons.Default.School),
+       // FeatureModel("Thoughts", Icons.Default.Edit),
+       // FeatureModel("Chat", Icons.Default.Chat),
         FeatureModel("Media", Icons.Default.VideoLibrary),
-        FeatureModel("Nearby", Icons.Default.LocationOn),
-        FeatureModel("Pending Verification", Icons.Default.HourglassTop) // ✅ better icon
+      //  FeatureModel("Nearby", Icons.Default.LocationOn),
+        FeatureModel("Verification", Icons.Default.HourglassTop) // ✅ better icon
     )
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("More Features 🚀") }
+            TopAppBar(
+                title = { Text("More Feature") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         }
     ) { padding ->
@@ -84,12 +90,12 @@ fun MoreFeaturesScreen(navController: NavController) {
                 FeatureCard(feature = feature) {
 
                     when (feature.title) {
-                        "Mentorship" -> navController.navigate("mentorship")
-                        "Thoughts" -> navController.navigate("feed")
-                        "Chat" -> navController.navigate("chat")
+                       // "Mentorship" -> navController.navigate(Routes.COMING_SOON)
+                       // "Thoughts" -> navController.navigate(Routes.COMING_SOON)
+                       // "Chat" -> navController.navigate(Routes.COMING_SOON)
                         "Media" -> navController.navigate(Routes.MEDIA_FEATURE)
-                        "Nearby" -> navController.navigate(Routes.NEARBY_HARCOURTIANS)
-                        "Pending Verification" -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
+                       // "Nearby" -> navController.navigate(Routes.COMING_SOON)
+                        "Verification" -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
 
                     }
 
