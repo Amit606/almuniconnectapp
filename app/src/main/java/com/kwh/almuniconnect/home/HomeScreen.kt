@@ -458,7 +458,7 @@ fun HomeScreen(
             item {
                 SectionTitle(
                     title = "News",
-                    actionText = "",
+                    actionText = "More News",
                     onAction = {
                         navController.navigate(Routes.NEWS)
                     }
@@ -489,7 +489,13 @@ fun HomeScreen(
                         AlumniNews(
                             post = post,
                             onClick = {
-                                navController.navigate(Routes.NEWS)
+                                navController.navigate(
+                                    "news_detail_alt/${Uri.encode(post.title)}/" +
+                                            "${Uri.encode(post.description)}/" +
+                                            "${Uri.encode(post.imageUrl)}/" +
+                                            "${Uri.encode(post.date)}"
+                                )
+                               // navController.navigate(Routes.NEWS)
                             }
                         )
                         Spacer(modifier = Modifier.height(8.dp))

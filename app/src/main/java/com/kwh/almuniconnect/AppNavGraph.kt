@@ -73,6 +73,7 @@ import com.kwh.almuniconnect.network.YearGridScreen
 import com.kwh.almuniconnect.network.BranchScreen
 import com.kwh.almuniconnect.network.BranchViewModel
 import com.kwh.almuniconnect.network.BranchViewModelFactory
+import com.kwh.almuniconnect.news.NewsDetailScreen
 import com.kwh.almuniconnect.news.NewsListingScreen
 import com.kwh.almuniconnect.profile.AlumniProfileScreen
 import com.kwh.almuniconnect.subscription.PremiumScreen
@@ -229,6 +230,75 @@ fun AppNavGraph(
         composable(Routes.NEWS) {
             NewsListingScreen(navController)
         }
+
+
+
+//        composable(
+//            route = "news_detail/{title}/{content}/{imageUrl}/{publishedAt}"
+//        ) { backStackEntry ->
+//
+//            val title = backStackEntry.arguments?.getString("title") ?: ""
+//            val content = backStackEntry.arguments?.getString("content") ?: ""
+//            val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+//            val publishedAt = backStackEntry.arguments?.getString("publishedAt") ?: ""
+//
+//            NewsDetailScreen(
+//                navController,
+//                title = title,
+//                description = content,
+//                imageUrl = imageUrl,
+//                date = publishedAt,
+//                authorName = "Alumni Connect App Team" // agar pass nahi kar rahe ho
+//
+//            )
+//        }
+
+
+            // 🔹 Route 1 (API type)
+            composable(
+                route = "news_detail/{title}/{content}/{imageUrl}/{publishedAt}"
+            ) { backStackEntry ->
+
+                val title = backStackEntry.arguments?.getString("title") ?: ""
+                val description = backStackEntry.arguments?.getString("content") ?: ""
+                val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+                val date = backStackEntry.arguments?.getString("publishedAt") ?: ""
+
+                NewsDetailScreen(
+                    navController,
+                    title = title,
+                    description = description,
+                    imageUrl = imageUrl,
+                    date = date,
+                    authorName = "Alumni Connect App Team"
+                )
+            }
+
+            // 🔹 Route 2 (Local JSON type)
+            composable(
+                route = "news_detail_alt/{title}/{description}/{imageUrl}/{date}"
+            ) { backStackEntry ->
+
+                val title = backStackEntry.arguments?.getString("title") ?: ""
+                val description = backStackEntry.arguments?.getString("description") ?: ""
+                val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+                val date = backStackEntry.arguments?.getString("date") ?: ""
+
+                NewsDetailScreen(
+                    navController,
+                    title = title,
+                    description = description,
+                    imageUrl = imageUrl,
+                    date = date,
+                    authorName = "Alumni Connect App Team"
+                )
+            }
+
+
+
+
+
+
         composable("player/{videoId}") { backStackEntry ->
             val videoId = Uri.decode(
                 backStackEntry.arguments?.getString("videoId") ?: ""

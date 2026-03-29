@@ -79,13 +79,13 @@ fun ProfileScreen(navController: NavController,
     var mobile by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
     var totalExp by remember { mutableStateOf<Int?>(null) }
-    val totalYear = (1..60).toList()
+    val totalYear = (1..70).toList()
     var job by remember { mutableStateOf("") }
     var cityName by remember { mutableStateOf("") }
     var linkedin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
-    val years = (1972..2026).map { it.toString() }
+    val years = (1965..2026).map { it.toString() }
     val safeYear = year.trim().takeIf { it in years } ?: ""
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
