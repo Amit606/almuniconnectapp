@@ -189,12 +189,12 @@ fun CategoryChip(category: StoryCategory?) {
         )
     }
 }
+
 @Composable
 fun SafeImage(
     image: String?,
     modifier: Modifier = Modifier
 ) {
-
     val context = LocalContext.current
 
     val drawableId = if (!image.isNullOrEmpty()) getDrawableId(image) else 0
@@ -213,9 +213,40 @@ fun SafeImage(
             .crossfade(true)
             .build(),
         contentDescription = null,
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.FillBounds, // 🔥 FIXED
         placeholder = painterResource(R.drawable.man),
         error = painterResource(R.drawable.man),
         modifier = modifier
     )
 }
+
+//@Composable
+//fun SafeImage(
+//    image: String?,
+//    modifier: Modifier = Modifier
+//) {
+//
+//    val context = LocalContext.current
+//
+//    val drawableId = if (!image.isNullOrEmpty()) getDrawableId(image) else 0
+//
+//    val model: Any =
+//        when {
+//            image.isNullOrBlank() -> R.drawable.man
+//            image.startsWith("http") -> image
+//            drawableId != 0 -> drawableId
+//            else -> R.drawable.man
+//        }
+//
+//    AsyncImage(
+//        model = ImageRequest.Builder(context)
+//            .data(model)
+//            .crossfade(true)
+//            .build(),
+//        contentDescription = null,
+//        contentScale = ContentScale.Crop,
+//        placeholder = painterResource(R.drawable.man),
+//        error = painterResource(R.drawable.man),
+//        modifier = modifier
+//    )
+//}

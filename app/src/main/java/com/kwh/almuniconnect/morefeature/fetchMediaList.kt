@@ -10,7 +10,7 @@ fun fetchMediaList(onResult: (List<MediaItem>) -> Unit) {
     val remoteConfig = Firebase.remoteConfig
 
     val configSettings = remoteConfigSettings {
-        minimumFetchIntervalInSeconds = 0//3600
+        minimumFetchIntervalInSeconds = 3600
     }
 
     remoteConfig.setConfigSettingsAsync(configSettings)

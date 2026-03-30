@@ -66,7 +66,7 @@ fun ProductServiceCardNew(
                     .fallback(R.drawable.ic_services)
                     .build(),
                 contentDescription = item.title,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .width(140.dp)
                     .fillMaxHeight()

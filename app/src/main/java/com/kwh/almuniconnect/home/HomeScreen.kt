@@ -290,7 +290,7 @@ fun HomeScreen(
                                         )
                                         .build(),
                                     contentDescription = "Banner",
-                                    contentScale = ContentScale.Crop,
+                                    contentScale = ContentScale.FillBounds,
                                     modifier = Modifier.fillMaxSize()
                                 )
                             }

@@ -1,8 +1,10 @@
 package com.kwh.almuniconnect.almunipost
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +27,7 @@ import androidx.navigation.NavController
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.analytics.TrackScreen
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.font.FontWeight
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
@@ -56,11 +59,95 @@ fun AlumniStoriesScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(alumniList) { story ->
-                AlumniStoryCard(
-                    story = story,
+                AlumniPost(
+                    post = story,
                     onClick = {
                         navController.navigate("story_detail/${story.name}")
                     }
+                )
+            }
+        }
+    }
+}
+@Composable
+fun AlumniPost(
+    post: AlumniStory,
+    onClick: () -> Unit
+) {
+
+    val drawableId = getDrawableId(post.image)
+
+    val fallback = R.drawable.man
+
+    Card(
+        modifier = Modifier
+
+            .height(120.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(1.dp, Color(0xFFE6E9F0)),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            // Image Loader
+            if (post.image.startsWith("http")) {
+
+                AsyncImage(
+                    model = post.image,
+                    contentDescription = "avatar",
+                    contentScale = ContentScale.FillBounds,
+                    placeholder = painterResource(fallback),
+                    error = painterResource(fallback),
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                )
+
+            } else {
+
+                val imageRes =
+                    if (drawableId != 0) drawableId else fallback
+
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = "avatar",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+
+                Text(
+                    text = post.name,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = post.title,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = post.companyOrStartup,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }

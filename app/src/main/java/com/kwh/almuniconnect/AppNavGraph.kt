@@ -60,6 +60,7 @@ import com.kwh.almuniconnect.morefeature.ComingSoonScreen
 import com.kwh.almuniconnect.morefeature.MediaScreen
 import com.kwh.almuniconnect.morefeature.MoreFeaturesScreen
 import com.kwh.almuniconnect.morefeature.YoutubePlayerScreen
+import com.kwh.almuniconnect.nearby.LocationPermissionScreen
 import com.kwh.almuniconnect.nearby.NearbyHarcourtianScreen
 import com.kwh.almuniconnect.network.AlumniBatchViewModel
 import com.kwh.almuniconnect.network.AlumniBatchViewModelFactory
@@ -120,7 +121,14 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-         SplashScreen(navController)
+        // SplashScreen(navController)
+            LocationPermissionScreen(navController,onAllowClick = {
+                navController.navigate(Routes.NEARBY_HARCOURTIANS)
+            }) {
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            }
 //            CreateJobProfileScreen { profile ->
 //                // Save to Firebase / Room
 //

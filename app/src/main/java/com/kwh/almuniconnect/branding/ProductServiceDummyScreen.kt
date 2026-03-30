@@ -136,7 +136,7 @@ fun ProductServiceCard(
                     .fallback(R.drawable.ic_services)
                     .build(),
                 contentDescription = item.title,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
