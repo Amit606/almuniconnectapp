@@ -8,6 +8,7 @@ data class AlumniStory(
     val story: String = "",
     val image: String = "",          // 👈 change from imageRes Int
     val featured: Boolean = false,
+    val linkedURl : String = "",
     val category: StoryCategory = StoryCategory.SUCCESS
 )
 

@@ -1,12 +1,17 @@
 package com.kwh.almuniconnect.almunipost
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,7 +39,7 @@ fun AlumniStoryDetailScreen(
 
     TrackScreen("alumni_story_detail_screen")
     Log.e("Name", "Received name: ${story?.name}")
-
+  val context = LocalContext.current
     Scaffold(
         topBar = {
             HBTUTopBar(
@@ -141,20 +146,32 @@ fun AlumniStoryDetailScreen(
                     Divider()
 
                     Spacer(modifier = Modifier.height(16.dp))
+                    story.linkedURl?.takeIf { it.isNotBlank() }?.let { url ->
 
-//                    Text(
-//                        text = "Message to Juniors",
-//                        fontSize = 17.sp,
-//                        fontWeight = FontWeight.Medium
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(6.dp))
-//
-//                    Text(
-//                        text = "“Stay curious, stay humble, and never forget your roots.”",
-//                        fontSize = 15.sp,
-//                        fontStyle = FontStyle.Italic
-//                    )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                context.startActivity(intent)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Link,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = "View LinkedIn Profile",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
 
                     Spacer(modifier = Modifier.height(32.dp))
                 }

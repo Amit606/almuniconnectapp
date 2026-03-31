@@ -54,18 +54,18 @@ import com.kwh.almuniconnect.subscription.FeatureCard
 fun MoreFeaturesScreen(navController: NavController) {
 
     val features = listOf(
-      //  FeatureModel("Mentorship", Icons.Default.School),
+       // FeatureModel("Mentorship", Icons.Default.School),
        // FeatureModel("Thoughts", Icons.Default.Edit),
        // FeatureModel("Chat", Icons.Default.Chat),
         FeatureModel("Media", Icons.Default.VideoLibrary),
-      //  FeatureModel("Nearby", Icons.Default.LocationOn),
+       // FeatureModel("Nearby", Icons.Default.LocationOn),
         FeatureModel("Verification", Icons.Default.HourglassTop) // ✅ better icon
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("More Feature") },
+                title = { Text("More Features") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -90,11 +90,11 @@ fun MoreFeaturesScreen(navController: NavController) {
                 FeatureCard(feature = feature) {
 
                     when (feature.title) {
-                       // "Mentorship" -> navController.navigate(Routes.COMING_SOON)
-                       // "Thoughts" -> navController.navigate(Routes.COMING_SOON)
-                       // "Chat" -> navController.navigate(Routes.COMING_SOON)
+                        "Mentorship" -> navController.navigate(Routes.COMING_SOON)
+                        "Thoughts" -> navController.navigate(Routes.COMING_SOON)
+                        "Chat" -> navController.navigate(Routes.COMING_SOON)
                         "Media" -> navController.navigate(Routes.MEDIA_FEATURE)
-                       // "Nearby" -> navController.navigate(Routes.COMING_SOON)
+                        "Nearby" -> navController.navigate(Routes.NEARBY_HARCOURTIANS_PERMISSION)
                         "Verification" -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
 
                     }

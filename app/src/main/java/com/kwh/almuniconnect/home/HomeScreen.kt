@@ -143,16 +143,16 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(CircleShape),
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Fit
                             )
                         } else {
                             Image(
-                                painter = painterResource(id = R.drawable.girl),
+                                painter = painterResource(id = R.drawable.man),
                                 contentDescription = "Profile",
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape),
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Fit
                             )
                         }
                     }
@@ -166,8 +166,8 @@ fun HomeScreen(
                         onClick = { navController.navigate(Routes.TALENT_LIST) }
                     ) {
                         Icon(
-                            Icons.Default.Mic,
-                            tint = Color.Blue,
+                            Icons.Default.Lightbulb,
+                            tint = Color.DarkGray,
                             contentDescription = "Mic"
                         )
                     }
@@ -509,24 +509,16 @@ fun HomeScreen(
         }
         // Exit dialog
         if (showExitDialog) {
-            AlertDialog(
-                onDismissRequest = { showExitDialog = false },
-                title = { Text("Exit App") },
-                text = { Text("Are you sure you want to exit?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showExitDialog = false
-                        activity?.finish()
-                    }) {
-                        Text("Yes")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showExitDialog = false }) {
-                        Text("No")
-                    }
-                }
+
+            CommonActionBottomSheet(
+                showDialog = showExitDialog,
+                title = "Exit App",
+                description = "Are you sure you want to exit?",
+                confirmText = "Exit",
+                onDismiss = { showExitDialog = false },
+                onConfirm = { activity?.finish() }
             )
+
         }
 
     }

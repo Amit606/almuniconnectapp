@@ -121,7 +121,9 @@ fun AppNavGraph(
 
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
-        // SplashScreen(navController)
+         SplashScreen(navController)
+        }
+        composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
             LocationPermissionScreen(navController,onAllowClick = {
                 navController.navigate(Routes.NEARBY_HARCOURTIANS)
             }) {
@@ -129,13 +131,13 @@ fun AppNavGraph(
                     popUpTo(Routes.SPLASH) { inclusive = true }
                 }
             }
-
-           // NearbyHarcourtianScreen()
-
+           // NearbyHarcourtianScreen(navController)
         }
         composable(Routes.NEARBY_HARCOURTIANS) {
-            NearbyHarcourtianScreen(navController)
+
+             NearbyHarcourtianScreen(navController)
         }
+
 
         composable(Routes.TALENT_LIST) {
             HarcourtianTalentScreen(navController)
