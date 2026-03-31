@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.nearby
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -137,7 +138,7 @@ fun NearbyHarcourtianScreen(
 
             val locationProvider = LocationProvider(context)
 
-            LaunchedEffect(Unit) {
+            LaunchedEffect(true) {
 
                 val permission = ContextCompat.checkSelfPermission(
                     context,
@@ -148,10 +149,17 @@ fun NearbyHarcourtianScreen(
 
                     locationProvider.getLocation { location ->
 
-                        viewModel.loadNearby(
-                            location.latitude,
-                            location.longitude
-                        )
+                        if (location != null) {
+                            Log.e("LOCATION", "Got location: ${location.latitude}, ${location.longitude} ✅")
+
+                            viewModel.loadNearby(
+                                location.latitude,
+                                location.longitude
+                            )
+
+                        } else {
+                            Log.d("LOCATION", "Location null ❌")
+                        }
                     }
                 }
             }
