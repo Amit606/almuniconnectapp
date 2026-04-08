@@ -80,5 +80,7 @@ object Routes {
     const val COMING_SOON = "coming_soon"
     const val NEARBY_HARCOURTIANS_PERMISSION = "nearby_harcourtians_permission"
 
+    const val JOB_PROFILE = "create_job_profile"
+
 
 }

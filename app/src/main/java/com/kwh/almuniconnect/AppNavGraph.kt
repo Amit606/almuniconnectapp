@@ -54,6 +54,7 @@ import com.kwh.almuniconnect.emergency.EmergencyRequestForm
 import com.kwh.almuniconnect.emergency.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
+import com.kwh.almuniconnect.home.JobProfileScreen
 import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
 import com.kwh.almuniconnect.jobposting.jobprofile.CreateJobProfileScreen
 import com.kwh.almuniconnect.morefeature.ComingSoonScreen
@@ -122,6 +123,24 @@ fun AppNavGraph(
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
          SplashScreen(navController)
+//            JobProfileScreen(
+//                onSaveProfile = { profileData ->
+//                    // Send to backend or save locally
+//                    Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_LONG).show()
+//                },
+//                onCancel = { navController.popBackStack() }
+//            )
+        }
+        composable(Routes.JOB_PROFILE){
+
+                        JobProfileScreen(
+                            navController,
+                onSaveProfile = { profileData ->
+                    // Send to backend or save locally
+                    Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_LONG).show()
+                },
+                onCancel = { navController.popBackStack() }
+            )
         }
         composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
             LocationPermissionScreen(navController,onAllowClick = {

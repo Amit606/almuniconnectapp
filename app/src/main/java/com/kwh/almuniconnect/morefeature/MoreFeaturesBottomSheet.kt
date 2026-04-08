@@ -49,6 +49,14 @@ import androidx.core.net.toUri
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.subscription.FeatureCard
 
+enum class MORE{
+    MENTORSHIP,
+    THOUGHTS,
+    JOB_PROFILE,
+    MEDIA,
+    NEARBY,
+    VERIFICATION
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreFeaturesScreen(navController: NavController) {
@@ -56,10 +64,10 @@ fun MoreFeaturesScreen(navController: NavController) {
     val features = listOf(
        // FeatureModel("Mentorship", Icons.Default.School),
        // FeatureModel("Thoughts", Icons.Default.Edit),
-       // FeatureModel("Chat", Icons.Default.Chat),
-        FeatureModel("Media", Icons.Default.VideoLibrary),
-       // FeatureModel("Nearby", Icons.Default.LocationOn),
-        FeatureModel("Verification", Icons.Default.HourglassTop) // ✅ better icon
+        FeatureModel(MORE.JOB_PROFILE.name, Icons.Default.Work),
+        FeatureModel(MORE.MEDIA.name, Icons.Default.VideoLibrary),
+        FeatureModel(MORE.NEARBY.name, Icons.Default.LocationOn),
+        FeatureModel(MORE.VERIFICATION.name, Icons.Default.HourglassTop) // ✅ better icon
     )
 
     Scaffold(
@@ -90,12 +98,12 @@ fun MoreFeaturesScreen(navController: NavController) {
                 FeatureCard(feature = feature) {
 
                     when (feature.title) {
-                        "Mentorship" -> navController.navigate(Routes.COMING_SOON)
-                        "Thoughts" -> navController.navigate(Routes.COMING_SOON)
-                        "Chat" -> navController.navigate(Routes.COMING_SOON)
-                        "Media" -> navController.navigate(Routes.MEDIA_FEATURE)
-                        "Nearby" -> navController.navigate(Routes.NEARBY_HARCOURTIANS_PERMISSION)
-                        "Verification" -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
+                        MORE.MENTORSHIP.name -> navController.navigate(Routes.COMING_SOON)
+                        MORE.MENTORSHIP.name -> navController.navigate(Routes.COMING_SOON)
+                        MORE.JOB_PROFILE.name -> navController.navigate(Routes.JOB_PROFILE)
+                        MORE.MEDIA.name -> navController.navigate(Routes.MEDIA_FEATURE)
+                        MORE.NEARBY.name -> navController.navigate(Routes.NEARBY_HARCOURTIANS_PERMISSION)
+                        MORE.VERIFICATION.name -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
 
                     }
 
