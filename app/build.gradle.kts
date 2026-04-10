@@ -138,6 +138,8 @@ dependencies {
 
     implementation ("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation ("com.google.firebase:firebase-storage-ktx:20.3.0")
 
+     // or latest stable version// or latest version
 
 }

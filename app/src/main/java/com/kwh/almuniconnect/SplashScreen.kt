@@ -35,57 +35,56 @@ fun SplashScreen(navController: NavController) {
     val pulse = remember { Animatable(1f) }
 
     val context = LocalContext.current
-    val isLoggedIn by UserSession.isLoggedIn(context).collectAsState(initial = false)
+
+    val isLoggedIn by UserSession.isLoggedIn(context)
+        .collectAsState(initial = false)
 
     val userPrefs = remember { UserPreferences(context) }
-    val user by userPrefs.getUser().collectAsState(initial = UserLocalModel())
+    val user by userPrefs.getUser()
+        .collectAsState(initial = UserLocalModel())
 
     val splashViewModel: SplashViewModel = viewModel()
+
+    val scope = rememberCoroutineScope()
 
     // 🔥 Prevent multiple navigation
     var hasNavigated by remember { mutableStateOf(false) }
 
-    // 🚀 Main Splash Logic (run once safely)
-    LaunchedEffect(Unit) {
+    // 🚀 Main Logic (SAFE + Reactive)
+    LaunchedEffect(isLoggedIn, user.userId) {
 
-        // Run animation
+        // 🎬 Animation
         launch {
-            scale.animateTo(
-                1f,
-                animationSpec = tween(900, easing = FastOutSlowInEasing)
-            )
+            scale.animateTo(1f, tween(900, easing = FastOutSlowInEasing))
         }
 
         launch {
-            alpha.animateTo(
-                1f,
-                animationSpec = tween(800, delayMillis = 400)
-            )
+            alpha.animateTo(1f, tween(800, delayMillis = 400))
         }
 
         launch {
-            offsetY.animateTo(
-                0f,
-                animationSpec = tween(900, delayMillis = 400)
-            )
+            offsetY.animateTo(0f, tween(900, delayMillis = 400))
         }
 
         launch {
             pulse.animateTo(
                 1.08f,
-                animationSpec = infiniteRepeatable(
+                infiniteRepeatable(
                     animation = tween(900),
                     repeatMode = RepeatMode.Reverse
                 )
             )
         }
 
-        delay(1800)
+        delay(1500)
 
-        // 🔥 Navigation Decision (SAFE)
+        // 🛑 Prevent duplicate navigation
+        if (hasNavigated) return@LaunchedEffect
 
-        if (!isLoggedIn && !hasNavigated) {
+        // 🔐 Not logged in
+        if (!isLoggedIn) {
             hasNavigated = true
+
             navController.navigate(Routes.INTRO) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
                 launchSingleTop = true
@@ -93,8 +92,10 @@ fun SplashScreen(navController: NavController) {
             return@LaunchedEffect
         }
 
-        if (user.userId.isBlank() && !hasNavigated) {
+        // 👤 No user data
+        if (user.userId.isBlank()) {
             hasNavigated = true
+
             navController.navigate(Routes.LOGIN) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
                 launchSingleTop = true
@@ -102,23 +103,24 @@ fun SplashScreen(navController: NavController) {
             return@LaunchedEffect
         }
 
+        // 🔍 Verification API
         splashViewModel.checkAlumniVerification(user.userId) { isVerified ->
 
-            // 🛑 Prevent crash (double / late callback)
-            if (hasNavigated) return@checkAlumniVerification
+            scope.launch {
 
-            // 🛑 Ensure screen still active
-            if (navController.currentDestination?.route != Routes.SPLASH) return@checkAlumniVerification
+                // 🛑 Safety checks
+                if (hasNavigated) return@launch
+                if (navController.currentDestination?.route != Routes.SPLASH) return@launch
 
-            hasNavigated = true
+                hasNavigated = true
 
-            if (isVerified) {
-                navController.navigate(Routes.HOME) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
-                    launchSingleTop = true
+                val route = if (isVerified) {
+                    Routes.HOME
+                } else {
+                    Routes.APPROVAL_PENDING
                 }
-            } else {
-                navController.navigate(Routes.APPROVAL_PENDING) {
+
+                navController.navigate(route) {
                     popUpTo(Routes.SPLASH) { inclusive = true }
                     launchSingleTop = true
                 }
@@ -126,7 +128,7 @@ fun SplashScreen(navController: NavController) {
         }
     }
 
-    // 🎨 UI (UNCHANGED)
+    // 🎨 UI
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -173,6 +175,153 @@ fun SplashScreen(navController: NavController) {
         }
     }
 }
+//@Composable
+//fun SplashScreen(navController: NavController) {
+//
+//    val scale = remember { Animatable(0.7f) }
+//    val alpha = remember { Animatable(0f) }
+//    val offsetY = remember { Animatable(80f) }
+//    val pulse = remember { Animatable(1f) }
+//
+//    val context = LocalContext.current
+//    val isLoggedIn by UserSession.isLoggedIn(context).collectAsState(initial = false)
+//
+//    val userPrefs = remember { UserPreferences(context) }
+//    val user by userPrefs.getUser().collectAsState(initial = UserLocalModel())
+//
+//    val splashViewModel: SplashViewModel = viewModel()
+//
+//    // 🔥 Prevent multiple navigation
+//    var hasNavigated by remember { mutableStateOf(false) }
+//
+//    // 🚀 Main Splash Logic (run once safely)
+//    LaunchedEffect(Unit) {
+//
+//        // Run animation
+//        launch {
+//            scale.animateTo(
+//                1f,
+//                animationSpec = tween(900, easing = FastOutSlowInEasing)
+//            )
+//        }
+//
+//        launch {
+//            alpha.animateTo(
+//                1f,
+//                animationSpec = tween(800, delayMillis = 400)
+//            )
+//        }
+//
+//        launch {
+//            offsetY.animateTo(
+//                0f,
+//                animationSpec = tween(900, delayMillis = 400)
+//            )
+//        }
+//
+//        launch {
+//            pulse.animateTo(
+//                1.08f,
+//                animationSpec = infiniteRepeatable(
+//                    animation = tween(900),
+//                    repeatMode = RepeatMode.Reverse
+//                )
+//            )
+//        }
+//
+//        delay(1800)
+//
+//        // 🔥 Navigation Decision (SAFE)
+//
+//        if (!isLoggedIn && !hasNavigated) {
+//            hasNavigated = true
+//            navController.navigate(Routes.INTRO) {
+//                popUpTo(Routes.SPLASH) { inclusive = true }
+//                launchSingleTop = true
+//            }
+//            return@LaunchedEffect
+//        }
+//
+//        if (user.userId.isBlank() && !hasNavigated) {
+//            hasNavigated = true
+//            navController.navigate(Routes.LOGIN) {
+//                popUpTo(Routes.SPLASH) { inclusive = true }
+//                launchSingleTop = true
+//            }
+//            return@LaunchedEffect
+//        }
+//
+//        splashViewModel.checkAlumniVerification(user.userId) { isVerified ->
+//
+//            // 🛑 Prevent crash (double / late callback)
+//            if (hasNavigated) return@checkAlumniVerification
+//
+//            // 🛑 Ensure screen still active
+//            if (navController.currentDestination?.route != Routes.SPLASH) return@checkAlumniVerification
+//
+//            hasNavigated = true
+//
+//            if (isVerified) {
+//                navController.navigate(Routes.HOME) {
+//                    popUpTo(Routes.SPLASH) { inclusive = true }
+//                    launchSingleTop = true
+//                }
+//            } else {
+//                navController.navigate(Routes.APPROVAL_PENDING) {
+//                    popUpTo(Routes.SPLASH) { inclusive = true }
+//                    launchSingleTop = true
+//                }
+//            }
+//        }
+//    }
+//
+//    // 🎨 UI (UNCHANGED)
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(
+//                Brush.verticalGradient(
+//                    listOf(
+//                        Color(0xFF0D1B2A),
+//                        Color(0xFF1B4DB1),
+//                        Color(0xFF3A7BD5)
+//                    )
+//                )
+//            ),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//
+//            Icon(
+//                painter = painterResource(id = R.drawable.playstore),
+//                contentDescription = null,
+//                tint = Color.Unspecified,
+//                modifier = Modifier
+//                    .size(200.dp)
+//                    .scale(scale.value * pulse.value)
+//                    .alpha(alpha.value)
+//                    .offset(y = offsetY.value.dp)
+//            )
+//
+//            Spacer(Modifier.height(20.dp))
+//
+//            Text(
+//                "Harcourtian Alumni Connect",
+//                color = Color.White,
+//                fontSize = 22.sp,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier.alpha(alpha.value)
+//            )
+//
+//            Text(
+//                "Connecting Harcourtians Worldwide.",
+//                color = Color(0xFFD6E3FF),
+//                fontSize = 14.sp,
+//                modifier = Modifier.alpha(alpha.value)
+//            )
+//        }
+//    }
+//}
 //@Composable
 //fun SplashScreen(navController: NavController) {
 //

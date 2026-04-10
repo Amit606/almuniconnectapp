@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.login
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
@@ -9,48 +10,35 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kwh.almuniconnect.R
-import com.kwh.almuniconnect.analytics.TrackScreen
-import com.kwh.almuniconnect.permission.RequestNotificationPermission
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlumniLoginScreen(
-    onBack: () -> Unit = {},
-    onRequestOtp: (String) -> Unit = {},
-    onLoginWithPassword: () -> Unit = {},
-    onGoogleLogin: () -> Unit = {}
+    onGoogleLogin: () -> Unit = {},
+    onOpenTerms: () -> Unit = {},
+    onOpenPrivacy: () -> Unit = {}
 ) {
-    TrackScreen("alumni_login_screen")
-
-    // 🎬 Animation state
     var visible by remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         visible = true
     }
-    RequestNotificationPermission(
-        onPermissionGranted = {
-            // 🔔 Notifications enabled
-        },
-        onPermissionDenied = {
-            // 🚫 User denied (show snackbar or ignore)
-        }
-    )
-    Scaffold { padding ->
 
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface
+    ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -58,95 +46,135 @@ fun AlumniLoginScreen(
                 .imePadding(),
             contentAlignment = Alignment.Center
         ) {
-
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn() + scaleIn(initialScale = 0.95f)
+                enter = fadeIn(animationSpec = tween(600)) +
+                        scaleIn(initialScale = 0.92f, animationSpec = tween(600))
             ) {
-
                 Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                        .fillMaxWidth(0.92f)
+                        .shadow(elevation = 12.dp, shape = RoundedCornerShape(28.dp)),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-
                     Column(
                         modifier = Modifier
-                            .padding(horizontal = 24.dp, vertical = 32.dp)
+                            .padding(32.dp)
                             .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-                        // 🔵 Logo
-                        Image(
-                            painter = painterResource(R.drawable.playstore),
-                            contentDescription = "HBTU Logo",
-                            modifier = Modifier.size(88.dp)
-                        )
-
-                        Spacer(Modifier.height(24.dp))
-
-                        // 🏷 Heading
-                        Text(
-                            text = "Sign in",
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Text(
-                            text = "to continue to Harcourtian Alumni Network",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(Modifier.height(32.dp))
-
-//
-
-
-                        // 🌐 Material Filled Tonal Google Button
-                        FilledTonalButton(
-                            onClick = onGoogleLogin,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp),
-
-                            shape = RoundedCornerShape(26.dp)
+                        // App Icon
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(92.dp)
                         ) {
                             Image(
-                                painter = painterResource(R.drawable.ic_google),
+                                painter = painterResource(R.drawable.playstore),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(Modifier.width(12.dp))
-                            Text(
-                                text = "Continue with Google",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium
+                                modifier = Modifier
+                                    .size(88.dp)
+                                    .shadow(8.dp, RoundedCornerShape(20.dp))
                             )
                         }
 
                         Spacer(Modifier.height(32.dp))
 
-                        // 🔐 Footer
                         Text(
-                            text = "By continuing, you agree to our Terms & Privacy Policy",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
+                            text = "Welcome Back",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = "Sign in to continue to\nAlumni Network",
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 22.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Spacer(Modifier.height(48.dp))
+
+                        // Google Button
+                        FilledTonalButton(
+                            onClick = onGoogleLogin,
+                            enabled = isChecked,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_google),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                text = "Continue with Google",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+
+                        Spacer(Modifier.height(40.dp))
+
+                        // Checkbox + Agreement Text
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = { isChecked = it },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = MaterialTheme.colorScheme.primary
+                                )
+                            )
+
+                            Spacer(Modifier.width(8.dp))
+
+                            Text(
+                                text = "I agree to the Terms of Service and Privacy Policy",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                lineHeight = 20.sp
+                            )
+                        }
+
+                        // Clickable Links (Clean & Professional)
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Terms of Service",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.clickable { onOpenTerms() }
+                            )
+
+                            Spacer(Modifier.width(20.dp))
+
+                            Text(
+                                text = "Privacy Policy",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.clickable { onOpenPrivacy() }
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-

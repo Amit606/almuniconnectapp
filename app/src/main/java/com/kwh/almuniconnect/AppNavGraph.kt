@@ -36,6 +36,7 @@ import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
@@ -57,6 +58,8 @@ import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.home.JobProfileScreen
 import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
 import com.kwh.almuniconnect.jobposting.jobprofile.CreateJobProfileScreen
+import com.kwh.almuniconnect.login.PrivacyPolicyScreen
+import com.kwh.almuniconnect.login.TermsScreen
 import com.kwh.almuniconnect.morefeature.ComingSoonScreen
 import com.kwh.almuniconnect.morefeature.MediaScreen
 import com.kwh.almuniconnect.morefeature.MoreFeaturesScreen
@@ -133,13 +136,9 @@ fun AppNavGraph(
         }
         composable(Routes.JOB_PROFILE){
 
-                        JobProfileScreen(
-                            navController,
-                onSaveProfile = { profileData ->
-                    // Send to backend or save locally
-                    Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_LONG).show()
-                },
-                onCancel = { navController.popBackStack() }
+            JobProfileScreen(
+                onBack = { navController.popBackStack() },
+
             )
         }
         composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
@@ -398,6 +397,17 @@ fun AppNavGraph(
                 branchShort = branchShort,
                 year = year
             )
+        }
+        composable("terms") {
+            TermsScreen {
+                navController.popBackStack()
+            }
+        }
+
+        composable("privacy") {
+            PrivacyPolicyScreen {
+                navController.popBackStack()
+            }
         }
 //        composable(Routes.NETWORK) {
 //            val apiService = remember {
@@ -789,3 +799,33 @@ fun setSubscribed(context: Context) {
     val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     prefs.edit().putBoolean("coming_soon_subscribed", true).apply()
 }
+fun saveUserConsent(userId: String) {
+
+    val db = FirebaseFirestore.getInstance()
+
+    val consent = UserConsent(
+        userId = userId,
+        consentGiven = true,
+        timestamp = System.currentTimeMillis(),
+        policyVersion = "v1.0",
+        device = android.os.Build.MODEL
+    )
+
+    db.collection("users")
+        .document(userId)
+        .collection("consents")
+        .add(consent)
+        .addOnSuccessListener {
+            Log.d("CONSENT", "Consent saved successfully")
+        }
+        .addOnFailureListener {
+            Log.e("CONSENT", "Error saving consent", it)
+        }
+}
+data class UserConsent(
+    val userId: String = "",
+    val consentGiven: Boolean = false,
+    val timestamp: Long = System.currentTimeMillis(),
+    val policyVersion: String = "v1.0",
+    val device: String = android.os.Build.MODEL
+)

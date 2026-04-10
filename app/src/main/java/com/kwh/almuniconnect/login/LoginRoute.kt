@@ -28,6 +28,7 @@ import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.kwh.almuniconnect.saveUserConsent
 
 
 @Composable
@@ -115,7 +116,19 @@ fun LoginRoute(
         AlumniLoginScreen(
             onGoogleLogin = {
                 launcher.launch(googleSignInClient.signInIntent)
+               // saveUserConsent(userId)
+
+            },
+            onOpenTerms = {
+                navController.navigate("terms")
+
+            },
+            onOpenPrivacy = {
+                navController.navigate("privacy")
+
             }
+
+
         )
 
         if (isLoading) {
@@ -123,6 +136,8 @@ fun LoginRoute(
         }
     }
 }
+
+
 @Composable
 fun LoadingOverlay() {
     Box(
