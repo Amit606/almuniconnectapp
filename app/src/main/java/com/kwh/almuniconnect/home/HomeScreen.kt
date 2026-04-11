@@ -52,6 +52,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.almunipost.SuccessViewModel
 import com.kwh.almuniconnect.branding.ProductServiceCard
 import com.kwh.almuniconnect.branding.ProductServiceViewModel
@@ -80,6 +81,8 @@ fun HomeScreen(
 
 
     val context = LocalContext.current
+    var totalAlumni by remember { mutableStateOf(0L) }
+
     TrackScreen("home_screen")
     var showExitDialog by remember { mutableStateOf(false) }
     val activity = LocalActivity.current
@@ -96,6 +99,27 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) {
         pviewModel.loadProducts()
+    }
+    LaunchedEffect(Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("stats")
+            .document("app_stats")
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    Log.e("FIRESTORE", "Error: ${error.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val value = snapshot.getLong("total_users")
+                    Log.d("FIRESTORE", "Value: $value")
+
+                    totalAlumni = value ?: 0
+                } else {
+                    Log.d("FIRESTORE", "Document not found")
+                }
+            }
     }
 
     RequestNotificationPermission(
@@ -305,6 +329,10 @@ fun HomeScreen(
                         )
                     }
                 }
+            }
+
+            item {
+                AlumniCountBanner(totalAlumni,true)
             }
 
 

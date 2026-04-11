@@ -36,7 +36,9 @@ import com.kwh.almuniconnect.profile.ProfileScreen
 import com.kwh.almuniconnect.settings.SettingsScreen
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
@@ -61,8 +63,10 @@ import com.kwh.almuniconnect.jobposting.jobprofile.CreateJobProfileScreen
 import com.kwh.almuniconnect.login.PrivacyPolicyScreen
 import com.kwh.almuniconnect.login.TermsScreen
 import com.kwh.almuniconnect.morefeature.ComingSoonScreen
+import com.kwh.almuniconnect.morefeature.JobProfileComingSoonScreen
 import com.kwh.almuniconnect.morefeature.MediaScreen
 import com.kwh.almuniconnect.morefeature.MoreFeaturesScreen
+import com.kwh.almuniconnect.morefeature.NearbyComingSoonScreen
 import com.kwh.almuniconnect.morefeature.YoutubePlayerScreen
 import com.kwh.almuniconnect.nearby.LocationPermissionScreen
 import com.kwh.almuniconnect.nearby.NearbyHarcourtianScreen
@@ -89,6 +93,7 @@ import com.kwh.almuniconnect.tallent.TalentDetailScreen
 import com.kwh.almuniconnect.tallent.TalentViewModel
 import com.kwh.almuniconnect.tallent.shareTalent
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
+import androidx.core.content.edit
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -141,6 +146,26 @@ fun AppNavGraph(
 
             )
         }
+        composable(Routes.JOB_PROFILE_COMMING_SOON)
+        {
+            JobProfileComingSoonScreen(navController, onNotifyClick =
+                {
+                    subscribeToJobProfile(context)
+
+                }
+                )
+        }
+        //NearbyComingSoonScreen
+        composable(Routes.NEAR_BY_COMMING_SOON)
+        {
+            NearbyComingSoonScreen(navController, onNotifyClick =
+                {
+                    subscribeToNearbyFeature(context)
+
+                }
+            )
+        }
+
         composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
             LocationPermissionScreen(navController,onAllowClick = {
                 navController.navigate(Routes.NEARBY_HARCOURTIANS)
@@ -409,25 +434,7 @@ fun AppNavGraph(
                 navController.popBackStack()
             }
         }
-//        composable(Routes.NETWORK) {
-//            val apiService = remember {
-//                NetworkClient.createService(ApiService::class.java)
-//            }
-//            val repository = remember { AlumniRepository(apiService) }
-//
-//            val alumniViewModel: AlumniViewModel = viewModel(
-//                factory = AlumniViewModelFactory(repository)
-//            )
-//
-//            NetworkScreen(
-//                navController = navController,
-//                onOpenProfile = { alumni ->
-//                    navController.navigate(
-//                        Routes.profileRoute(alumni.alumniId)
-//                    )
-//                }
-//            )
-//        }
+
         composable("profile") {
 
             val alumni = navController
@@ -829,3 +836,118 @@ data class UserConsent(
     val policyVersion: String = "v1.0",
     val device: String = android.os.Build.MODEL
 )
+
+fun subscribeToJobProfile(context: Context) {
+    try {
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isSubscribed = prefs.getBoolean("job_profile_subscribed", false)
+
+        // ✅ Already subscribed check
+        if (isSubscribed) {
+            Toast.makeText(
+                context,
+                "✅ You are already subscribed!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("job_profile")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+
+                    // 🔥 Save locally to prevent duplicate
+                    prefs.edit() { putBoolean("job_profile_subscribed", true) }
+
+                    // 🔥 Save click in Firestore (only once)
+                    val docRef = FirebaseFirestore.getInstance()
+                        .collection("feature_interest")
+                        .document("job_profile")
+
+                    docRef.get().addOnSuccessListener { document ->
+                        if (document.exists()) {
+
+                            // ✅ Increment existing
+                            docRef.update("count", FieldValue.increment(1))
+
+                        } else {
+
+                            // ✅ First time create
+                            docRef.set(mapOf("count" to 1))
+                        }
+                    }
+                    Toast.makeText(
+                        context,
+                        "🔔 You will be notified when Job Profile goes live!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+                    Toast.makeText(
+                        context,
+                        "❌ Subscription failed. Try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+    } catch (ex: Exception) {
+        Log.e("SUBSCRIPTION", "Error subscribing to topic", ex)
+    }
+}
+fun subscribeToNearbyFeature(context: Context) {
+    try {
+
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isSubscribed = prefs.getBoolean("nearby_subscribed", false)
+
+        // ✅ Already subscribed check
+        if (isSubscribed) {
+            Toast.makeText(
+                context,
+                "✅ You are already subscribed!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("nearby_feature")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+
+                    // 🔥 Save locally
+                    prefs.edit().putBoolean("nearby_subscribed", true).apply()
+
+                    // 🔥 Update Firestore count
+                    val docRef = FirebaseFirestore.getInstance()
+                        .collection("feature_interest")
+                        .document("nearby")
+
+                    docRef.get().addOnSuccessListener { document ->
+                        if (document.exists()) {
+                            docRef.update("count", FieldValue.increment(1))
+                        } else {
+                            docRef.set(mapOf("count" to 1))
+                        }
+                    }
+
+                    Toast.makeText(
+                        context,
+                        "📍 You will be notified when Nearby goes live!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+                    Toast.makeText(
+                        context,
+                        "❌ Subscription failed. Try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+    } catch (ex: Exception) {
+        Log.e("SUBSCRIPTION", "Error subscribing to nearby", ex)
+    }
+}

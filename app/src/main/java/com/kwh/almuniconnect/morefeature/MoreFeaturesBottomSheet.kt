@@ -100,9 +100,9 @@ fun MoreFeaturesScreen(navController: NavController) {
                     when (feature.title) {
                         MORE.MENTORSHIP.name -> navController.navigate(Routes.COMING_SOON)
                         MORE.MENTORSHIP.name -> navController.navigate(Routes.COMING_SOON)
-                        MORE.JOB_PROFILE.name -> navController.navigate(Routes.JOB_PROFILE)
+                        MORE.JOB_PROFILE.name -> navController.navigate(Routes.JOB_PROFILE_COMMING_SOON)
                         MORE.MEDIA.name -> navController.navigate(Routes.MEDIA_FEATURE)
-                        MORE.NEARBY.name -> navController.navigate(Routes.NEARBY_HARCOURTIANS_PERMISSION)
+                        MORE.NEARBY.name -> navController.navigate(Routes.NEAR_BY_COMMING_SOON)
                         MORE.VERIFICATION.name -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
 
                     }

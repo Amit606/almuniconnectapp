@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.login
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,9 +33,31 @@ fun AlumniLoginScreen(
 ) {
     var visible by remember { mutableStateOf(false) }
     var isChecked by remember { mutableStateOf(false) }
+    var totalAlumni by remember { mutableStateOf(0L) }
 
     LaunchedEffect(Unit) {
         visible = true
+    }
+    LaunchedEffect(Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("stats")
+            .document("app_stats")
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    Log.e("FIRESTORE", "Error: ${error.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val value = snapshot.getLong("total_users")
+                    Log.d("FIRESTORE", "Value: $value")
+
+                    totalAlumni = value ?: 0
+                } else {
+                    Log.d("FIRESTORE", "Document not found")
+                }
+            }
     }
 
     Scaffold(
@@ -97,6 +121,16 @@ fun AlumniLoginScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            text = "$totalAlumni+ alumni are already here — join them today",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
                         Spacer(Modifier.height(48.dp))
 
                         // Google Button

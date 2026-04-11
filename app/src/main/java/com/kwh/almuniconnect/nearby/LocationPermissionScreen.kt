@@ -94,7 +94,10 @@ fun LocationPermissionScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = onSkipClick) {
+            TextButton(onClick = {
+                navController.popBackStack()
+
+            }) {
                 Text("Skip for now")
             }
         }

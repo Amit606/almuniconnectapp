@@ -32,7 +32,6 @@ import com.kwh.almuniconnect.storage.UserPreferences
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedbackForm(navController: NavController) {
@@ -152,31 +151,33 @@ fun FeedbackForm(navController: NavController) {
 
                     isLoading = true
 
-                    submitFeedback(
-                        context = context,
-                        userId = user.userId ?: "anonymous",
-                        name = name.ifBlank { user.name ?: "Anonymous" },
-                        email = email.ifBlank { user.email ?: "" },
-                        message = message,
-                        onSuccess = {
-                            isLoading = false
-                            isSuccess = true
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        submitFeedback(
+                            context = context,
+                            userId = user.userId ?: "anonymous",
+                            name = name.ifBlank { user.name ?: "Anonymous" },
+                            email = email.ifBlank { user.email ?: "" },
+                            message = message,
+                            onSuccess = {
+                                isLoading = false
+                                isSuccess = true
 
-                            // Reset form after success
-                            kotlinx.coroutines.MainScope().launch {
-                                delay(2000)
-                                name = ""
-                                email = ""
-                                message = ""
-                                isSuccess = false
-                                navController.popBackStack()
+                                // Reset form after success
+                                kotlinx.coroutines.MainScope().launch {
+                                    delay(2000)
+                                    name = ""
+                                    email = ""
+                                    message = ""
+                                    isSuccess = false
+                                    navController.popBackStack()
+                                }
+                            },
+                            onError = { errorMsg ->
+                                isLoading = false
+                                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
                             }
-                        },
-                        onError = { errorMsg ->
-                            isLoading = false
-                            Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
-                        }
-                    )
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

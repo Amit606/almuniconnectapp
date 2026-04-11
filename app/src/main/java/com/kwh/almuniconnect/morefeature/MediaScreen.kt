@@ -56,7 +56,7 @@ fun MediaScreen(navController: NavController) {
     var mediaList by remember { mutableStateOf<List<MediaItem>>(emptyList()) }
 
 
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         fetchMediaList {

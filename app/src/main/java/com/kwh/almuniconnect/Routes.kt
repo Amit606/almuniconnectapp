@@ -82,5 +82,8 @@ object Routes {
 
     const val JOB_PROFILE = "create_job_profile"
 
+    const val JOB_PROFILE_COMMING_SOON = "job_profile_coming_soon";
+    const val NEAR_BY_COMMING_SOON="nearby_coming_soon";
+
 
 }
