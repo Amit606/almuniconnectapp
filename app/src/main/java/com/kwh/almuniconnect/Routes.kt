@@ -64,7 +64,6 @@ object Routes {
     const val THANK_YOU = "emergency_thank_you/{amount}"
     const val VERIFICATION = "verification"
     const val APPROVAL_PENDING="approval_pending"
-
     const val FEEDBACK="feedback"
     const val BRANCHES ="branches"
     const val COURSES ="courses"
@@ -79,11 +78,8 @@ object Routes {
     const val MEDIA_FEATURE = "media_feature"
     const val COMING_SOON = "coming_soon"
     const val NEARBY_HARCOURTIANS_PERMISSION = "nearby_harcourtians_permission"
-
     const val JOB_PROFILE = "create_job_profile"
-
     const val JOB_PROFILE_COMMING_SOON = "job_profile_coming_soon";
     const val NEAR_BY_COMMING_SOON="nearby_coming_soon";
-
-
+    const val LOCATION_PERMISSION_INFO = "permission_info"
 }

@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.network
 
 
 import AlumniViewModel
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -112,6 +113,7 @@ fun AlumniListScreen(
                         items = filteredList,
                         key = { it.alumniId ?: it.hashCode() }
                     ) { alumni ->
+                        Log.e("AlumniListScreen", "Displaying Alumni: ${alumni.name} (${alumni.courseName} - ${alumni.batch})")
 
                         AlumniCard1(
                             alumni = alumni,

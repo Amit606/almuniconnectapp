@@ -94,6 +94,7 @@ import com.kwh.almuniconnect.tallent.TalentViewModel
 import com.kwh.almuniconnect.tallent.shareTalent
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 import androidx.core.content.edit
+import com.kwh.almuniconnect.nearby.PermissionInfoScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -166,19 +167,38 @@ fun AppNavGraph(
             )
         }
 
+//        composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
+//            LocationPermissionScreen(navController,onAllowClick = {
+//                navController.navigate(Routes.NEARBY_HARCOURTIANS)
+//            }) {
+//                navController.navigate(Routes.HOME) {
+//                    popUpTo(Routes.SPLASH) { inclusive = true }
+//                }
+//            }
+//        }
+//        composable(Routes.NEARBY_HARCOURTIANS) {
+//
+//             NearbyHarcourtianScreen(navController)
+//        }
         composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
-            LocationPermissionScreen(navController,onAllowClick = {
-                navController.navigate(Routes.NEARBY_HARCOURTIANS)
-            }) {
-                navController.navigate(Routes.HOME) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
-                }
-            }
-           // NearbyHarcourtianScreen(navController)
-        }
-        composable(Routes.NEARBY_HARCOURTIANS) {
 
-             NearbyHarcourtianScreen(navController)
+            LocationPermissionScreen(
+                navController,
+                onAllowClick = {
+                    navController.navigate(Routes.NEARBY_HARCOURTIANS) {
+                        popUpTo(Routes.NEARBY_HARCOURTIANS_PERMISSION) { inclusive = true }
+                    }
+                },
+                onSkipClick = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Routes.NEARBY_HARCOURTIANS) {
+            NearbyHarcourtianScreen(navController)
         }
 
 
@@ -281,27 +301,6 @@ fun AppNavGraph(
             NewsListingScreen(navController)
         }
 
-
-
-//        composable(
-//            route = "news_detail/{title}/{content}/{imageUrl}/{publishedAt}"
-//        ) { backStackEntry ->
-//
-//            val title = backStackEntry.arguments?.getString("title") ?: ""
-//            val content = backStackEntry.arguments?.getString("content") ?: ""
-//            val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
-//            val publishedAt = backStackEntry.arguments?.getString("publishedAt") ?: ""
-//
-//            NewsDetailScreen(
-//                navController,
-//                title = title,
-//                description = content,
-//                imageUrl = imageUrl,
-//                date = publishedAt,
-//                authorName = "Alumni Connect App Team" // agar pass nahi kar rahe ho
-//
-//            )
-//        }
 
 
             // 🔹 Route 1 (API type)
@@ -756,6 +755,9 @@ fun AppNavGraph(
                     popUpTo(Routes.FEED)
                 }
             }
+        }
+        composable(Routes.LOCATION_PERMISSION_INFO) {
+            PermissionInfoScreen(navController)
         }
 
         /* ---------- SUCCESS ---------- */

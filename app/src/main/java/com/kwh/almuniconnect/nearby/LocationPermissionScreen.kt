@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +24,32 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.Routes
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationPermissionScreen(
     navController: NavController,
     onAllowClick: () -> Unit,
     onSkipClick: () -> Unit
 ) {
+
+    val permissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
     val screenHeight = LocalConfiguration.current.screenHeightDp
+
+    // 🔥 Auto-redirect if already granted
+    LaunchedEffect(permissionState.status) {
+        if (permissionState.status.isGranted) {
+            onAllowClick()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -44,7 +62,7 @@ fun LocationPermissionScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState()), // ✅ scroll for small devices
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -53,8 +71,8 @@ fun LocationPermissionScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Find Nearby Alumni",
-                fontSize = (screenHeight * 0.03f).sp, // ✅ dynamic text
+                text = "Find Nearby Harcourtians",
+                fontSize = (screenHeight * 0.03f).sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
                 textAlign = TextAlign.Center
@@ -63,27 +81,54 @@ fun LocationPermissionScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "We use your location to help you discover alumni nearby, attend local meetups, and build stronger connections within your community.",
+                text = "Discover verified Harcourtians around you for meaningful connections, mentorship, and local meetups.",
                 fontSize = (screenHeight * 0.018f).sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Your location is secure and never shared publicly.",
-                fontSize = (screenHeight * 0.015f).sp,
-                color = Color.LightGray,
+                text = "📍 Your location is used only to find nearby Harcourtians — it is never shown to other users.",
+                fontSize = (screenHeight * 0.016f).sp,
+                color = Color(0xFF424242),
                 textAlign = TextAlign.Center
             )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "🔒 With your permission, we store only approximate location (not exact address) to enable nearby discovery. You remain in full control.",
+                fontSize = (screenHeight * 0.016f).sp,
+                color = Color(0xFF2E7D32),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "✅ Trusted by Harcourtian alumni community",
+                fontSize = (screenHeight * 0.015f).sp,
+                color = Color(0xFF1E88E5),
+                textAlign = TextAlign.Center
+            )
+            TextButton(
+                onClick = {
+                    navController.navigate(Routes.LOCATION_PERMISSION_INFO)
+                }
+            ) {
+                Text(
+                    text = "Why do we need your location?",
+                    color = Color(0xFF1E88E5),
+                    fontSize = 14.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
                 onClick = {
-                    Log.d("LocationPermission", "Allow Location clicked")
-                    onAllowClick()
+                    permissionState.launchPermissionRequest()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,8 +140,7 @@ fun LocationPermissionScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = {
-                navController.popBackStack()
-
+                onSkipClick()
             }) {
                 Text("Skip for now")
             }

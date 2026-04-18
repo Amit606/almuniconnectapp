@@ -1,5 +1,7 @@
 package com.kwh.almuniconnect.morefeature
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
@@ -39,6 +41,7 @@ import coil.request.ImageRequest
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.HourglassTop
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.api.ApiService
@@ -60,6 +63,7 @@ enum class MORE{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreFeaturesScreen(navController: NavController) {
+    val context = LocalContext.current
 
     val features = listOf(
        // FeatureModel("Mentorship", Icons.Default.School),
@@ -102,7 +106,18 @@ fun MoreFeaturesScreen(navController: NavController) {
                         MORE.MENTORSHIP.name -> navController.navigate(Routes.COMING_SOON)
                         MORE.JOB_PROFILE.name -> navController.navigate(Routes.JOB_PROFILE_COMMING_SOON)
                         MORE.MEDIA.name -> navController.navigate(Routes.MEDIA_FEATURE)
-                        MORE.NEARBY.name -> navController.navigate(Routes.NEAR_BY_COMMING_SOON)
+                        MORE.NEARBY.name -> {
+                            val permission = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            )
+
+                            if (permission == PackageManager.PERMISSION_GRANTED) {
+                                navController.navigate(Routes.NEARBY_HARCOURTIANS)
+                            } else {
+                                navController.navigate(Routes.NEARBY_HARCOURTIANS_PERMISSION)
+                            }
+                        }
                         MORE.VERIFICATION.name -> navController.navigate(Routes.VERIFICATION) // ✅ ADD THIS
 
                     }

@@ -229,22 +229,22 @@ private fun ExperienceSkillsPage(
             modifier = Modifier.fillMaxWidth()
         )
 
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            viewModel.skillsList.forEach { skill ->
-                AssistChip(
-                    onClick = { },
-                    label = { Text(skill) },
-                    trailingIcon = {
-                        IconButton(onClick = { viewModel.removeSkill(skill) }) {
-                            Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.Gray)
-                        }
-                    }
-                )
-            }
-        }
+//        FlowRow(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            viewModel.skillsList.forEach { skill ->
+//                AssistChip(
+//                    onClick = { },
+//                    label = { Text(skill) },
+//                    trailingIcon = {
+//                        IconButton(onClick = { viewModel.removeSkill(skill) }) {
+//                            Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.Gray)
+//                        }
+//                    }
+//                )
+//            }
+//        }
 
         Spacer(Modifier.weight(1f))
 

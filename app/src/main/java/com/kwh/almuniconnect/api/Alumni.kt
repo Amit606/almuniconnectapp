@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.api
 import com.kwh.almuniconnect.evetns.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
 import com.kwh.almuniconnect.login.EmailCheckApiResponse
+import com.kwh.almuniconnect.nearby.NearbyAlumniResponse
 import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.news.NewsResponse
 import com.kwh.almuniconnect.profile.ProfileResponse
@@ -189,6 +190,14 @@ interface ApiService {
         @Header("accept") accept: String = "application/json",
         @Header("X-Correlation-ID") correlationId: String
     ): Response<VerifyResponse>
+
+
+    //near by alumni
+    @GET("alumni/nearby")
+    suspend fun getNearbyAlumni(
+        @Query("latitude") lat: Double,
+        @Query("longitude") lng: Double
+    ): NearbyAlumniResponse
 }
 
 data class VerifyRequest(

@@ -1,8 +1,6 @@
 package com.kwh.almuniconnect.login
 
 import android.content.Context
-import android.util.Log
-import com.google.gson.Gson
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.SignupRequest
 import com.kwh.almuniconnect.profile.ProfileResponse
@@ -64,8 +62,8 @@ class AuthRepository(
       val tokenDataStore = TokenDataStore(context)
         return try {
 
-            val response = api.checkEmailExist(email)//
-            //val response = api.checkEmailExist("amitsun.noida@gmail.com")//
+          //  val response = api.checkEmailExist(email)//
+            val response = api.checkEmailExist("amitsun.noida@gmail.com")//
             if (!response.isSuccessful) {
                 return Result.failure(
                     Exception("HTTP ${response.code()}")

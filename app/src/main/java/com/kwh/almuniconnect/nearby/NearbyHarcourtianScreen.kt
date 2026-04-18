@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -96,115 +97,130 @@ fun NearbyHarcourtianScreen(
 ) {
 
     val context = LocalContext.current
-    val alumniList = alumniList//viewModel.alumniList
+
+    val alumniList by viewModel.alumniList
+    val isLoading by viewModel.isLoading
+    val error by viewModel.errorMessage
+
+    var hasLoaded by remember { mutableStateOf(false) }
+
+    // ✅ SAFE API CALL (only once)
+    LaunchedEffect(Unit) {
+        if (!hasLoaded) {
+            hasLoaded = true
+
+            val locationProvider = LocationProvider(context)
+
+            locationProvider.getLocation { location ->
+                location?.let {
+                    viewModel.loadNearby(it.latitude, it.longitude)
+                }
+            }
+        }
+    }
 
     Scaffold(
-
         topBar = {
             TopAppBar(
-                title = {
-                    Text("Nearby Harcourtians")
-                },
+                title = { Text("Nearby Harcourtians") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack()}) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
                 actions = {
-
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Search, contentDescription = null)
                     }
-
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.Map,
-                            contentDescription = "Map View"
-                        )
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Map, contentDescription = null)
                     }
                 }
             )
         }
-
     ) { padding ->
-
-        LocationPermission {
-
-            val locationProvider = LocationProvider(context)
-
-            LaunchedEffect(true) {
-
-                val permission = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-
-                if (permission == PackageManager.PERMISSION_GRANTED) {
-
-                    locationProvider.getLocation { location ->
-
-                        if (location != null) {
-                            Log.e("LOCATION", "Got location: ${location.latitude}, ${location.longitude} ✅")
-
-                            viewModel.loadNearby(
-                                location.latitude,
-                                location.longitude
-                            )
-
-                        } else {
-                            Log.d("LOCATION", "Location null ❌")
-                        }
-                    }
-                }
-            }
-        }
 
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-
                 .background(Color(0xFFF5F7FA))
         ) {
 
-            NearbySmartBanner(
-                count = alumniList.size
-            )
+            NearbySmartBanner(count = alumniList.size)
 
-            if (alumniList.isEmpty()) {
-
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No Harcourtians nearby")
-                }
-
-            } else {
-
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-
-                    items(alumniList) { alumni ->
-
-                        AlumniCard(alumni)
-
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                }
+            when {
+                isLoading -> Loader()
+                error != null -> ErrorState(error!!)
+                alumniList.isEmpty() -> EmptyState()
+                else -> AlumniList(alumniList,navController)
             }
         }
     }
 }
 @Composable
-fun AlumniCard(alumni: NearAlumni) {
+fun Loader() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+@Composable
+fun ErrorState(msg: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(msg)
+    }
+}
+@Composable
+fun AlumniList(list: List<NearAlumni>,navController: NavController) {
+
+    LazyColumn(contentPadding = PaddingValues(16.dp)) {
+
+        items(list) { alumni ->
+
+            AlumniCard(alumni,navController)
+
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+@Composable
+fun EmptyState() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Icon(
+            imageVector = Icons.Default.People,
+            contentDescription = null,
+            tint = Color.Gray,
+            modifier = Modifier.size(48.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            "No Harcourtians found nearby",
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            "Try moving to a different location or check back later",
+            color = Color.Gray,
+            fontSize = 13.sp
+        )
+    }
+}
+@Composable
+fun AlumniCard(alumni: NearAlumni,navController: NavController) {
+    var showSheet by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -260,7 +276,10 @@ fun AlumniCard(alumni: NearAlumni) {
             Column {
 
                 Button(
-                    onClick = { },
+                    onClick = {
+                        showSheet = true
+
+                    },
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp)
                 ) {
@@ -276,6 +295,13 @@ fun AlumniCard(alumni: NearAlumni) {
                 ) {
                     Text("Chat")
                 }
+            }
+            if (showSheet) {
+                AlumniActionSheet(
+                    alumni = alumni,
+                    onDismiss = { showSheet = false },
+                    navController = navController
+                )
             }
         }
     }
@@ -322,3 +348,4 @@ fun NearbySmartBanner(count: Int) {
         }
     }
 }
+
