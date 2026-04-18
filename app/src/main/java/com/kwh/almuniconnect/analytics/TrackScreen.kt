@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun TrackScreen(screenName: String) {
-    LaunchedEffect(screenName) {
+    LaunchedEffect(Unit) {
         AnalyticsManager.logScreen(screenName)
     }
 }

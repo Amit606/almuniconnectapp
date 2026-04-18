@@ -52,8 +52,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.almunipost.SuccessViewModel
+import com.kwh.almuniconnect.billing.PremiumAnalytics
 import com.kwh.almuniconnect.branding.ProductServiceCard
 import com.kwh.almuniconnect.branding.ProductServiceViewModel
 import com.kwh.almuniconnect.evetns.Event
@@ -871,6 +873,7 @@ fun EventCard(
         }
     }
 }
+
 
 
 

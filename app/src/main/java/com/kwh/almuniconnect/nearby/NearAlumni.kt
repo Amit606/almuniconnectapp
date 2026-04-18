@@ -1,19 +1,10 @@
 package com.kwh.almuniconnect.nearby
-//
-//data class NearAlumni(
-//    val userId: String,
-//    val name: String,
-//    val branch: String,
-//    val batch: String,
-//    val city: String,
-//    val profileImage: String?,
-//    val latitude: Double,
-//    val longitude: Double,
-//    val distanceKm: Float
-//)
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class NearAlumni(
-
     val userId: String,
     val name: String,
 
@@ -22,7 +13,7 @@ data class NearAlumni(
     val email: String?,
 
     val courseId: Int?,
-    val branch: String,              // courseName
+    val branch: String,
     val batch: String,
 
     val countryId: Int?,
@@ -42,4 +33,4 @@ data class NearAlumni(
     val longitude: Double,
 
     val distanceKm: Float
-)
+) : Parcelable

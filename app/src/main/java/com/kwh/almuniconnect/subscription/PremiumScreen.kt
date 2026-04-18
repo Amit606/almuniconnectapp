@@ -61,7 +61,7 @@ fun PremiumScreen(
 
             delay(800)
 
-            navController.navigate(Routes.NEARBY_HARCOURTIANS) {
+            navController.navigate(Routes.HOME) {
                 popUpTo(Routes.SUBSCRIPTION) { inclusive = true }
             }
         }

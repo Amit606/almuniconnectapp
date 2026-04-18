@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.android.billingclient.api.*
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.storage.UserLocalModel
 import com.kwh.almuniconnect.storage.UserPreferences
@@ -37,6 +38,7 @@ class BillingManager(
 
     private var userId: String = ""
     private var email: String = ""
+    private var alumniID: String = ""
 
     private var productDetails: ProductDetails? = null
 
@@ -110,7 +112,7 @@ class BillingManager(
         }
     }
     fun setUser(userId: String, email: String) {
-        this.userId = userId
+        this.alumniID = userId
         this.email = email
     }
 
@@ -248,30 +250,39 @@ class BillingManager(
             putString(FirebaseAnalytics.Param.ITEM_ID, "alumni_premium_199")
         }
         firebase.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)
-        saveToFirestore(userId,email)
+        saveToFireStore(alumniID,email)
     }
-    fun saveToFirestore(userId: String,email: String) {
 
-        val db = FirebaseFirestore.getInstance()
-        PremiumAnalytics.logPurchaseSuccess(context, userId)
-        val userData = hashMapOf(
-            "userId" to userId,
-            "email" to email,
-            "isPremium" to true,
-            "productId" to "alumni_premium_199",
-            "purchaseTime" to System.currentTimeMillis()
-        )
+fun saveToFireStore(alumniID:String,email: String) {
 
-        db.collection("subscriptions")
-            .document(userData["userId"].toString())
-            .set(userData)
-            .addOnSuccessListener {
-                Log.d("Firestore", "Saved successfully")
-            }
-            .addOnFailureListener {
-                Log.e("Firestore", "Error saving", it)
-            }
-    }
+    val user = FirebaseAuth.getInstance().currentUser
+
+
+    val userId = user?.uid   // ✅ always correct UID
+
+    val db = FirebaseFirestore.getInstance()
+
+    PremiumAnalytics.logPurchaseSuccess(context, userId.toString())
+
+    val userData = hashMapOf(
+        "userId" to userId,
+        "alumniID" to alumniID,  // ✅ consistent field name
+        "email" to email,
+        "isPremium" to true,
+        "productId" to "alumni_premium_199",
+        "purchaseTime" to System.currentTimeMillis()
+    )
+
+    db.collection("subscriptions")
+        .document(userId.toString())   // ✅ match rules
+        .set(userData)
+        .addOnSuccessListener {
+            Log.d("Firestore", "Saved successfully")
+        }
+        .addOnFailureListener {
+            Log.e("Firestore", "Error saving", it)
+        }
+}
 
     // -------------------------------
     // End Connection

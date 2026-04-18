@@ -53,9 +53,9 @@ fun AlumniActionSheet(
             ActionItem("👤 View Profile") {
                 navController.currentBackStackEntry
                     ?.savedStateHandle
-                    ?.set("alumni", alumni)
+                    ?.set("nearalumni", alumni)
 
-                navController.navigate("profile")
+                navController.navigate(Routes.NEAR_ALUMNI_PROFILE)
                 onDismiss()
             }
 

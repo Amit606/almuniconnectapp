@@ -94,6 +94,9 @@ import com.kwh.almuniconnect.tallent.TalentViewModel
 import com.kwh.almuniconnect.tallent.shareTalent
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 import androidx.core.content.edit
+import com.kwh.almuniconnect.analytics.AnalyticsManager
+import com.kwh.almuniconnect.nearby.NearAlumni
+import com.kwh.almuniconnect.nearby.NearAlumniProfile
 import com.kwh.almuniconnect.nearby.PermissionInfoScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -132,15 +135,10 @@ fun AppNavGraph(
         // 🟣 Splash Screen
         composable(Routes.SPLASH) {
          SplashScreen(navController)
-//            JobProfileScreen(
-//                onSaveProfile = { profileData ->
-//                    // Send to backend or save locally
-//                    Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_LONG).show()
-//                },
-//                onCancel = { navController.popBackStack() }
-//            )
+
         }
         composable(Routes.JOB_PROFILE){
+            AnalyticsManager.logScreen("JOB_PROFILE")
 
             JobProfileScreen(
                 onBack = { navController.popBackStack() },
@@ -149,6 +147,8 @@ fun AppNavGraph(
         }
         composable(Routes.JOB_PROFILE_COMMING_SOON)
         {
+            AnalyticsManager.logScreen("JOB_PROFILE_COMMING_SOON")
+
             JobProfileComingSoonScreen(navController, onNotifyClick =
                 {
                     subscribeToJobProfile(context)
@@ -159,6 +159,8 @@ fun AppNavGraph(
         //NearbyComingSoonScreen
         composable(Routes.NEAR_BY_COMMING_SOON)
         {
+            AnalyticsManager.logScreen("NEAR_BY_COMMING_SOON")
+
             NearbyComingSoonScreen(navController, onNotifyClick =
                 {
                     subscribeToNearbyFeature(context)
@@ -167,20 +169,8 @@ fun AppNavGraph(
             )
         }
 
-//        composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
-//            LocationPermissionScreen(navController,onAllowClick = {
-//                navController.navigate(Routes.NEARBY_HARCOURTIANS)
-//            }) {
-//                navController.navigate(Routes.HOME) {
-//                    popUpTo(Routes.SPLASH) { inclusive = true }
-//                }
-//            }
-//        }
-//        composable(Routes.NEARBY_HARCOURTIANS) {
-//
-//             NearbyHarcourtianScreen(navController)
-//        }
         composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
+            AnalyticsManager.logScreen("NEARBY_HARCOURTIANS_PERMISSION")
 
             LocationPermissionScreen(
                 navController,
@@ -198,15 +188,21 @@ fun AppNavGraph(
         }
 
         composable(Routes.NEARBY_HARCOURTIANS) {
+            AnalyticsManager.logScreen("NEARBY_HARCOURTIANS")
+
             NearbyHarcourtianScreen(navController)
         }
 
 
         composable(Routes.TALENT_LIST) {
+            AnalyticsManager.logScreen("TALENT_LIST")
+
             HarcourtianTalentScreen(navController)
 
         }
         composable(Routes.ADD_TALENT_LIST) {
+            AnalyticsManager.logScreen("ADD_TALENT_LIST")
+
             AddTalentScreen(navController)
 
         }
@@ -232,6 +228,8 @@ fun AppNavGraph(
         }
 
         composable(Routes.BRANCHES) {
+
+            AnalyticsManager.logScreen("BRANCHES")
 
             val context = LocalContext.current
 
@@ -289,6 +287,7 @@ fun AppNavGraph(
 
             // Create ViewModel
             val viewModel: AlumniBatchViewModel = viewModel(factory = factory)
+            AnalyticsManager.logScreen("YearGridScreen")
 
             YearGridScreen(
                 navController = navController,
@@ -298,6 +297,8 @@ fun AppNavGraph(
             )
         }
         composable(Routes.NEWS) {
+            AnalyticsManager.logScreen("NEWS")
+
             NewsListingScreen(navController)
         }
 
@@ -352,12 +353,17 @@ fun AppNavGraph(
             val videoId = Uri.decode(
                 backStackEntry.arguments?.getString("videoId") ?: ""
             )
+            AnalyticsManager.logScreen("YoutubePlayerScreen")
+
             YoutubePlayerScreen(videoId,navController)
         }
         composable(Routes.MORE_FEATURES) {
+            AnalyticsManager.logScreen("MORE_FEATURES")
+
             MoreFeaturesScreen(navController)
         }
         composable(Routes.MEDIA_FEATURE) {
+            AnalyticsManager.logScreen("MEDIA_FEATURE")
             MediaScreen(navController)
         }
         composable(Routes.Internet_Splash) {
@@ -370,6 +376,8 @@ fun AppNavGraph(
 
         composable(Routes.USER_PROFILE)
         {
+            AnalyticsManager.logScreen("USER_PROFILE")
+
             val context = LocalContext.current
 
             val database = remember {
@@ -394,6 +402,8 @@ fun AppNavGraph(
             ProfileScreen(navController,viewModel)
         }
         composable(Routes.APPROVAL_PENDING) {
+            AnalyticsManager.logScreen("APPROVAL_PENDING")
+
             ApprovalPendingScreen()
         }
         composable(
@@ -423,18 +433,24 @@ fun AppNavGraph(
             )
         }
         composable("terms") {
+            AnalyticsManager.logScreen("terms")
+
             TermsScreen {
                 navController.popBackStack()
             }
         }
 
         composable("privacy") {
+            AnalyticsManager.logScreen("privacy")
+
             PrivacyPolicyScreen {
                 navController.popBackStack()
             }
         }
 
         composable("profile") {
+            AnalyticsManager.logScreen("profile")
+
 
             val alumni = navController
                 .previousBackStackEntry
@@ -448,6 +464,22 @@ fun AppNavGraph(
                 )
             }
         }
+        composable(Routes.NEAR_ALUMNI_PROFILE) {
+            AnalyticsManager.logScreen("NEAR_ALUMNI_PROFILE")
+
+                val alumni = navController
+                    .previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<NearAlumni>("nearalumni")
+
+                alumni?.let {
+                    NearAlumniProfile(
+                        alumni = it,
+                        navController = navController
+                    )
+                }
+
+        }
 
 
 
@@ -458,11 +490,15 @@ fun AppNavGraph(
         }
         composable(Routes.FEEDBACK)
         {
+            AnalyticsManager.logScreen("FEEDBACK")
+
             FeedbackForm(navController)
 
         }
         composable(Routes.COMING_SOON)
         {
+            AnalyticsManager.logScreen("COMING_SOON")
+
             ComingSoonScreen(
                 navController,
                 onNotifyClick = {
@@ -496,12 +532,16 @@ fun AppNavGraph(
 
         composable(Routes.LOGIN)
         {
+            AnalyticsManager.logScreen("LOGIN")
+
             LoginRoute(navController)
 
         }
         // 🔢 OTP Screen
      composable(Routes.VERIFICATION)
      {
+         AnalyticsManager.logScreen("VERIFICATION")
+
          AccountVerificationScreen(
              navController = navController,
 
@@ -545,6 +585,8 @@ fun AppNavGraph(
 
         // 🟢 Intro Screen
         composable(Routes.INTRO) {
+            AnalyticsManager.logScreen("INTRO")
+
             IntroScreen(
                 pages= pages,
                 onFinish = {
@@ -562,12 +604,18 @@ fun AppNavGraph(
             )
         }
         composable(Routes.EVENTS) {
+            AnalyticsManager.logScreen("EVENTS")
+
             EventsScreen(navController)
         }
         composable(Routes.WHATSUP_CHANNEL) {
+            AnalyticsManager.logScreen("WHATSUP_CHANNEL")
+
             WhatsAppChannelsScreen(navController)
         }
         composable(Routes.ADD_SOCIAL_CHANNEL) {
+            AnalyticsManager.logScreen("ADD_SOCIAL_CHANNEL")
+
             AddSocialChannelScreen(navController)
         }
 
@@ -590,6 +638,8 @@ fun AppNavGraph(
 
         // 🟧 Home
         composable(Routes.HOME) {
+            AnalyticsManager.logScreen("HOME")
+
             HomeScreen(
                 navController = navController,
                 onOpenProfile = { navController.navigate(Routes.USER_PROFILE) },
@@ -604,12 +654,21 @@ fun AppNavGraph(
         composable(Routes.MESSAGES) { /* MessagesScreen(navController) */ }
         composable(Routes.CREATE_POST) { /* CreatePostScreen(navController) */ }
         composable(Routes.SETTINGS) {
+            AnalyticsManager.logScreen("SETTINGS")
+
             SettingsScreen(
                 navController = navController
             )
         }
-        composable(Routes.HELP_SUPPORTS) { HelpSupportScreen(navController) }
-        composable(Routes.ABOUT_US) { AboutAlumniConnectScreen(navController) }
+        composable(Routes.HELP_SUPPORTS) {
+            AnalyticsManager.logScreen("HELP_SUPPORTS")
+
+            HelpSupportScreen(navController) }
+        composable(Routes.ABOUT_US) {
+            AnalyticsManager.logScreen("ABOUT_US")
+
+
+            AboutAlumniConnectScreen(navController) }
 
         composable(
             route = "${Routes.EVENT_DETAILS}?title={title}&date={date}&location={location}",
@@ -624,6 +683,7 @@ fun AppNavGraph(
             val location = entry.arguments?.getString("location").orEmpty()
             val date = entry.arguments?.getString("date").orEmpty()
 
+            AnalyticsManager.logScreen("EventDetailsScreen")
 
             EventDetailsScreen(navController,title, location,date,"")
         }
@@ -642,9 +702,13 @@ fun AppNavGraph(
 
 
         composable(Routes.JOB_DETAILS){
+            AnalyticsManager.logScreen("JOB_DETAILS")
+
             JobListingScreen(navController)
         }
         composable(Routes.SUBSCRIPTION){
+            AnalyticsManager.logScreen("SUBSCRIPTION")
+
             PremiumScreen(navController)
         }
 
@@ -666,12 +730,18 @@ fun AppNavGraph(
         }
 
         composable(Routes.JOB_POST){
+            AnalyticsManager.logScreen("JOB_POST")
+
             JobPostByEmailScreen(navController)
         }
         composable(Routes.PRODUCT_SCREEN){
+            AnalyticsManager.logScreen("PRODUCT_SCREEN")
+
             ProductServiceDummyScreen(navController)
         }
         composable(Routes.ALMUNI_POST){
+            AnalyticsManager.logScreen("ALMUNI_POST")
+
             AlumniStoriesScreen(navController)
         }
         composable("story_detail/{name}") { backStackEntry ->
@@ -688,11 +758,7 @@ fun AppNavGraph(
                 story = story
             )
         }
-//        composable(Routes.ENTRY) {
-//            EmergencyFeedScreen {
-//                navController.navigate(Routes.REQUEST)
-//            }
-//        }
+
 
         composable(Routes.REQUEST) {
             EmergencyRequestForm {
@@ -705,6 +771,8 @@ fun AppNavGraph(
 
         /* ---------- FEED ---------- */
         composable(Routes.FEED) {
+            AnalyticsManager.logScreen("FEED")
+
             EmergencyFeedScreen (navController){ emergency ->
                 navController.navigate(
                     "emergency_detail/${emergency.id}"
@@ -757,6 +825,8 @@ fun AppNavGraph(
             }
         }
         composable(Routes.LOCATION_PERMISSION_INFO) {
+            AnalyticsManager.logScreen("LOCATION_PERMISSION_INFO")
+
             PermissionInfoScreen(navController)
         }
 

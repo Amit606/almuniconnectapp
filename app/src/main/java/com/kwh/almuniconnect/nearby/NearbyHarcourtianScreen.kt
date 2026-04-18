@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.nearby
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -92,19 +93,19 @@ fun NearbyHarcourtianScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Nearby Harcourtians") },
+                title = { Text("Nearby Alumni") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Search, contentDescription = null)
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Map, contentDescription = null)
-                    }
+//                    IconButton(onClick = {}) {
+//                        Icon(Icons.Default.Search, contentDescription = null)
+//                    }
+//                    IconButton(onClick = {}) {
+//                        Icon(Icons.Default.Map, contentDescription = null)
+//                    }
                 }
             )
         }
@@ -273,10 +274,13 @@ fun AlumniCard(alumni: NearAlumni,navController: NavController,isPremium: Boolea
                     onDismiss = { showSheet = false },
                     navController = navController
                 )
+
             }
         }
     }
+
 }
+
 @Composable
 fun NearbySmartBanner(count: Int) {
 

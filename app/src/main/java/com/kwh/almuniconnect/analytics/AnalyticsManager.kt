@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.analytics
 import android.content.Context
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
+import java.util.Locale
 
 object AnalyticsManager {
 
@@ -26,11 +27,11 @@ object AnalyticsManager {
 
         analytics.logEvent(event.name, bundle)
     }
-    fun logScreen(screenName: String) {
+    fun logScreen(screenName: String, screenClass: String = "ComposeScreen") {
         val bundle = Bundle().apply {
-            putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
+            putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName.toLowerCase(Locale.ROOT))
+            putString(FirebaseAnalytics.Param.SCREEN_CLASS, screenClass)
         }
-
         analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
     }
 }
