@@ -2,10 +2,20 @@ package com.kwh.almuniconnect.billing
 
 import android.app.Activity
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import com.android.billingclient.api.*
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.firestore.FirebaseFirestore
+import com.kwh.almuniconnect.storage.UserLocalModel
+import com.kwh.almuniconnect.storage.UserPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+
+
 
 class BillingManager(
     private val context: Context
@@ -16,11 +26,17 @@ class BillingManager(
         private const val TAG = "BillingManager"
     }
 
+    private val prefs =
+        context.getSharedPreferences("billing_prefs", Context.MODE_PRIVATE)
+
     private val _isPremium = MutableStateFlow(false)
     val isPremium: StateFlow<Boolean> = _isPremium
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private var userId: String = ""
+    private var email: String = ""
 
     private var productDetails: ProductDetails? = null
 
@@ -30,21 +46,32 @@ class BillingManager(
             .enablePendingPurchases()
             .build()
 
+    init {
+        // 🔥 Load cached premium state
+        _isPremium.value = prefs.getBoolean("is_premium", false)
+    }
+
     // -------------------------------
     // Start Billing Connection
     // -------------------------------
     fun startConnection(onConnected: (() -> Unit)? = null) {
+
         if (billingClient.isReady) {
             onConnected?.invoke()
             return
         }
 
         billingClient.startConnection(object : BillingClientStateListener {
+
             override fun onBillingSetupFinished(result: BillingResult) {
+
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+
                     Log.d(TAG, "Billing Connected")
+
                     queryProductDetails()
                     restorePurchase()
+
                     onConnected?.invoke()
                 }
             }
@@ -56,52 +83,65 @@ class BillingManager(
     }
 
     // -------------------------------
-    // Query Product Details
+    // Query Product
     // -------------------------------
     private fun queryProductDetails() {
-        val productList = listOf(
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(PRODUCT_ID)
-                .setProductType(BillingClient.ProductType.INAPP)
-                .build()
-        )
 
         val params = QueryProductDetailsParams.newBuilder()
-            .setProductList(productList)
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PRODUCT_ID)
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build()
+                )
+            )
             .build()
 
         billingClient.queryProductDetailsAsync(params) { result, list ->
+
             if (result.responseCode == BillingClient.BillingResponseCode.OK && list.isNotEmpty()) {
+
                 productDetails = list.first()
                 Log.d(TAG, "Product Loaded")
+            } else {
+                Log.e(TAG, "Product not found")
             }
         }
     }
+    fun setUser(userId: String, email: String) {
+        this.userId = userId
+        this.email = email
+    }
 
     // -------------------------------
-    // Launch Purchase Flow
+    // Launch Purchase
     // -------------------------------
     fun launchPurchase(activity: Activity) {
+
         if (_isPremium.value) {
-            Log.d(TAG, "User already premium")
+            Log.d(TAG, "Already premium")
             return
         }
 
-        val details = productDetails ?: return
+        if (productDetails == null) {
+            Log.e(TAG, "Product not loaded yet")
+            return
+        }
 
         _isLoading.value = true
 
-        val productDetailsParams =
+        val productParams =
             BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(details)
+                .setProductDetails(productDetails!!)
                 .build()
 
-        val billingFlowParams =
+        val flowParams =
             BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(listOf(productDetailsParams))
+                .setProductDetailsParamsList(listOf(productParams))
                 .build()
 
-        billingClient.launchBillingFlow(activity, billingFlowParams)
+        billingClient.launchBillingFlow(activity, flowParams)
     }
 
     // -------------------------------
@@ -111,12 +151,23 @@ class BillingManager(
         billingResult: BillingResult,
         purchases: MutableList<Purchase>?
     ) {
+
         _isLoading.value = false
 
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-            purchases.forEach { handlePurchase(it) }
-        } else {
-            Log.d(TAG, "Purchase Failed: ${billingResult.debugMessage}")
+        when (billingResult.responseCode) {
+
+            BillingClient.BillingResponseCode.OK -> {
+                purchases?.forEach { handlePurchase(it) }
+            }
+
+            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                Log.d(TAG, "User cancelled purchase")
+            }
+
+            else -> {
+                Log.e(TAG, "Purchase failed: ${billingResult.debugMessage}")
+                PremiumAnalytics.logPurchaseFailed(context, billingResult.debugMessage)
+            }
         }
     }
 
@@ -124,22 +175,29 @@ class BillingManager(
     // Handle Purchase
     // -------------------------------
     private fun handlePurchase(purchase: Purchase) {
+
+        // 🔥 IMPORTANT: validate product
+        if (!purchase.products.contains(PRODUCT_ID)) return
+
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
 
             if (!purchase.isAcknowledged) {
-                val acknowledgeParams =
-                    AcknowledgePurchaseParams.newBuilder()
-                        .setPurchaseToken(purchase.purchaseToken)
-                        .build()
 
-                billingClient.acknowledgePurchase(acknowledgeParams) { result ->
+                val params = AcknowledgePurchaseParams.newBuilder()
+                    .setPurchaseToken(purchase.purchaseToken)
+                    .build()
+
+                billingClient.acknowledgePurchase(params) { result ->
+
                     if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                        _isPremium.value = true
-                        Log.d(TAG, "Purchase Acknowledged")
+
+                        unlockPremium()
+                        Log.d(TAG, "Purchase acknowledged")
                     }
                 }
+
             } else {
-                _isPremium.value = true
+                unlockPremium()
             }
         }
     }
@@ -148,24 +206,76 @@ class BillingManager(
     // Restore Purchase
     // -------------------------------
     fun restorePurchase() {
-        billingClient.queryPurchasesAsync(
-            QueryPurchasesParams.newBuilder()
-                .setProductType(BillingClient.ProductType.INAPP)
-                .build()
-        ) { result, purchases ->
+
+        val params = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.INAPP)
+            .build()
+
+        billingClient.queryPurchasesAsync(params) { result, purchases ->
 
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+
+                Log.d(TAG, "Restoring purchases: ${purchases.size}")
+
                 purchases.forEach { purchase ->
+
                     if (purchase.products.contains(PRODUCT_ID) &&
                         purchase.purchaseState == Purchase.PurchaseState.PURCHASED
                     ) {
-                        _isPremium.value = true
+                        PremiumAnalytics.logRestore(context)
+                        unlockPremium()
                     }
                 }
             }
         }
     }
 
+    // -------------------------------
+    // Unlock Premium
+    // -------------------------------
+    private fun unlockPremium() {
+
+        _isPremium.value = true
+
+        prefs.edit().putBoolean("is_premium", true).apply()
+
+        // 🔥 FIREBASE PURCHASE EVENT
+        val firebase = FirebaseAnalytics.getInstance(context)
+
+        val bundle = Bundle().apply {
+            putDouble(FirebaseAnalytics.Param.VALUE, 199.0)
+            putString(FirebaseAnalytics.Param.CURRENCY, "INR")
+            putString(FirebaseAnalytics.Param.ITEM_ID, "alumni_premium_199")
+        }
+        firebase.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)
+        saveToFirestore(userId,email)
+    }
+    fun saveToFirestore(userId: String,email: String) {
+
+        val db = FirebaseFirestore.getInstance()
+        PremiumAnalytics.logPurchaseSuccess(context, userId)
+        val userData = hashMapOf(
+            "userId" to userId,
+            "email" to email,
+            "isPremium" to true,
+            "productId" to "alumni_premium_199",
+            "purchaseTime" to System.currentTimeMillis()
+        )
+
+        db.collection("subscriptions")
+            .document(userData["userId"].toString())
+            .set(userData)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Saved successfully")
+            }
+            .addOnFailureListener {
+                Log.e("Firestore", "Error saving", it)
+            }
+    }
+
+    // -------------------------------
+    // End Connection
+    // -------------------------------
     fun endConnection() {
         billingClient.endConnection()
     }

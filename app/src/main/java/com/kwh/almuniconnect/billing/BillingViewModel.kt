@@ -23,7 +23,9 @@ class BillingViewModel(application: Application) :
         billingManager.startConnection()
     }
 
-    fun buy(activity: Activity) {
+    fun buy(activity: Activity,email:String,userID:String) {
+        billingManager.setUser(userID, email)
+
         billingManager.launchPurchase(activity)
     }
 

@@ -1,10 +1,6 @@
 package com.kwh.almuniconnect.nearby
-
-import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
-
 class NearbyRepository(
     private val api: ApiService = NetworkClient.createService(ApiService::class.java)
 ) {
@@ -18,17 +14,37 @@ class NearbyRepository(
             if (!response.success || response.data == null) {
                 emptyList()
             } else {
+
                 response.data.map {
 
                     NearAlumni(
                         userId = it.alumniId,
                         name = it.name,
+
+                        countryCode = it.countryCode,
+                        mobileNo = it.mobileNo,
+                        email = it.email,
+
+                        courseId = it.courseId,
                         branch = it.courseName,
                         batch = it.batch.toString(),
+
+                        countryId = it.countryId,
+                        countryName = it.countryName,
                         city = it.cityName,
+
+                        companyName = it.companyName,
+                        title = it.title,
+                        totalExperience = it.totalExperience,
+
+                        linkedinUrl = it.linkedinUrl,
                         profileImage = it.photoUrl,
+
+                        isVerified = it.isVerified,
+
                         latitude = it.latitude.toDoubleOrNull() ?: 0.0,
                         longitude = it.longitude.toDoubleOrNull() ?: 0.0,
+
                         distanceKm = it.distanceKm.toFloat()
                     )
                 }

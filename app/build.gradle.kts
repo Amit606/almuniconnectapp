@@ -16,8 +16,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 27
-        versionName = "1.2.7"
+        versionCode = 28
+        versionName = "1.2.7.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

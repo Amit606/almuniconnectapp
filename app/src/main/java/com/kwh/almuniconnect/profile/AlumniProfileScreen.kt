@@ -39,8 +39,12 @@ import com.kwh.almuniconnect.network.AlumniDto
 import androidx.core.net.toUri
 import android.graphics.Paint
 import android.graphics.Path
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.nativeCanvas
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kwh.almuniconnect.Routes
+import com.kwh.almuniconnect.billing.BillingViewModel
+import androidx.compose.runtime.getValue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlumniProfileScreen(
@@ -50,6 +54,8 @@ fun AlumniProfileScreen(
 
     val context = LocalContext.current
     TrackScreen("alumni_profile_screen")
+    val billingViewModel: BillingViewModel = viewModel()
+    val isPremium = billingViewModel.isPremium.collectAsState().value
 
     Scaffold(
         topBar = {
@@ -59,7 +65,7 @@ fun AlumniProfileScreen(
             )
         }
     ) { padding ->
-
+        Log.e("AlumniProfileScreen","Rendering profile for  isPremium: $isPremium")
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -147,40 +153,63 @@ fun AlumniProfileScreen(
 
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    ProfileRow(
+                    PremiumProfileRow(
                         icon = Icons.Default.Phone,
                         label = "Mobile",
                         value = alumni.mobileNo.toString(),
-                        onClick = { callPhone(context, alumni.mobileNo.toString()) }
+                        isPremium = isPremium,
+                        onUnlockClick = {
+                            navController.navigate(Routes.SUBSCRIPTION)
+                        },
+                        onClick = {
+                            callPhone(context, alumni.mobileNo.toString())
+                        }
                     )
 
                     HorizontalDivider()
 
-                    ProfileRow(
+                    PremiumProfileRow(
                         icon = Icons.Default.Email,
                         label = "Email",
                         value = alumni.email.toString(),
-                        onClick = { sendEmail(context, alumni.email.toString()) }
+                        isPremium = isPremium,
+                        onUnlockClick = {
+                            navController.navigate(Routes.SUBSCRIPTION)
+                        },
+                        onClick = {
+                            sendEmail(context, alumni.email.toString())
+                        }
                     )
 
                     HorizontalDivider()
-
-                    ProfileRow(
+                    PremiumProfileRow(
                         icon = Icons.Default.LocationOn,
                         label = "Location",
                         value = alumni.countryName.toString(),
-                        onClick = { openLocation(context, alumni.countryName.toString()) }
+                        isPremium = isPremium,
+                        onUnlockClick = {
+                            navController.navigate(Routes.SUBSCRIPTION)
+                        },
+                        onClick = {
+                            openLocation(context, alumni.countryName.toString())                       }
                     )
+
+
 
                     HorizontalDivider()
 
-                    ProfileRow(
+                    PremiumProfileRow(
                         icon = Icons.Default.Whatsapp,
                         label = "WhatsApp",
                         value = alumni.mobileNo.toString(),
-                        iconTint = Color(0xFF25D366),
-                        onClick = { openWhatsApp(context, alumni.mobileNo.toString()) }
+                        isPremium = isPremium,
+                        onUnlockClick = {
+                            navController.navigate(Routes.SUBSCRIPTION)
+                        },
+                        onClick = {
+                            openWhatsApp(context, alumni.mobileNo.toString())                        }
                     )
+
                 }
             }
 
@@ -229,61 +258,105 @@ fun AlumniProfileScreen(
 }
 
 /* ---------------- PROFILE ROW ---------------- */
-
 @Composable
-fun ProfileRow(
+fun PremiumProfileRow(
     icon: ImageVector,
     label: String,
     value: String,
-    iconTint: Color = MaterialTheme.colorScheme.primary,
+    isPremium: Boolean,
+    onUnlockClick: () -> Unit,
     onClick: () -> Unit
 ) {
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .clickable { onClick() }
-            .padding(vertical = 14.dp),
+            .clickable {
+                if (isPremium) onClick() else onUnlockClick()
+            }
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .background(
-                    iconTint.copy(alpha = 0.10f),
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
+        Icon(icon, contentDescription = null)
 
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = iconTint,
-                modifier = Modifier.size(24.dp)
-            )
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+
+            Text(label, fontWeight = FontWeight.SemiBold)
+
+            if (isPremium) {
+                Text(value)
+            } else {
+                Text("🔒 Unlock with Premium", color = Color.Gray)
+            }
         }
 
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Column {
-
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
+        if (!isPremium) {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null,
+                tint = Color.Gray
             )
         }
     }
 }
+
+//@Composable
+//fun ProfileRow(
+//    icon: ImageVector,
+//    label: String,
+//    value: String,
+//    iconTint: Color = MaterialTheme.colorScheme.primary,
+//    onClick: () -> Unit
+//) {
+//
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clip(RoundedCornerShape(14.dp))
+//            .clickable { onClick() }
+//            .padding(vertical = 14.dp),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//
+//        Box(
+//            modifier = Modifier
+//                .size(44.dp)
+//                .background(
+//                    iconTint.copy(alpha = 0.10f),
+//                    CircleShape
+//                ),
+//            contentAlignment = Alignment.Center
+//        ) {
+//
+//            Icon(
+//                imageVector = icon,
+//                contentDescription = label,
+//                tint = iconTint,
+//                modifier = Modifier.size(24.dp)
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.width(14.dp))
+//
+//        Column {
+//
+//            Text(
+//                text = label,
+//                style = MaterialTheme.typography.labelSmall,
+//                color = MaterialTheme.colorScheme.onSurfaceVariant
+//            )
+//
+//            Text(
+//                text = value,
+//                style = MaterialTheme.typography.bodyMedium,
+//                fontWeight = FontWeight.Medium
+//            )
+//        }
+//    }
+//}
 
 /* ---------------- HARCOURTIAN IMAGE ---------------- */
 
