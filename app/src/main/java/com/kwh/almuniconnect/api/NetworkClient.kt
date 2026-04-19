@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.api
 
 import com.kwh.almuniconnect.api.NetworkClient.logging
+import com.kwh.almuniconnect.network.AuthInterceptor
 import com.kwh.almuniconnect.storage.TokenDataStore
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

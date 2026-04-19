@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.nearby
 
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -48,44 +49,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.billing.BillingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NearbyHarcourtianScreen(
     navController: NavController,
-    viewModel: NearbyAlumniViewModel = viewModel()
 ) {
 
     val context = LocalContext.current
 
-    val alumniList by viewModel.alumniList
-    val isLoading by viewModel.isLoading
-    val error by viewModel.errorMessage
     val billingViewModel: BillingViewModel = viewModel()
     val isPremium by billingViewModel.isPremium.collectAsState()
 
-    var hasLoaded by remember { mutableStateOf(false) }
+    val viewModel: NearbyAlumniViewModel = viewModel(
+        factory = NearbyViewModelFactory(context)
+    )
+
+    val alumniList by viewModel.alumniList
+    val isLoading by viewModel.isLoading
+    val error by viewModel.errorMessage
+
     LaunchedEffect(Unit) {
+
+        Log.d("NearbyScreen", "Screen launched")
+
+        // ✅ Step 1: Billing
         billingViewModel.startBilling()
-    }
 
-    if (isPremium) {
-        Text("Premium User ✅")
-    } else {
-        Text("Locked 🔒")
-    }
-    // ✅ SAFE API CALL (only once)
-    LaunchedEffect(Unit) {
-        if (!hasLoaded) {
-            hasLoaded = true
+        // ✅ Step 2: Location
+        val locationProvider = LocationProvider(context)
 
-            val locationProvider = LocationProvider(context)
+        locationProvider.getLocation { location ->
 
-            locationProvider.getLocation { location ->
-                location?.let {
-                    viewModel.loadNearby(it.latitude, it.longitude)
-                }
+            if (location != null) {
+                Log.d("NearbyScreen", "Location: ${location.latitude}, ${location.longitude}")
+
+                viewModel.loadNearby(location.latitude, location.longitude)
+
+            } else {
+                Log.e("NearbyScreen", "Location null")
             }
         }
     }

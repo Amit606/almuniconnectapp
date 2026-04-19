@@ -55,6 +55,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.almunipost.SuccessViewModel
+import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.billing.PremiumAnalytics
 import com.kwh.almuniconnect.branding.ProductServiceCard
 import com.kwh.almuniconnect.branding.ProductServiceViewModel
@@ -242,8 +244,13 @@ fun HomeScreen(
         ) {
 
             item {
+                val viewModel = remember {
+                    HomeViewModel(
+                        context = context,
+                        authApi = NetworkClient.createService(ApiService::class.java)
+                    )
+                }
 
-                val viewModel: HomeViewModel = viewModel()
                 val bannerImages = viewModel.banners
                 val isLoading = viewModel.isLoading
                 val context = LocalContext.current
@@ -648,15 +655,6 @@ fun BottomAppBarWithNav(
     }}
 }
 
-// Sample models + data
-
-
-
-
-
-
-
-
 data class UniversityNews(
     val id: String,
 
@@ -683,196 +681,8 @@ enum class ProductCategory {
     EDUCATION,
     NETWORKING
 }
-fun getDummyProducts() = listOf(
-    HProduct(
-        id = "1",
-        productName = "HBTU Alumni Mart",
-        category = ProductCategory.ALUMNI,
-        tagline = "Discover, connect, and grow with HBTU alumni worldwide",
-        founderName = "HBTU Alumni Association",
-        location = "Kanpur, Uttar Pradesh, India • Global Network"
-    ),
-    HProduct(
-        id = "2",
-        productName = "Harcourtian Jobs",
-        category = ProductCategory.CAREER,
-        tagline = "Jobs and referrals from trusted alumni",
-        founderName = "Harcourtian Team",
-        location = "Bengaluru"
-    ),
-    HProduct(
-        id = "3",
-        productName = "Align My Career",
-        category = ProductCategory.CAREER,
-        tagline = "Career guidance for students and professionals",
-        founderName = "Ankit Gupta",
-        location = "Delhi"
-    ),
-    HProduct(
-        id = "4",
-        productName = "AlumBridge",
-        category = ProductCategory.ALUMNI,
-        tagline = "Reuniting alumni through shared journeys",
-        founderName = "Harcourtian Ventures",
-        location = "Mumbai"
-    ),
-    HProduct(
-        id = "5",
-        productName = "MentorNet",
-        category = ProductCategory.EDUCATION,
-        tagline = "Mentorship from experienced professionals",
-        founderName = "Rohit Verma",
-        location = "Pune"
-    ),
-    HProduct(
-        id = "6",
-        productName = "CampusConnect",
-        category = ProductCategory.EDUCATION,
-        tagline = "Bridging students and alumni",
-        founderName = "Harcourtian Innovation",
-        location = "Noida"
-    ),
-    HProduct(
-        id = "7",
-        productName = "Referra",
-        category = ProductCategory.NETWORKING,
-        tagline = "Smart employee referral platform",
-        founderName = "Amit Sharma",
-        location = "Gurugram"
-    ),
-    HProduct(
-        id = "8",
-        productName = "Netly",
-        category = ProductCategory.NETWORKING,
-        tagline = "Build meaningful professional connections",
-        founderName = "Harcourtian Labs",
-        location = "Hyderabad"
-    ),
-    HProduct(
-        id = "9",
-        productName = "GradLink",
-        category = ProductCategory.ALUMNI,
-        tagline = "From campus to career success",
-        founderName = "EduTech Collective",
-        location = "Chennai"
-    ),
-    HProduct(
-        id = "10",
-        productName = "CareerBond",
-        category = ProductCategory.CAREER,
-        tagline = "Where careers connect",
-        founderName = "Harcourtian Team",
-        location = "Remote"
-    )
-)
 
-@Composable
-fun EventCard(
-    imageUrl: String,
-    title: String,
-    date: String,
-    organizer: String,
-    onBuyClick: () -> Unit
-) {
 
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    ) {
-
-        Column {
-
-            // 🔹 Event Image
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "Event Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = 20.dp,
-                            topEnd = 20.dp
-                        )
-                    )
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-
-                // 🔹 Title
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E1E1E)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // 🔹 Date Row
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(18.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    Text(
-                        text = date,
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 🔹 Bottom Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Column {
-                        Text(
-                            text = "Organized By",
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
-
-                        Text(
-                            text = organizer,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFFE91E63)
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = onBuyClick,
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Text("BUY NOW")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-    }
-}
 
 
 

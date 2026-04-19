@@ -1,6 +1,7 @@
 package com.kwh.almuniconnect.subscription
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -54,15 +55,16 @@ fun PremiumScreen(
     val userId = user.userId ?: ""
     val email = user.email ?: ""
 
-    LaunchedEffect(isPremium) {
-        if (isPremium) {
+    LaunchedEffect(Unit) {
+        viewModel.purchaseSuccess.collect {
+
+            Log.d("PremiumScreen", "🔥 Navigate to HOME")
 
             Toast.makeText(context, "Premium Unlocked 🎉", Toast.LENGTH_SHORT).show()
 
-            delay(800)
-
             navController.navigate(Routes.HOME) {
                 popUpTo(Routes.SUBSCRIPTION) { inclusive = true }
+                launchSingleTop = true
             }
         }
     }
@@ -105,6 +107,7 @@ fun PremiumScreen(
                     .padding(24.dp)
             ) {
                 Column {
+
 
                     Text(
                         text = "Unlock Direct Alumni Connections",

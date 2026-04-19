@@ -9,6 +9,7 @@ import com.kwh.almuniconnect.news.NewsResponse
 import com.kwh.almuniconnect.profile.ProfileResponse
 import com.kwh.almuniconnect.verification.PendingVerificationResponse
 import com.kwh.almuniconnect.verification.VerifyResponse
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -198,7 +199,51 @@ interface ApiService {
         @Query("latitude") lat: Double,
         @Query("longitude") lng: Double
     ): NearbyAlumniResponse
+
+    // update user location
+    @POST("alumni/update-current-location")
+    suspend fun updateCurrentLocation(
+        @Header("Authorization") authorization: String,
+        @Body request: UpdateLocationRequest
+    ): Response<UpdateLocationResponse>
+
+
+    //refresh token
+    @POST("auth/refresh-token")
+    suspend fun refreshToken(
+        @Body request: RefreshTokenRequest
+    ): Response<RefreshTokenResponse>
+
+
 }
+data class UpdateLocationResponse(
+    val success: Boolean,
+    val data: LocationData?,
+    val message: String,
+    val correlationId: String?,
+    val errors: Any?
+)
+
+data class LocationData(
+    val userId: String,
+    val latitude: String,
+    val longitude: String,
+    val updatedAtUtc: String
+)
+data class RefreshTokenRequest(
+    val refreshToken: String
+)
+data class UpdateLocationRequest(
+    val latitude: String,
+    val longitude: String
+)
+
+
+data class RefreshTokenResponse(
+    val accessToken: String,
+    val refreshToken: String,
+    val expiresIn: Long
+)
 
 data class VerifyRequest(
     val isVerified: Boolean
