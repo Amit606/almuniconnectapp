@@ -16,8 +16,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 28
-        versionName = "1.2.7.1"
+        versionCode = 29
+        versionName = "1.2.7.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -122,7 +122,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-perf")
-    implementation ("com.android.billingclient:billing-ktx:6.2.1")
+    implementation("com.android.billingclient:billing:8.0.0")
+
 
     implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation ("androidx.paging:paging-compose:3.2.1")

@@ -51,21 +51,18 @@ import com.kwh.almuniconnect.utils.encodeRoute
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kwh.almuniconnect.almunipost.SuccessViewModel
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
-import com.kwh.almuniconnect.billing.PremiumAnalytics
-import com.kwh.almuniconnect.branding.ProductServiceCard
 import com.kwh.almuniconnect.branding.ProductServiceViewModel
 import com.kwh.almuniconnect.evetns.Event
 import com.kwh.almuniconnect.evetns.EventsUiState
 import com.kwh.almuniconnect.evetns.EventsViewModel
 import kotlinx.coroutines.delay
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +83,8 @@ fun HomeScreen(
 
     val context = LocalContext.current
     var totalAlumni by remember { mutableStateOf(0L) }
+    var activeUsers by remember { mutableStateOf(0L) }
+
 
     TrackScreen("home_screen")
     var showExitDialog by remember { mutableStateOf(false) }
@@ -110,18 +109,15 @@ fun HomeScreen(
             .document("app_stats")
             .addSnapshotListener { snapshot, error ->
 
-                if (error != null) {
-                    Log.e("FIRESTORE", "Error: ${error.message}")
-                    return@addSnapshotListener
-                }
+                if (error != null) return@addSnapshotListener
 
                 if (snapshot != null && snapshot.exists()) {
-                    val value = snapshot.getLong("total_users")
-                    Log.d("FIRESTORE", "Value: $value")
 
-                    totalAlumni = value ?: 0
-                } else {
-                    Log.d("FIRESTORE", "Document not found")
+                    val total = snapshot.getLong("total_users") ?: 0
+                    val active = snapshot.getLong("active_users") ?: 0
+
+                    totalAlumni = total
+                    activeUsers = active
                 }
             }
     }
@@ -341,15 +337,26 @@ fun HomeScreen(
             }
 
             item {
-                AlumniCountBanner(totalAlumni,true)
+                AlumniWelcomeHeader(
+                    userName = user.name.ifEmpty { "Harcourtian" },
+                    nearbyCount = alumniList.size
+                )
             }
+
+            item {
+                AnimatedVisibility(visible = true) {
+                    AlumniCountBanner(totalAlumni, 20,true)
+                }
+            }
+            // ❤️ Welcome Header
+
 
 
             // Events section
             item {
                 SectionTitle(
-                    title = "Upcoming Events",
-                    actionText = "View All",
+                    title = "Relive Your College Moments ✨",
+                    actionText = "Explore",
                     onAction = {
                         AnalyticsManager.logEvent(
                             AnalyticsEvent.ScreenView("events_view_all")
@@ -429,7 +436,7 @@ fun HomeScreen(
 
             // Jobs section
             item {
-                SectionTitle(title = "Product & Services", actionText = "More", onAction = {
+                SectionTitle(title = "Product & Services", actionText = "Discover", onAction = {
                     AnalyticsManager.logEvent(
                         AnalyticsEvent.ScreenView("product_view_all")
                     )
@@ -452,7 +459,7 @@ fun HomeScreen(
 
             // Feed
             item {
-                SectionTitle(title = "Alumni Stories & Achievements", actionText = "View All", onAction = {
+                SectionTitle(title = "Inspiration from Harcourtians \uD83D\uDE80", actionText = "Explore", onAction = {
                     AnalyticsManager.logEvent(
                         AnalyticsEvent.ScreenView("alumni_posts_view_all")
                     )
@@ -559,6 +566,42 @@ fun HomeScreen(
         }
 
     }
+@Composable
+fun AlumniWelcomeHeader(userName: String, nearbyCount: Int) {
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),   // ✅ Full width
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(Color.White)
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally, // ✅ Center content
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Text(
+                text = "Welcome back, $userName ❤️",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Black,
+                textAlign = TextAlign.Center // ✅ Center text
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "$nearbyCount alumni near you 👀",
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
 
 @Composable
 fun PagerDotsIndicator(

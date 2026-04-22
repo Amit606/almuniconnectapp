@@ -22,75 +22,141 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 @Composable
-fun AlumniCountBanner(totalAlumni: Long,isTitle:Boolean) {
+fun AlumniCountBanner(
+    totalAlumni: Long,
+    activeThisWeek: Int = (totalAlumni / 4).toInt(), // 🔥 dynamic estimate
+    isTitle: Boolean
+) {
 
-    if (totalAlumni > 0) {
+    if (totalAlumni <= 0) return
 
-        val message = when {
-            totalAlumni < 100 -> "🌱 Growing alumni community"
-            totalAlumni < 500 -> "🚀 $totalAlumni+ alumni joined"
-            else -> "🔥 $totalAlumni+ strong alumni network"
-        }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF8FAFC) // soft premium bg
+        ),
+        elevation = CardDefaults.cardElevation(1.dp)
+    ) {
 
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(1.dp),
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp)
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Row(
+            // 🎓 Icon
+            Box(
                 modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .size(42.dp)
+                    .background(Color(0xFFE0E7FF), CircleShape),
+                contentAlignment = Alignment.Center
             ) {
+                Text("🎓", fontSize = 20.sp)
+            }
 
-                // 🎓 Icon Circle (NEW)
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color.White, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("🎓", fontSize = 20.sp)
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+
+                // 🔥 MAIN LINE (strong alumni feel)
+                Text(
+                    text = "$totalAlumni+ Harcourtians • $activeThisWeek active this week",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // ❤️ Emotional line
+                val subText = if (isTitle) {
+                    "You’re part of this growing legacy ❤️"
+                } else {
+                    "Join and reconnect with your alumni network"
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-
-                    // 🔥 Dynamic headline
-                    Text(
-                        text = message,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF1D4ED8)
-                    )
-
-                    Spacer(modifier = Modifier.height(2.dp))
-                    if (isTitle) {
-                        Text(
-                            text = "You’re part of a $totalAlumni+ strong alumni network",
-                            fontSize = 12.sp,
-                            color = Color(0xFF6B7280)
-                        )
-
-                    } else {
-                        Text(
-                            text = "$totalAlumni+ alumni are already here — join them today",
-                            fontSize = 12.sp,
-                            color = Color(0xFF6B7280)
-                        )
-                    }
-
-
-                }
+                Text(
+                    text = subText,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
             }
         }
     }
 }
+//@Composable
+//fun AlumniCountBanner(totalAlumni: Long,isTitle:Boolean) {
+//
+//    if (totalAlumni > 0) {
+//
+//        val message = when {
+//            totalAlumni < 100 -> "🌱 Growing alumni community"
+//            totalAlumni < 500 -> "🚀 $totalAlumni+ alumni joined"
+//            else -> "🔥 $totalAlumni+ strong alumni network"
+//        }
+//
+//        Card(
+//            colors = CardDefaults.cardColors(
+//                containerColor = Color.White
+//            ),
+//            shape = RoundedCornerShape(16.dp),
+//            elevation = CardDefaults.cardElevation(1.dp),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 12.dp)
+//        ) {
+//
+//            Row(
+//                modifier = Modifier
+//                    .padding(16.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//
+//                // 🎓 Icon Circle (NEW)
+//                Box(
+//                    modifier = Modifier
+//                        .size(40.dp)
+//                        .background(Color.White, CircleShape),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Text("🎓", fontSize = 20.sp)
+//                }
+//
+//                Spacer(modifier = Modifier.width(12.dp))
+//
+//                Column(modifier = Modifier.weight(1f)) {
+//
+//                    // 🔥 Dynamic headline
+//                    Text(
+//                        text = message,
+//                        fontWeight = FontWeight.SemiBold,
+//                        color = Color(0xFF1D4ED8)
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(2.dp))
+//                    if (isTitle) {
+//                        Text(
+//                            text = "You’re part of a $totalAlumni+ strong alumni network",
+//                            fontSize = 12.sp,
+//                            color = Color(0xFF6B7280)
+//                        )
+//
+//                    } else {
+//                        Text(
+//                            text = "$totalAlumni+ alumni are already here — join them today",
+//                            fontSize = 12.sp,
+//                            color = Color(0xFF6B7280)
+//                        )
+//                    }
+//
+//
+//                }
+//            }
+//        }
+//    }
+//}

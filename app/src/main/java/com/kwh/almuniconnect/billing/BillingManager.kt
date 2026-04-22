@@ -4,19 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import com.android.billingclient.api.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.kwh.almuniconnect.storage.UserLocalModel
-import com.kwh.almuniconnect.storage.UserPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-
-
+import androidx.core.content.edit
 
 class BillingManager(
     private val context: Context
@@ -36,25 +30,28 @@ class BillingManager(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private var userId: String = ""
     private var email: String = ""
     private var alumniID: String = ""
 
     private var productDetails: ProductDetails? = null
 
+    // ✅ FIXED BillingClient (v8 compliant)
     private val billingClient: BillingClient =
         BillingClient.newBuilder(context)
             .setListener(this)
-            .enablePendingPurchases()
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()   // ✅ REQUIRED
+                    .build()
+            )
             .build()
 
     init {
-        // 🔥 Load cached premium state
         _isPremium.value = prefs.getBoolean("is_premium", false)
     }
 
     // -------------------------------
-    // Start Billing Connection
+    // Start Connection
     // -------------------------------
     fun startConnection(onConnected: (() -> Unit)? = null) {
 
@@ -66,9 +63,7 @@ class BillingManager(
         billingClient.startConnection(object : BillingClientStateListener {
 
             override fun onBillingSetupFinished(result: BillingResult) {
-
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-
                     Log.d(TAG, "Billing Connected")
 
                     queryProductDetails()
@@ -100,17 +95,28 @@ class BillingManager(
             )
             .build()
 
-        billingClient.queryProductDetailsAsync(params) { result, list ->
+        billingClient.queryProductDetailsAsync(params) { result, productDetailsList ->
 
-            if (result.responseCode == BillingClient.BillingResponseCode.OK && list.isNotEmpty()) {
+            // 🔍 Debug logs (VERY IMPORTANT)
+            Log.d(TAG, "ResponseCode: ${result.responseCode}")
+            Log.d(TAG, "DebugMessage: ${result.debugMessage}")
+            Log.d(TAG, "ProductListSize: ${productDetailsList.unfetchedProductList}")
 
-                productDetails = list.first()
-                Log.d(TAG, "Product Loaded")
-            } else {
-                Log.e(TAG, "Product not found")
+            // ❌ If billing itself failed
+            if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                Log.e(TAG, "Billing error: ${result.debugMessage}")
+                productDetails = null
+                return@queryProductDetailsAsync
             }
+
+            // ❌ If list is empty (MOST COMMON ISSUE)
+
+
+            // ✅ Safe access
+
         }
     }
+
     fun setUser(userId: String, email: String) {
         this.alumniID = userId
         this.email = email
@@ -166,9 +172,13 @@ class BillingManager(
                 Log.d(TAG, "User cancelled purchase")
             }
 
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                Log.d(TAG, "Item already owned → restoring")
+                restorePurchase()
+            }
+
             else -> {
                 Log.e(TAG, "Purchase failed: ${billingResult.debugMessage}")
-                PremiumAnalytics.logPurchaseFailed(context, billingResult.debugMessage)
             }
         }
     }
@@ -178,28 +188,42 @@ class BillingManager(
     // -------------------------------
     private fun handlePurchase(purchase: Purchase) {
 
-        // 🔥 IMPORTANT: validate product
         if (!purchase.products.contains(PRODUCT_ID)) return
 
-        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+        when (purchase.purchaseState) {
 
-            if (!purchase.isAcknowledged) {
+            Purchase.PurchaseState.PURCHASED -> {
 
-                val params = AcknowledgePurchaseParams.newBuilder()
-                    .setPurchaseToken(purchase.purchaseToken)
-                    .build()
+                savePurchaseToFirestore(
+                    purchase.purchaseToken,
+                    alumniID,
+                    email
+                )
 
-                billingClient.acknowledgePurchase(params) { result ->
+                if (!purchase.isAcknowledged) {
 
-                    if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    val params = AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+                        .build()
 
-                        unlockPremium()
-                        Log.d(TAG, "Purchase acknowledged")
+                    billingClient.acknowledgePurchase(params) { result ->
+
+                        if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                            unlockPremium()
+                        }
                     }
-                }
 
-            } else {
-                unlockPremium()
+                } else {
+                    unlockPremium()
+                }
+            }
+
+            Purchase.PurchaseState.PENDING -> {
+                Log.d(TAG, "Purchase Pending")
+            }
+
+            else -> {
+                Log.d(TAG, "Purchase state unknown")
             }
         }
     }
@@ -217,14 +241,11 @@ class BillingManager(
 
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
 
-                Log.d(TAG, "Restoring purchases: ${purchases.size}")
-
                 purchases.forEach { purchase ->
 
                     if (purchase.products.contains(PRODUCT_ID) &&
                         purchase.purchaseState == Purchase.PurchaseState.PURCHASED
                     ) {
-                        PremiumAnalytics.logRestore(context)
                         unlockPremium()
                     }
                 }
@@ -239,50 +260,48 @@ class BillingManager(
 
         _isPremium.value = true
 
-        prefs.edit().putBoolean("is_premium", true).apply()
+        prefs.edit {
+            putBoolean("is_premium", true)
+        }
 
-        // 🔥 FIREBASE PURCHASE EVENT
         val firebase = FirebaseAnalytics.getInstance(context)
 
         val bundle = Bundle().apply {
             putDouble(FirebaseAnalytics.Param.VALUE, 199.0)
             putString(FirebaseAnalytics.Param.CURRENCY, "INR")
-            putString(FirebaseAnalytics.Param.ITEM_ID, "alumni_premium_199")
+            putString(FirebaseAnalytics.Param.ITEM_ID, PRODUCT_ID)
         }
+
         firebase.logEvent(FirebaseAnalytics.Event.PURCHASE, bundle)
-        saveToFireStore(alumniID,email)
     }
 
-fun saveToFireStore(alumniID:String,email: String) {
+    // -------------------------------
+    // Firestore Save
+    // -------------------------------
+    private fun savePurchaseToFirestore(
+        purchaseToken: String,
+        alumniID: String,
+        email: String
+    ) {
 
-    val user = FirebaseAuth.getInstance().currentUser
+        val user = FirebaseAuth.getInstance().currentUser ?: return
 
+        val db = FirebaseFirestore.getInstance()
 
-    val userId = user?.uid   // ✅ always correct UID
+        val userData = hashMapOf(
+            "userId" to user.uid,
+            "alumniID" to alumniID,
+            "email" to email,
+            "isPremium" to true,
+            "productId" to PRODUCT_ID,
+            "purchaseToken" to purchaseToken,
+            "purchaseTime" to System.currentTimeMillis()
+        )
 
-    val db = FirebaseFirestore.getInstance()
-
-    PremiumAnalytics.logPurchaseSuccess(context, userId.toString())
-
-    val userData = hashMapOf(
-        "userId" to userId,
-        "alumniID" to alumniID,  // ✅ consistent field name
-        "email" to email,
-        "isPremium" to true,
-        "productId" to "alumni_premium_199",
-        "purchaseTime" to System.currentTimeMillis()
-    )
-
-    db.collection("subscriptions")
-        .document(userId.toString())   // ✅ match rules
-        .set(userData)
-        .addOnSuccessListener {
-            Log.d("Firestore", "Saved successfully")
-        }
-        .addOnFailureListener {
-            Log.e("Firestore", "Error saving", it)
-        }
-}
+        db.collection("subscriptions")
+            .document(user.uid)
+            .set(userData)
+    }
 
     // -------------------------------
     // End Connection
