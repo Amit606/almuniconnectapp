@@ -25,11 +25,13 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AlumniCountBanner(
     totalAlumni: Long,
-    activeThisWeek: Int = (totalAlumni / 4).toInt(), // 🔥 dynamic estimate
+    activeThisWeek: Int?, // nullable
     isTitle: Boolean
 ) {
 
     if (totalAlumni <= 0) return
+
+    val active = activeThisWeek ?: (totalAlumni / 4).toInt()
 
     Card(
         modifier = Modifier
@@ -37,7 +39,7 @@ fun AlumniCountBanner(
             .padding(vertical = 12.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF8FAFC) // soft premium bg
+            containerColor = Color(0xFFF8FAFC)
         ),
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
@@ -49,7 +51,6 @@ fun AlumniCountBanner(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // 🎓 Icon
             Box(
                 modifier = Modifier
                     .size(42.dp)
@@ -63,9 +64,8 @@ fun AlumniCountBanner(
 
             Column(modifier = Modifier.weight(1f)) {
 
-                // 🔥 MAIN LINE (strong alumni feel)
                 Text(
-                    text = "$totalAlumni+ Harcourtians • $activeThisWeek active this week",
+                    text = "$totalAlumni+ Harcourtians",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     color = Color.Black
@@ -73,7 +73,6 @@ fun AlumniCountBanner(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // ❤️ Emotional line
                 val subText = if (isTitle) {
                     "You’re part of this growing legacy ❤️"
                 } else {
@@ -89,74 +88,3 @@ fun AlumniCountBanner(
         }
     }
 }
-//@Composable
-//fun AlumniCountBanner(totalAlumni: Long,isTitle:Boolean) {
-//
-//    if (totalAlumni > 0) {
-//
-//        val message = when {
-//            totalAlumni < 100 -> "🌱 Growing alumni community"
-//            totalAlumni < 500 -> "🚀 $totalAlumni+ alumni joined"
-//            else -> "🔥 $totalAlumni+ strong alumni network"
-//        }
-//
-//        Card(
-//            colors = CardDefaults.cardColors(
-//                containerColor = Color.White
-//            ),
-//            shape = RoundedCornerShape(16.dp),
-//            elevation = CardDefaults.cardElevation(1.dp),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 12.dp)
-//        ) {
-//
-//            Row(
-//                modifier = Modifier
-//                    .padding(16.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//
-//                // 🎓 Icon Circle (NEW)
-//                Box(
-//                    modifier = Modifier
-//                        .size(40.dp)
-//                        .background(Color.White, CircleShape),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Text("🎓", fontSize = 20.sp)
-//                }
-//
-//                Spacer(modifier = Modifier.width(12.dp))
-//
-//                Column(modifier = Modifier.weight(1f)) {
-//
-//                    // 🔥 Dynamic headline
-//                    Text(
-//                        text = message,
-//                        fontWeight = FontWeight.SemiBold,
-//                        color = Color(0xFF1D4ED8)
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(2.dp))
-//                    if (isTitle) {
-//                        Text(
-//                            text = "You’re part of a $totalAlumni+ strong alumni network",
-//                            fontSize = 12.sp,
-//                            color = Color(0xFF6B7280)
-//                        )
-//
-//                    } else {
-//                        Text(
-//                            text = "$totalAlumni+ alumni are already here — join them today",
-//                            fontSize = 12.sp,
-//                            color = Color(0xFF6B7280)
-//                        )
-//                    }
-//
-//
-//                }
-//            }
-//        }
-//    }
-//}

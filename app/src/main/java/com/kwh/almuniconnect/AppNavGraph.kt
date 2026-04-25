@@ -22,7 +22,6 @@ import com.kwh.almuniconnect.evetns.EventDetailsScreen
 import com.kwh.almuniconnect.evetns.EventsScreen
 import com.kwh.almuniconnect.help.AboutAlumniConnectScreen
 import com.kwh.almuniconnect.help.HelpSupportScreen
-import com.kwh.almuniconnect.help.WhatsAppChannelsScreen
 import com.kwh.almuniconnect.home.HomeScreen
 import com.kwh.almuniconnect.internet.NoInternetDialog
 import com.kwh.almuniconnect.intro.ConnectivityObserver
@@ -38,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.kwh.almuniconnect.almunipost.AlumniStoriesScreen
@@ -59,13 +57,11 @@ import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.home.JobProfileScreen
 import com.kwh.almuniconnect.jobposting.JobPostByEmailScreen
-import com.kwh.almuniconnect.jobposting.jobprofile.CreateJobProfileScreen
 import com.kwh.almuniconnect.login.PrivacyPolicyScreen
 import com.kwh.almuniconnect.login.TermsScreen
 import com.kwh.almuniconnect.morefeature.ComingSoonScreen
 import com.kwh.almuniconnect.morefeature.JobProfileComingSoonScreen
 import com.kwh.almuniconnect.morefeature.MediaScreen
-import com.kwh.almuniconnect.morefeature.MoreFeaturesScreen
 import com.kwh.almuniconnect.morefeature.NearbyComingSoonScreen
 import com.kwh.almuniconnect.morefeature.YoutubePlayerScreen
 import com.kwh.almuniconnect.nearby.LocationPermissionScreen
@@ -75,7 +71,6 @@ import com.kwh.almuniconnect.network.AlumniBatchViewModelFactory
 import com.kwh.almuniconnect.network.AlumniDto
 import com.kwh.almuniconnect.network.AlumniListScreen
 import com.kwh.almuniconnect.network.AlumniRepository
-import com.kwh.almuniconnect.network.AlumniViewModelFactory
 import com.kwh.almuniconnect.network.AppDatabase
 import com.kwh.almuniconnect.network.BranchRepository
 import com.kwh.almuniconnect.network.YearGridScreen
@@ -95,6 +90,8 @@ import com.kwh.almuniconnect.tallent.shareTalent
 import com.kwh.almuniconnect.verification.AccountVerificationScreen
 import androidx.core.content.edit
 import com.kwh.almuniconnect.analytics.AnalyticsManager
+import com.kwh.almuniconnect.help.SocialCommunityScreen
+import com.kwh.almuniconnect.morefeature.MoreFeaturesBottomSheet
 import com.kwh.almuniconnect.nearby.NearAlumni
 import com.kwh.almuniconnect.nearby.NearAlumniProfile
 import com.kwh.almuniconnect.nearby.PermissionInfoScreen
@@ -138,7 +135,7 @@ fun AppNavGraph(
 
         }
         composable(Routes.JOB_PROFILE){
-            AnalyticsManager.logScreen("JOB_PROFILE")
+            AnalyticsManager.logScreen(context,"JOB_PROFILE")
 
             JobProfileScreen(
                 onBack = { navController.popBackStack() },
@@ -147,7 +144,7 @@ fun AppNavGraph(
         }
         composable(Routes.JOB_PROFILE_COMMING_SOON)
         {
-            AnalyticsManager.logScreen("JOB_PROFILE_COMMING_SOON")
+            AnalyticsManager.logScreen(context,"JOB_PROFILE_COMMING_SOON")
 
             JobProfileComingSoonScreen(navController, onNotifyClick =
                 {
@@ -159,7 +156,7 @@ fun AppNavGraph(
         //NearbyComingSoonScreen
         composable(Routes.NEAR_BY_COMMING_SOON)
         {
-            AnalyticsManager.logScreen("NEAR_BY_COMMING_SOON")
+            AnalyticsManager.logScreen(context,"NEAR_BY_COMMING_SOON")
 
             NearbyComingSoonScreen(navController, onNotifyClick =
                 {
@@ -170,7 +167,7 @@ fun AppNavGraph(
         }
 
         composable(Routes.NEARBY_HARCOURTIANS_PERMISSION) {
-            AnalyticsManager.logScreen("NEARBY_HARCOURTIANS_PERMISSION")
+            AnalyticsManager.logScreen(context,"NEARBY_HARCOURTIANS_PERMISSION")
 
             LocationPermissionScreen(
                 navController,
@@ -188,20 +185,20 @@ fun AppNavGraph(
         }
 
         composable(Routes.NEARBY_HARCOURTIANS) {
-            AnalyticsManager.logScreen("NEARBY_HARCOURTIANS")
+            AnalyticsManager.logScreen(context,"NEARBY_HARCOURTIANS")
 
             NearbyHarcourtianScreen(navController)
         }
 
 
         composable(Routes.TALENT_LIST) {
-            AnalyticsManager.logScreen("TALENT_LIST")
+            AnalyticsManager.logScreen(context,"TALENT_LIST")
 
             HarcourtianTalentScreen(navController)
 
         }
         composable(Routes.ADD_TALENT_LIST) {
-            AnalyticsManager.logScreen("ADD_TALENT_LIST")
+            AnalyticsManager.logScreen(context,"ADD_TALENT_LIST")
 
             AddTalentScreen(navController)
 
@@ -229,7 +226,7 @@ fun AppNavGraph(
 
         composable(Routes.BRANCHES) {
 
-            AnalyticsManager.logScreen("BRANCHES")
+            AnalyticsManager.logScreen(context,"BRANCHES")
 
             val context = LocalContext.current
 
@@ -287,7 +284,7 @@ fun AppNavGraph(
 
             // Create ViewModel
             val viewModel: AlumniBatchViewModel = viewModel(factory = factory)
-            AnalyticsManager.logScreen("YearGridScreen")
+            AnalyticsManager.logScreen(context,"YearGridScreen")
 
             YearGridScreen(
                 navController = navController,
@@ -297,7 +294,7 @@ fun AppNavGraph(
             )
         }
         composable(Routes.NEWS) {
-            AnalyticsManager.logScreen("NEWS")
+            AnalyticsManager.logScreen(context,"NEWS")
 
             NewsListingScreen(navController)
         }
@@ -353,17 +350,17 @@ fun AppNavGraph(
             val videoId = Uri.decode(
                 backStackEntry.arguments?.getString("videoId") ?: ""
             )
-            AnalyticsManager.logScreen("YoutubePlayerScreen")
+            AnalyticsManager.logScreen(context,"YoutubePlayerScreen")
 
             YoutubePlayerScreen(videoId,navController)
         }
         composable(Routes.MORE_FEATURES) {
-            AnalyticsManager.logScreen("MORE_FEATURES")
+            AnalyticsManager.logScreen(context,"MORE_FEATURES")
 
-            MoreFeaturesScreen(navController)
+            MoreFeaturesBottomSheet(navController)
         }
         composable(Routes.MEDIA_FEATURE) {
-            AnalyticsManager.logScreen("MEDIA_FEATURE")
+            AnalyticsManager.logScreen(context,"MEDIA_FEATURE")
             MediaScreen(navController)
         }
         composable(Routes.Internet_Splash) {
@@ -376,7 +373,7 @@ fun AppNavGraph(
 
         composable(Routes.USER_PROFILE)
         {
-            AnalyticsManager.logScreen("USER_PROFILE")
+            AnalyticsManager.logScreen(context,"USER_PROFILE")
 
             val context = LocalContext.current
 
@@ -402,7 +399,7 @@ fun AppNavGraph(
             ProfileScreen(navController,viewModel)
         }
         composable(Routes.APPROVAL_PENDING) {
-            AnalyticsManager.logScreen("APPROVAL_PENDING")
+            AnalyticsManager.logScreen(context,"APPROVAL_PENDING")
 
             ApprovalPendingScreen()
         }
@@ -433,7 +430,7 @@ fun AppNavGraph(
             )
         }
         composable("terms") {
-            AnalyticsManager.logScreen("terms")
+            AnalyticsManager.logScreen(context,"terms")
 
             TermsScreen {
                 navController.popBackStack()
@@ -441,7 +438,7 @@ fun AppNavGraph(
         }
 
         composable("privacy") {
-            AnalyticsManager.logScreen("privacy")
+            AnalyticsManager.logScreen(context,"privacy")
 
             PrivacyPolicyScreen {
                 navController.popBackStack()
@@ -449,7 +446,7 @@ fun AppNavGraph(
         }
 
         composable("profile") {
-            AnalyticsManager.logScreen("profile")
+            AnalyticsManager.logScreen(context,"profile")
 
 
             val alumni = navController
@@ -465,7 +462,7 @@ fun AppNavGraph(
             }
         }
         composable(Routes.NEAR_ALUMNI_PROFILE) {
-            AnalyticsManager.logScreen("NEAR_ALUMNI_PROFILE")
+            AnalyticsManager.logScreen(context,"NEAR_ALUMNI_PROFILE")
 
                 val alumni = navController
                     .previousBackStackEntry
@@ -490,14 +487,14 @@ fun AppNavGraph(
         }
         composable(Routes.FEEDBACK)
         {
-            AnalyticsManager.logScreen("FEEDBACK")
+            AnalyticsManager.logScreen(context,"FEEDBACK")
 
             FeedbackForm(navController)
 
         }
         composable(Routes.COMING_SOON)
         {
-            AnalyticsManager.logScreen("COMING_SOON")
+            AnalyticsManager.logScreen(context,"COMING_SOON")
 
             ComingSoonScreen(
                 navController,
@@ -532,7 +529,7 @@ fun AppNavGraph(
 
         composable(Routes.LOGIN)
         {
-            AnalyticsManager.logScreen("LOGIN")
+            AnalyticsManager.logScreen(context,"LOGIN")
 
             LoginRoute(navController)
 
@@ -540,7 +537,7 @@ fun AppNavGraph(
         // 🔢 OTP Screen
      composable(Routes.VERIFICATION)
      {
-         AnalyticsManager.logScreen("VERIFICATION")
+         AnalyticsManager.logScreen(context,"VERIFICATION")
 
          AccountVerificationScreen(
              navController = navController,
@@ -585,7 +582,7 @@ fun AppNavGraph(
 
         // 🟢 Intro Screen
         composable(Routes.INTRO) {
-            AnalyticsManager.logScreen("INTRO")
+            AnalyticsManager.logScreen(context,"INTRO")
 
             IntroScreen(
                 pages= pages,
@@ -604,17 +601,17 @@ fun AppNavGraph(
             )
         }
         composable(Routes.EVENTS) {
-            AnalyticsManager.logScreen("EVENTS")
+            AnalyticsManager.logScreen(context,"EVENTS")
 
             EventsScreen(navController)
         }
         composable(Routes.WHATSUP_CHANNEL) {
-            AnalyticsManager.logScreen("WHATSUP_CHANNEL")
+            AnalyticsManager.logScreen(context,"WHATSUP_CHANNEL")
 
-            WhatsAppChannelsScreen(navController)
+            SocialCommunityScreen(navController)
         }
         composable(Routes.ADD_SOCIAL_CHANNEL) {
-            AnalyticsManager.logScreen("ADD_SOCIAL_CHANNEL")
+            AnalyticsManager.logScreen(context,"ADD_SOCIAL_CHANNEL")
 
             AddSocialChannelScreen(navController)
         }
@@ -638,7 +635,7 @@ fun AppNavGraph(
 
         // 🟧 Home
         composable(Routes.HOME) {
-            AnalyticsManager.logScreen("HOME")
+            AnalyticsManager.logScreen(context,"HOME")
 
             HomeScreen(
                 navController = navController,
@@ -654,18 +651,18 @@ fun AppNavGraph(
         composable(Routes.MESSAGES) { /* MessagesScreen(navController) */ }
         composable(Routes.CREATE_POST) { /* CreatePostScreen(navController) */ }
         composable(Routes.SETTINGS) {
-            AnalyticsManager.logScreen("SETTINGS")
+            AnalyticsManager.logScreen(context,"SETTINGS")
 
             SettingsScreen(
                 navController = navController
             )
         }
         composable(Routes.HELP_SUPPORTS) {
-            AnalyticsManager.logScreen("HELP_SUPPORTS")
+            AnalyticsManager.logScreen(context,"HELP_SUPPORTS")
 
             HelpSupportScreen(navController) }
         composable(Routes.ABOUT_US) {
-            AnalyticsManager.logScreen("ABOUT_US")
+            AnalyticsManager.logScreen(context,"ABOUT_US")
 
 
             AboutAlumniConnectScreen(navController) }
@@ -683,7 +680,7 @@ fun AppNavGraph(
             val location = entry.arguments?.getString("location").orEmpty()
             val date = entry.arguments?.getString("date").orEmpty()
 
-            AnalyticsManager.logScreen("EventDetailsScreen")
+            AnalyticsManager.logScreen(context,"EventDetailsScreen")
 
             EventDetailsScreen(navController,title, location,date,"")
         }
@@ -702,12 +699,12 @@ fun AppNavGraph(
 
 
         composable(Routes.JOB_DETAILS){
-            AnalyticsManager.logScreen("JOB_DETAILS")
+            AnalyticsManager.logScreen(context,"JOB_DETAILS")
 
             JobListingScreen(navController)
         }
         composable(Routes.SUBSCRIPTION){
-            AnalyticsManager.logScreen("SUBSCRIPTION")
+            AnalyticsManager.logScreen(context,"SUBSCRIPTION")
 
             PremiumScreen(navController)
         }
@@ -730,17 +727,17 @@ fun AppNavGraph(
         }
 
         composable(Routes.JOB_POST){
-            AnalyticsManager.logScreen("JOB_POST")
+            AnalyticsManager.logScreen(context,"JOB_POST")
 
             JobPostByEmailScreen(navController)
         }
         composable(Routes.PRODUCT_SCREEN){
-            AnalyticsManager.logScreen("PRODUCT_SCREEN")
+            AnalyticsManager.logScreen(context,"PRODUCT_SCREEN")
 
             ProductServiceDummyScreen(navController)
         }
         composable(Routes.ALMUNI_POST){
-            AnalyticsManager.logScreen("ALMUNI_POST")
+            AnalyticsManager.logScreen(context,"ALMUNI_POST")
 
             AlumniStoriesScreen(navController)
         }
@@ -771,7 +768,7 @@ fun AppNavGraph(
 
         /* ---------- FEED ---------- */
         composable(Routes.FEED) {
-            AnalyticsManager.logScreen("FEED")
+            AnalyticsManager.logScreen(context,"FEED")
 
             EmergencyFeedScreen (navController){ emergency ->
                 navController.navigate(
@@ -825,7 +822,7 @@ fun AppNavGraph(
             }
         }
         composable(Routes.LOCATION_PERMISSION_INFO) {
-            AnalyticsManager.logScreen("LOCATION_PERMISSION_INFO")
+            AnalyticsManager.logScreen(context,"LOCATION_PERMISSION_INFO")
 
             PermissionInfoScreen(navController)
         }

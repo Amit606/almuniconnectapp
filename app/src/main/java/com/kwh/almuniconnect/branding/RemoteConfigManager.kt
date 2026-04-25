@@ -8,29 +8,60 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.kwh.almuniconnect.branding.ProductServiceItem
 
+
+
 object RemoteConfigManager {
 
-    @SuppressLint("StaticFieldLeak")
-    private val remoteConfig = FirebaseRemoteConfig.getInstance()
+    // ✅ Lazy init (important)
+    private val remoteConfig: FirebaseRemoteConfig by lazy {
+        FirebaseRemoteConfig.getInstance()
+    }
 
-    fun init() {
+    private var isInitialized = false
+
+    private fun ensureInit() {
+        if (isInitialized) return
+
         val configSettings = FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(3600)
             .build()
 
         remoteConfig.setConfigSettingsAsync(configSettings)
+        isInitialized = true
     }
 
     fun fetchProducts(onResult: (List<ProductServiceItem>) -> Unit) {
 
+        ensureInit()
+
+        // ✅ 1. Return cached data immediately (FAST UI)
+        try {
+            val cachedJson = remoteConfig.getString("product_services")
+
+            if (cachedJson.isNotEmpty()) {
+                val type = object :
+                    TypeToken<List<ProductServiceItem>>() {}.type
+
+                val cachedList: List<ProductServiceItem> =
+                    Gson().fromJson(cachedJson, type) ?: emptyList()
+
+                onResult(
+                    cachedList.filter { it.isActive }
+                        .sortedBy { it.srNo }
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("RemoteConfig", "Cache parse error ${e.message}")
+        }
+
+        // ✅ 2. Fetch latest in background
         remoteConfig.fetchAndActivate()
             .addOnCompleteListener { task ->
 
                 if (task.isSuccessful) {
 
-                    val json = remoteConfig.getString("product_services")
-
                     try {
+                        val json = remoteConfig.getString("product_services")
 
                         val type = object :
                             TypeToken<List<ProductServiceItem>>() {}.type
@@ -44,17 +75,12 @@ object RemoteConfigManager {
                         )
 
                     } catch (e: Exception) {
-
                         Log.e("RemoteConfig", "Parse error ${e.message}")
-                        onResult(emptyList())
                     }
 
                 } else {
-
                     Log.e("RemoteConfig", "Fetch failed", task.exception)
-                    onResult(emptyList())
                 }
             }
     }
-
 }

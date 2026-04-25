@@ -52,6 +52,11 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material.icons.outlined.DynamicFeed
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Work
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -358,7 +363,7 @@ fun HomeScreen(
                     title = "Relive Your College Moments ✨",
                     actionText = "Explore",
                     onAction = {
-                        AnalyticsManager.logEvent(
+                        AnalyticsManager.logEvent(context,
                             AnalyticsEvent.ScreenView("events_view_all")
                         )
 
@@ -437,7 +442,7 @@ fun HomeScreen(
             // Jobs section
             item {
                 SectionTitle(title = "Product & Services", actionText = "Discover", onAction = {
-                    AnalyticsManager.logEvent(
+                    AnalyticsManager.logEvent(context,
                         AnalyticsEvent.ScreenView("product_view_all")
                     )
                     navController.navigate(Routes.PRODUCT_SCREEN)
@@ -460,7 +465,7 @@ fun HomeScreen(
             // Feed
             item {
                 SectionTitle(title = "Inspiration from Harcourtians \uD83D\uDE80", actionText = "Explore", onAction = {
-                    AnalyticsManager.logEvent(
+                    AnalyticsManager.logEvent(context,
                         AnalyticsEvent.ScreenView("alumni_posts_view_all")
                     )
                     navController.navigate(Routes.ALMUNI_POST)
@@ -483,7 +488,7 @@ fun HomeScreen(
                             post = post,
                             onClick = {
 
-                                AnalyticsManager.logEvent(
+                                AnalyticsManager.logEvent(context,
                                     AnalyticsEvent.ScreenView(
                                         "story_clicked_${post.name}"
                                     )
@@ -665,34 +670,100 @@ fun BottomAppBarWithNav(
         NavigationBarItem(
             selected = selected == BottomNavItem.Home,
             onClick = { onSelect(BottomNavItem.Home) },
-            icon = { Icon(Icons.Default.Home, contentDescription = null) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF1E3A8A),
+                selectedTextColor = Color(0xFF1E3A8A),
+                indicatorColor = Color(0xFFE0E7FF)
+            ),
+            icon = {
+                Icon(
+                    if (selected == BottomNavItem.Home)
+                        Icons.Filled.Home
+                    else
+                        Icons.Outlined.Home,
+                    contentDescription = "Home"
+                )
+            },
             label = { Text("Home") }
         )
 
         NavigationBarItem(
             selected = selected == BottomNavItem.Network,
             onClick = { onSelect(BottomNavItem.Network) },
-            icon = { Icon(Icons.Default.Group, contentDescription = null) },
-            label = { Text("Alumni") }
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF1E3A8A),
+                selectedTextColor = Color(0xFF1E3A8A),
+                indicatorColor = Color(0xFFE0E7FF)
+            ),
+            icon = {
+                Icon(
+                    if (selected == BottomNavItem.Network)
+                        Icons.Filled.People
+                    else
+                        Icons.Outlined.People,
+                    contentDescription = "Network"
+                )
+            },
+            label = { Text("Network") }
         )
 
         NavigationBarItem(
             selected = selected == BottomNavItem.JOBS,
             onClick = { onSelect(BottomNavItem.JOBS) },
-            icon = { Icon(Icons.Default.PostAdd, contentDescription = null) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF1E3A8A),
+                selectedTextColor = Color(0xFF1E3A8A),
+                indicatorColor = Color(0xFFE0E7FF)
+            ),
+            icon = {
+                Icon(
+                    if (selected == BottomNavItem.JOBS)
+                        Icons.Filled.Work
+                    else
+                        Icons.Outlined.Work,
+                    contentDescription = "Jobs"
+                )
+            },
             label = { Text("Jobs") }
         )
+
         NavigationBarItem(
             selected = selected == BottomNavItem.ChANNEL,
             onClick = { onSelect(BottomNavItem.ChANNEL) },
-            icon = { Icon(Icons.Default.Whatsapp, contentDescription = null) },
-            label = { Text("Channel") }
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF1E3A8A),
+                selectedTextColor = Color(0xFF1E3A8A),
+                indicatorColor = Color(0xFFE0E7FF)
+            ),
+            icon = {
+                Icon(
+                    if (selected == BottomNavItem.ChANNEL)
+                        Icons.Filled.DynamicFeed
+                    else
+                        Icons.Outlined.DynamicFeed,
+                    contentDescription = "Feed"
+                )
+            },
+            label = { Text("Feed") }
         )
 
         NavigationBarItem(
             selected = selected == BottomNavItem.More,
             onClick = { onSelect(BottomNavItem.More) },
-            icon = { Icon(Icons.Default.More, contentDescription = null) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF1E3A8A),
+                selectedTextColor = Color(0xFF1E3A8A),
+                indicatorColor = Color(0xFFE0E7FF)
+            ),
+            icon = {
+                Icon(
+                    if (selected == BottomNavItem.More)
+                        Icons.Filled.Menu
+                    else
+                        Icons.Outlined.Menu,
+                    contentDescription = "More"
+                )
+            },
             label = { Text("More") }
         )
     }}

@@ -58,7 +58,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             val destination = data["destination"]
             val ctaTitle = data["cta_title"]
             val ctaDestination = data["cta_destination"]
-            AnalyticsManager.logEvent(
+            AnalyticsManager.logEvent(this,
                 AnalyticsEvent.NotificationReceived(
                     type = data["title"] ?: remoteMessage.notification?.title,
                     destination = data["destination"]

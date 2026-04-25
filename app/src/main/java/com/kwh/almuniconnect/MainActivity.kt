@@ -40,22 +40,25 @@ class MainActivity : ComponentActivity() {
         // get cold-start notification
         notificationIntent = intent
 
+
         setContent {
             LinkedTheme {
+
+                val context = androidx.compose.ui.platform.LocalContext.current
                 val navController = rememberNavController()
+
                 // Handle FCM click safely
                 LaunchedEffect(notificationIntent) {
                     notificationIntent?.let {
-                        handleNotificationIntent(it, navController)
-                        notificationIntent = null   // prevent repeat
+                        handleNotificationIntent(context, it, navController)
+                        notificationIntent = null
                     }
                 }
+
                 AppNavGraph(
                     navController = navController,
                     startDestination = Routes.SPLASH
                 )
-
-
             }
         }
     }
@@ -113,13 +116,14 @@ private fun tokenGeneration(context: Context) {
 
 
 private fun handleNotificationIntent(
+    context: Context,
     intent: Intent?,
     navController: NavHostController
 ) {
     if (intent == null) return
 
     val fromNotification = intent.getBooleanExtra("from_notification", false)
-    AnalyticsManager.logEvent(
+    AnalyticsManager.logEvent(context,
         AnalyticsEvent.NotificationOpened(
             type = intent.getStringExtra("type"),
             destination = intent.getStringExtra("destination")

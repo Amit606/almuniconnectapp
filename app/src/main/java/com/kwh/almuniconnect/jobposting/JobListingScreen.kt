@@ -46,6 +46,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ControlPoint
 import androidx.compose.material.icons.filled.CurrencyRupee
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PostAdd
@@ -123,7 +124,7 @@ fun JobListingScreen(navController: NavController) {
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.PostAdd,
+                            imageVector = Icons.Default.ControlPoint,
                             contentDescription = "Add Job"
                         )
                     }

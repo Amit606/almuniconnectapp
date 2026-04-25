@@ -20,104 +20,146 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobPostByEmailScreen(
-    navController: NavController,
-    viewModel: JobPostViewModel = viewModel(),
-    onSubmit: (JobPost) -> Unit = {}
+    navController: NavController
 ) {
+
     val context = LocalContext.current
 
     Scaffold(
         topBar = {
             HBTUTopBar(
-                title = "Post a Job",
+                title = "Post Opportunity",
                 navController = navController
             )
-        },
-        contentColor = Color.White
-    ) { paddingValues ->
+        }
+    ) { padding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(15.dp)
+                .padding(padding)
                 .verticalScroll(rememberScrollState())
+                .padding(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(14.dp))
 
-            Text(
-                text = "🤝 One Opportunity Can Change Someone’s Life\n\n" +
-                        "Many Harcourtians are looking for the right opportunity to grow in their careers. " +
-                        "If you know about any job opening in your company or network, please share it with us.\n\n" +
-                        "Our team will verify the job details and publish it in the app so fellow alumni can apply. " +
-                        "Your small effort can help a Harcourtians take the next big step in life.",
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
-                color = Color.Black
-            )
+            /* ---------- HERO CARD ---------- */
+
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFEFF6FF)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Column(modifier = Modifier.padding(16.dp)) {
+
+                    Text(
+                        text = "🤝 Help a Fellow Harcourtian Grow",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = "Share job opportunities from your company or network.\nYour small effort can change someone’s career.",
+                        fontSize = 13.sp,
+                        color = Color(0xFF6B7280)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            /* ---------- BENEFITS ---------- */
+
+            Column {
+
+                BenefitItem("🎯 Verified job posting")
+                BenefitItem("🚀 Reach 500+ alumni instantly")
+                BenefitItem("💼 Help someone grow in career")
+
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-
-
-//            Button(
-//                onClick = {
-//                    val message = "Job Opportunity"
-//
-//                    val intent = Intent(Intent.ACTION_VIEW)
-//                    intent.data = Uri.parse("https://wa.me/?text=${Uri.encode(message)}")
-//
-//                    context.startActivity(intent)
-//                },
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Text("Share Job via WhatsApp", fontSize = 16.sp)
-//            }
-
+            /* ---------- CTA BUTTON ---------- */
 
             Button(
                 onClick = {
+
                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                         data = "mailto:".toUri()
 
                         putExtra(Intent.EXTRA_EMAIL, arrayOf("support@appschance.com"))
                         putExtra(Intent.EXTRA_BCC, arrayOf("amitsun.noida@gmail.com"))
-
                         putExtra(Intent.EXTRA_SUBJECT, "Job Opportunity from Alumni")
 
                         putExtra(
                             Intent.EXTRA_TEXT,
                             """
-Job Opportunity Details
+Job Opportunity Details:
 
+Company:
+Role:
+Location:
+Experience:
+Apply Link:
 
-Shared by Alumni via Harcourtian Alumni Connect App
-                """.trimIndent()
+Shared via Alumni Connect App
+                            """.trimIndent()
                         )
                     }
 
                     context.startActivity(intent)
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(14.dp)
             ) {
-                Text("Share Job via Email", fontSize = 16.sp)
+                Text("📩 Share Job via Email", fontSize = 15.sp)
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
 
+            /* ---------- TRUST LINE ---------- */
 
-
-
+            Text(
+                text = "Your submission will be verified before publishing",
+                fontSize = 12.sp,
+                color = Color.Gray,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
     }
 }
 
+@Composable
+fun BenefitItem(text: String) {
+
+    Row(
+        modifier = Modifier.padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            text = text,
+            fontSize = 13.sp,
+            color = Color.Black
+        )
+    }
+}
 
 @Composable
 fun SectionHeader(text: String) {

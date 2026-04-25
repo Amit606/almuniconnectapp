@@ -7,13 +7,18 @@ import java.util.Locale
 
 object AnalyticsManager {
 
-    private lateinit var analytics: FirebaseAnalytics
+    private var analytics: FirebaseAnalytics? = null
 
-    fun init(context: Context) {
-        analytics = FirebaseAnalytics.getInstance(context)
+
+
+    private fun getAnalytics(context: Context): FirebaseAnalytics {
+        if (analytics == null) {
+            analytics = FirebaseAnalytics.getInstance(context)
+        }
+        return analytics!!
     }
 
-    fun logEvent(event: AnalyticsEvent) {
+    fun logEvent(context: Context, event: AnalyticsEvent) {
         val bundle = Bundle()
 
         event.params.forEach { (k, v) ->
@@ -25,13 +30,22 @@ object AnalyticsManager {
             }
         }
 
-        analytics.logEvent(event.name, bundle)
+        getAnalytics(context).logEvent(event.name, bundle)
     }
-    fun logScreen(screenName: String, screenClass: String = "ComposeScreen") {
+
+    fun logScreen(
+        context: Context,
+        screenName: String,
+        screenClass: String = "ComposeScreen"
+    ) {
         val bundle = Bundle().apply {
-            putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName.toLowerCase(Locale.ROOT))
+            putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName.lowercase())
             putString(FirebaseAnalytics.Param.SCREEN_CLASS, screenClass)
         }
-        analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
+
+        getAnalytics(context).logEvent(
+            FirebaseAnalytics.Event.SCREEN_VIEW,
+            bundle
+        )
     }
 }
