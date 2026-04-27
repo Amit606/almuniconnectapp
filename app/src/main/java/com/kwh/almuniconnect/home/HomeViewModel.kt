@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.home
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,9 +14,11 @@ import com.kwh.almuniconnect.api.RefreshTokenRequest
 import com.kwh.almuniconnect.storage.TokenDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.OffsetDateTime
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 class HomeViewModel(
     private val context: Context,
     private val authApi: ApiService
@@ -49,53 +52,49 @@ class HomeViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun refreshTokenIfNeeded() {
 
         val refreshToken = tokenStore.getRefreshToken().first()
+        val accessToken = tokenStore.getAccessToken().first()
         val expiry = tokenStore.getAccessTokenExpiry().first()
-
-        Log.d(TAG, "RefreshToken: ${refreshToken?.take(10)}...")
-        Log.d(TAG, "Expiry: $expiry")
 
         if (refreshToken.isNullOrEmpty()) {
             Log.w(TAG, "Refresh token missing → skipping refresh")
             return
         }
 
+        if (accessToken.isNullOrEmpty()) {
+            Log.w(TAG, "Access token missing → skipping refresh")
+            return
+        }
+
         if (!isTokenExpired(expiry)) {
 
-            Log.d(TAG, "Token expired → calling refresh API")
+            Log.d(TAG, "Token expired → calling refresh API"+refreshToken)
 
             try {
                 val response = authApi.refreshToken(
-                    RefreshTokenRequest(refreshToken)
+                    token = "Bearer $accessToken",
+                    request = RefreshTokenRequest(refreshToken)
                 )
-
-                Log.d(TAG, "Refresh API response code: ${response.code()}")
 
                 if (response.isSuccessful) {
 
-                    val body = response.body()
+                    val body = response.body() ?: return
+                    val data = body.data
 
-                    if (body == null) {
-                        Log.e(TAG, "Refresh response body is null")
-                        return
-                    }
-
-                    val expiryTime =
-                        System.currentTimeMillis() + (body.expiresIn * 1000)
-
-                    Log.d(TAG, "New accessToken: ${body.accessToken.take(10)}...")
-                    Log.d(TAG, "New expiryTime: $expiryTime")
+                    val expiryMillis = Instant.parse(data.accessTokenExpiry)
+                        .toEpochMilli()
 
                     tokenStore.saveTokens(
-                        accessToken = body.accessToken,
-                        refreshToken = body.refreshToken,
-                        accessTokenExpiry = expiryTime.toString(),
-                        refreshTokenExpiry = ""
+                        accessToken = data.accessToken,
+                        refreshToken = data.refreshToken,
+                        accessTokenExpiry = expiryMillis.toString(),
+                        refreshTokenExpiry = data.refreshTokenExpiry
                     )
 
-                    Log.d(TAG, "Tokens updated successfully")
+                    Log.d(TAG, "Tokens updated successfully"+data.accessToken)
 
                 } else {
                     Log.e(TAG, "Refresh failed: ${response.code()} ${response.message()}")

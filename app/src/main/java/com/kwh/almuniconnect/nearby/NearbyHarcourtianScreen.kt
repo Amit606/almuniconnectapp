@@ -28,6 +28,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.billing.BillingViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,21 +55,28 @@ fun NearbyHarcourtianScreen(
     val alumniList by viewModel.alumniList
     val isLoading by viewModel.isLoading
     val error by viewModel.errorMessage
+    var isLocationLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
 
-        // 🔥 Start billing safely
-        billingViewModel.startBilling()
 
-        val locationProvider = LocationProvider(context)
+        coroutineScope {
 
-        locationProvider.getLocation { location ->
-
-            if (location != null) {
-                viewModel.loadNearby(location.latitude, location.longitude)
-            } else {
-                Log.e("NearbyScreen", "Location null")
+            // 🔥 Run billing in parallel
+            launch {
+                billingViewModel.startBilling()
             }
+            launch {
+                val locationProvider = LocationProvider(context)
+                val location = locationProvider.getLocationSuspend()
+                isLocationLoading = false
+
+                location?.let {
+                    viewModel.loadNearby(it.latitude, it.longitude)
+                }
+            }
+
+
         }
     }
 

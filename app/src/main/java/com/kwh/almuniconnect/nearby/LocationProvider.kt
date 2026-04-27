@@ -11,6 +11,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 //class LocationProvider(
 //    private val context: Context
@@ -70,15 +71,28 @@ class LocationProvider(
         LocationServices.getFusedLocationProviderClient(context)
 
     @SuppressLint("MissingPermission")
-    fun getLocation(onLocation: (Location?) -> Unit) {
+    suspend fun getLocationSuspend(): Location? =
+        suspendCancellableCoroutine { cont ->
 
-        fusedClient.getCurrentLocation(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            null
-        ).addOnSuccessListener { location ->
-            onLocation(location)
-        }.addOnFailureListener {
-            onLocation(null)
+            fusedClient.lastLocation
+                .addOnSuccessListener { lastLocation ->
+
+                    if (lastLocation != null) {
+                        cont.resume(lastLocation, null)
+                        return@addOnSuccessListener
+                    }
+
+                    fusedClient.getCurrentLocation(
+                        Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                        null
+                    ).addOnSuccessListener { location ->
+                        cont.resume(location, null)
+                    }.addOnFailureListener {
+                        cont.resume(null, null)
+                    }
+                }
+                .addOnFailureListener {
+                    cont.resume(null, null)
+                }
         }
-    }
 }

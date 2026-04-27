@@ -211,6 +211,7 @@ interface ApiService {
     //refresh token
     @POST("auth/refresh-token")
     suspend fun refreshToken(
+        @Header("Authorization") token: String,
         @Body request: RefreshTokenRequest
     ): Response<RefreshTokenResponse>
 
@@ -230,19 +231,24 @@ data class LocationData(
     val longitude: String,
     val updatedAtUtc: String
 )
-data class RefreshTokenRequest(
-    val refreshToken: String
-)
-data class UpdateLocationRequest(
-    val latitude: String,
-    val longitude: String
-)
+data class RefreshTokenRequest(val refreshToken: String)
+
+data class UpdateLocationRequest(val latitude: String, val longitude: String)
 
 
 data class RefreshTokenResponse(
+    val success: Boolean,
+    val data: TokenData,
+    val message: String,
+    val correlationId: String,
+    val errors: Any?
+)
+
+data class TokenData(
     val accessToken: String,
+    val accessTokenExpiry: String,
     val refreshToken: String,
-    val expiresIn: Long
+    val refreshTokenExpiry: String
 )
 
 data class VerifyRequest(
