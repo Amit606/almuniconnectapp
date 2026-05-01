@@ -7,7 +7,9 @@ import com.kwh.almuniconnect.profile.ProfileResponse
 import com.kwh.almuniconnect.storage.TokenDataStore
 
 class AuthRepository(
-    private val api: ApiService
+    private val api: ApiService,
+    private val tokenDataStore: TokenDataStore
+
 ) {
 
     /* ------------------------------------------------ */
@@ -56,17 +58,16 @@ class AuthRepository(
     /* ------------------------------------------------ */
 
     suspend fun checkEmailAndGetUser(
-        email: String,
-        context: Context
+        email: String
     ): Result<ExistingUserDto?> {
-      val tokenDataStore = TokenDataStore(context)
+
         return try {
 
-           // val response = api.checkEmailExist(email)//
-            val response = api.checkEmailExist("amitsun.noida@gmail.com")//
+            val response = api.checkEmailExist(email) // ✅ use param
+
             if (!response.isSuccessful) {
                 return Result.failure(
-                    Exception("HTTP ${response.code()}")
+                    Exception("HTTP ${response.code()} - ${response.message()}")
                 )
             }
 
@@ -74,21 +75,27 @@ class AuthRepository(
                 ?: return Result.failure(Exception("Empty response"))
 
             if (!body.success) {
-                return Result.failure(Exception(body.message ?: "Unknown error"))
+                return Result.failure(
+                    Exception(body.message ?: "Something went wrong")
+                )
             }
-            tokenDataStore.saveTokens(
-                accessToken = body.data?.accessToken.orEmpty(),
-                refreshToken = body.data?.refreshToken.orEmpty(),
-                accessTokenExpiry = body.data?.accessTokenExpiry.orEmpty(),
-                refreshTokenExpiry = body.data?.refreshTokenExpiry.orEmpty()
-            )
 
-            val user = body.data?.userProfile
-            if (user != null) {
-                Result.success(user)
-            } else {
-                Result.success(null)
+            val data = body.data
+
+            // ✅ Save tokens only if available
+            if (data?.accessToken != null && data.refreshToken != null) {
+
+                tokenDataStore.saveTokens(
+                    accessToken = data.accessToken,
+                    refreshToken = data.refreshToken,
+                    accessTokenExpiry = data.accessTokenExpiry?.toLongOrNull()
+                        ?: System.currentTimeMillis(),
+                    refreshTokenExpiry = data.refreshTokenExpiry?.toLongOrNull()
+                        ?: System.currentTimeMillis()
+                )
             }
+
+            Result.success(data?.userProfile)
 
         } catch (e: Exception) {
             Result.failure(e)

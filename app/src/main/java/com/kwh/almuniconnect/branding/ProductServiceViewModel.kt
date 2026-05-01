@@ -2,6 +2,7 @@ package com.kwh.almuniconnect.branding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kwh.almuniconnect.model.ProductServiceItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

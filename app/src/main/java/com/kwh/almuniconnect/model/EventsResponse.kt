@@ -1,4 +1,4 @@
-package com.kwh.almuniconnect.evetns
+package com.kwh.almuniconnect.model
 
 data class EventsResponse(
     val success: Boolean,

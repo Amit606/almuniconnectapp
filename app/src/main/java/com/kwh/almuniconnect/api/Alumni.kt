@@ -1,6 +1,6 @@
 package com.kwh.almuniconnect.api
 
-import com.kwh.almuniconnect.evetns.EventsResponse
+import com.kwh.almuniconnect.model.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
 import com.kwh.almuniconnect.login.EmailCheckApiResponse
 import com.kwh.almuniconnect.nearby.NearbyAlumniResponse
@@ -9,7 +9,6 @@ import com.kwh.almuniconnect.news.NewsResponse
 import com.kwh.almuniconnect.profile.ProfileResponse
 import com.kwh.almuniconnect.verification.PendingVerificationResponse
 import com.kwh.almuniconnect.verification.VerifyResponse
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 

@@ -1,8 +1,5 @@
 package com.kwh.almuniconnect.api
 
-import com.kwh.almuniconnect.api.NetworkClient.logging
-import com.kwh.almuniconnect.network.AuthInterceptor
-import com.kwh.almuniconnect.storage.TokenDataStore
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -18,10 +15,12 @@ object NetworkClient {
     val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.NONE
         }
-
+    val tokenManager = TokenManager()
 
     val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(logging)
+        .addInterceptor(AuthInterceptor(tokenManager)) // 👈 interceptor attached
+
         .build()
 
     private val retrofit: Retrofit by lazy {

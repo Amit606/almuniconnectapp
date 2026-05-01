@@ -1,4 +1,4 @@
-package com.kwh.almuniconnect.network
+package com.kwh.almuniconnect.api
 
 import com.kwh.almuniconnect.storage.TokenDataStore
 import kotlinx.coroutines.flow.first
@@ -7,21 +7,17 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 class AuthInterceptor(
-    private val tokenDataStore: TokenDataStore
+    private val tokenManager: TokenManager
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
-        val token = runBlocking {
-            tokenDataStore.getAccessToken().first()
-        }
+        val request = chain.request().newBuilder().apply {
+            tokenManager.accessToken?.let {
+                addHeader("Authorization", "Bearer $it")
+            }
+        }.build()
 
-        val requestBuilder = chain.request().newBuilder()
-
-        if (!token.isNullOrEmpty()) {
-            requestBuilder.addHeader("Authorization", "Bearer $token")
-        }
-
-        return chain.proceed(requestBuilder.build())
+        return chain.proceed(request)
     }
 }

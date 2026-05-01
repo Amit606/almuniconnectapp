@@ -1,7 +1,4 @@
-package com.kwh.almuniconnect.branding
-
-import android.os.Parcel
-import android.os.Parcelable
+package com.kwh.almuniconnect.model
 
 data class ProductServiceItem(
     val productId: String,

@@ -6,7 +6,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.kwh.almuniconnect.branding.ProductServiceItem
+import com.kwh.almuniconnect.model.ProductServiceItem
 
 
 

@@ -7,6 +7,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.google.gson.Gson
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.model.AlumniStory
 import kotlinx.coroutines.tasks.await
 
 object SuccessRepository {

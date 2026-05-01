@@ -20,7 +20,6 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -64,7 +63,7 @@ import com.kwh.almuniconnect.almunipost.SuccessViewModel
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.branding.ProductServiceViewModel
-import com.kwh.almuniconnect.evetns.Event
+import com.kwh.almuniconnect.model.Event
 import com.kwh.almuniconnect.evetns.EventsUiState
 import com.kwh.almuniconnect.evetns.EventsViewModel
 import kotlinx.coroutines.delay

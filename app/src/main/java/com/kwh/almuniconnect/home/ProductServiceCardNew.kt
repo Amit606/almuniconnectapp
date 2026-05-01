@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
-import com.kwh.almuniconnect.branding.ProductServiceItem
+import com.kwh.almuniconnect.model.ProductServiceItem
 
 @Composable
 fun ProductServiceCardNew(

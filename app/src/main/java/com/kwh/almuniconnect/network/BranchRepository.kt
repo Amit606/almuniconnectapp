@@ -1,23 +1,13 @@
 package com.kwh.almuniconnect.network
 
 import android.util.Log
-import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey
-import androidx.room.Query
 import com.google.common.reflect.TypeToken
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
-import com.kwh.almuniconnect.almunipost.AlumniStory
-import com.kwh.almuniconnect.help.SocialAppChannel
-import com.kwh.almuniconnect.help.SocialType
-import com.kwh.almuniconnect.help.fallbackChannels
+import com.kwh.almuniconnect.model.AlumniStory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import org.json.JSONArray
 
 class BranchRepository(
     private val dao: BranchDao,

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.kwh.almuniconnect.R
-import com.kwh.almuniconnect.almunipost.AlumniStory
+import com.kwh.almuniconnect.model.AlumniStory
 import com.kwh.almuniconnect.almunipost.getDrawableId
  //Alumni post
 @Composable

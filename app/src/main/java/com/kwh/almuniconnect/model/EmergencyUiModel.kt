@@ -1,4 +1,4 @@
-package com.kwh.almuniconnect.emergency
+package com.kwh.almuniconnect.model
 
 data class EmergencyDemo(
     val id: String,

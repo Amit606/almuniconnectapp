@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.kwh.almuniconnect.model.ProductServiceItem
 import kotlinx.coroutines.tasks.await
 
 @Composable

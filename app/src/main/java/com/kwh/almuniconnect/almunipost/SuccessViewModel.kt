@@ -3,6 +3,7 @@ package com.kwh.almuniconnect.almunipost
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.kwh.almuniconnect.model.AlumniStory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

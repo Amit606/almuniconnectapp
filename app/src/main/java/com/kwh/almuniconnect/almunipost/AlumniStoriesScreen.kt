@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.model.AlumniStory
 
 @Composable
 fun AlumniStoriesScreen(

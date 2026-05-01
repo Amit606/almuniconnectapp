@@ -1,4 +1,4 @@
-package com.kwh.almuniconnect.almunipost
+package com.kwh.almuniconnect.model
 
 data class AlumniStory(
     val name: String = "",

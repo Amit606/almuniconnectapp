@@ -52,7 +52,7 @@ import com.kwh.almuniconnect.emergency.DonationSuccessScreen
 import com.kwh.almuniconnect.emergency.EmergencyDetailScreen
 import com.kwh.almuniconnect.emergency.EmergencyFeedScreen
 import com.kwh.almuniconnect.emergency.EmergencyRequestForm
-import com.kwh.almuniconnect.emergency.demoEmergencyList
+import com.kwh.almuniconnect.model.demoEmergencyList
 import com.kwh.almuniconnect.feedback.FeedbackForm
 import com.kwh.almuniconnect.help.AddSocialChannelScreen
 import com.kwh.almuniconnect.home.JobProfileScreen

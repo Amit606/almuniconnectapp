@@ -2,6 +2,8 @@ package com.kwh.almuniconnect.evetns
 
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.model.Event
+import com.kwh.almuniconnect.model.EventDto
 
 class EventsRepository(
     private val api: ApiService
