@@ -8,7 +8,13 @@ data class PendingVerificationResponse(
     val correlationId: String?,
     val errors: String?
 )
-
+data class VerifyResponse(
+    val success: Boolean,
+    val data: Boolean,
+    val message: String,
+    val correlationId: String,
+    val errors: Any?
+)
 data class PendingDataWrapper(
     val items: List<AlumniData>?,
     val totalCount: Int?,

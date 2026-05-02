@@ -3,9 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.firebase.crashlytics")
-
+    id("kotlin-parcelize")
+    id("kotlin-kapt")
     id("com.google.gms.google-services") // ✅ MUST
-
 }
 
 android {
@@ -16,9 +16,8 @@ android {
         applicationId = "com.kwh.almuniconnect"
         minSdk = 24
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.0.8"
-
+        versionCode = 29
+        versionName = "1.2.7.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,6 +40,10 @@ android {
     buildFeatures {
         compose = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
+
 }
 
 dependencies {
@@ -61,6 +64,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-video:2.6.0") // 🔥 REQUIRED
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
@@ -78,7 +82,6 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.4.0+")
 
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
 
     // Add the dependencies for the Remote Config and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
@@ -114,13 +117,30 @@ dependencies {
 
     implementation ("com.google.android.play:app-update:2.1.0")
     implementation("com.airbnb.android:lottie-compose:6.3.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+   // implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-perf")
-    implementation ("com.github.bumptech.glide:glide:5.0.5")
-    implementation ("com.android.billingclient:billing-ktx:6.2.1")
+    implementation("com.android.billingclient:billing:8.0.0")
 
+
+    implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
+    implementation ("androidx.paging:paging-compose:3.2.1")
+
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
     //kapt ("com.github.bumptech.glide:compiler:5.0.5") // if using kapt
+
+
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation ("com.google.firebase:firebase-storage-ktx:20.3.0")
+
+     // or latest stable version// or latest version
+
 }

@@ -1,12 +1,14 @@
 package com.kwh.almuniconnect.api
 
-import com.kwh.almuniconnect.evetns.EventsResponse
+import com.kwh.almuniconnect.model.EventsResponse
 import com.kwh.almuniconnect.jobposting.JobPostResponse
 import com.kwh.almuniconnect.login.EmailCheckApiResponse
+import com.kwh.almuniconnect.nearby.NearbyAlumniResponse
 import com.kwh.almuniconnect.network.AlumniApiResponse
 import com.kwh.almuniconnect.news.NewsResponse
 import com.kwh.almuniconnect.profile.ProfileResponse
 import com.kwh.almuniconnect.verification.PendingVerificationResponse
+import com.kwh.almuniconnect.verification.VerifyResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -34,6 +36,7 @@ data class MasterItem(
 )
 data class SignupRequest(
     val name: String,
+    val photoUrl:String,
     val mobileNo: String,
     val email: String,
     val dateOfBirth: String,
@@ -44,6 +47,7 @@ data class SignupRequest(
     val title: String,
     val totalExperience: Int,
     val linkedinUrl: String,
+    val cityName:String,
     val loggedFrom: String,
     val deviceId: String,
     val fcmToken: String,
@@ -143,6 +147,14 @@ interface ApiService {
         @Query("ascending") ascending: Boolean = false
     ): Response<AlumniApiResponse>
 
+    @GET("alumni/alumni-count")
+    suspend fun getAlumniCount(
+        @Query("courseId") courseId: Int
+    ): Response<AlumniCountResponse>
+
+
+
+
     @GET("auth/{email}/is-email-exist")
     suspend fun checkEmailExist(
         @Path(value = "email", encoded = true) email: String
@@ -156,23 +168,87 @@ interface ApiService {
     suspend fun deleteAccount(
         @Header("Authorization") token: String
     ): Response<Unit>
-    @GET("/api/v1/alumni/{alumniId}/pending-verifications")
+    @GET("alumni/{alumniId}/pending-verifications")
     suspend fun getPendingVerifications(
         @Path("alumniId") alumniId: String,
         @Header("accept") accept: String = "application/json",
         @Header("X-Correlation-ID") correlationId: String
     ): Response<PendingVerificationResponse>
 
-    @POST("api/v1/alumni/{alumniId}/profile/verify")
+    @POST("alumni/{alumniId}/profile/verify")
     suspend fun verifyAlumniProfile(
         @Path("alumniId") alumniId: String,
         @Body body: VerifyRequest,
-        @Header("X-Correlation-ID") correlationId: String
+        @Header("X-Correlation-ID") correlationId: String,
+        @Header("Authorization") authorization: String   // 👈 Add this
+
     ): Response<VerifyProfileResponse>
 
+    @GET("alumni/{alumniId}/is-verified")
+    suspend fun checkAlumniVerification(
+        @Path("alumniId") alumniId: String,
+        @Header("accept") accept: String = "application/json",
+        @Header("X-Correlation-ID") correlationId: String
+    ): Response<VerifyResponse>
+
+
+    //near by alumni
+    @GET("alumni/nearby")
+    suspend fun getNearbyAlumni(
+        @Query("latitude") lat: Double,
+        @Query("longitude") lng: Double
+    ): NearbyAlumniResponse
+
+    // update user location
+    @POST("alumni/update-current-location")
+    suspend fun updateCurrentLocation(
+        @Header("Authorization") authorization: String,
+        @Body request: UpdateLocationRequest
+    ): Response<UpdateLocationResponse>
+
+
+    //refresh token
+    @POST("auth/refresh-token")
+    suspend fun refreshToken(
+        @Header("Authorization") token: String,
+        @Body request: RefreshTokenRequest
+    ): Response<RefreshTokenResponse>
 
 
 }
+data class UpdateLocationResponse(
+    val success: Boolean,
+    val data: LocationData?,
+    val message: String,
+    val correlationId: String?,
+    val errors: Any?
+)
+
+data class LocationData(
+    val userId: String,
+    val latitude: String,
+    val longitude: String,
+    val updatedAtUtc: String
+)
+data class RefreshTokenRequest(val refreshToken: String)
+
+data class UpdateLocationRequest(val latitude: String, val longitude: String)
+
+
+data class RefreshTokenResponse(
+    val success: Boolean,
+    val data: TokenData,
+    val message: String,
+    val correlationId: String,
+    val errors: Any?
+)
+
+data class TokenData(
+    val accessToken: String,
+    val accessTokenExpiry: String,
+    val refreshToken: String,
+    val refreshTokenExpiry: String
+)
 
 data class VerifyRequest(
     val isVerified: Boolean
@@ -198,3 +274,13 @@ data class VerifyProfileResponse(
 )
 
 
+data class AlumniCountResponse(
+    val success: Boolean,
+    val data: List<BatchCount>,
+    val message: String = ""
+)
+
+data class BatchCount(
+    val batch: Int,
+    val count: Int
+)

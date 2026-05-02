@@ -1,5 +1,7 @@
 package com.kwh.almuniconnect.network
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 // AlumniListResponse.kt
 data class AlumniApiResponse(
     val success: Boolean,
@@ -16,8 +18,9 @@ data class AlumniListResponse(
 )
 
 // AlumniDto.kt
+@Parcelize
 data class AlumniDto(
-    val alumniId: String,
+    val alumniId: String?,
     val name: String,
     val countryCode: String?,
     val mobileNo: String?,
@@ -36,5 +39,5 @@ data class AlumniDto(
     val isVerified: Boolean,
     val createdAtUtc: String,
     val srNo: Int
-)
+) : Parcelable
 

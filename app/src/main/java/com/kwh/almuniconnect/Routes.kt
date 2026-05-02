@@ -63,5 +63,24 @@ object Routes {
     const val DONATE = "emergency_donate/{id}"
     const val THANK_YOU = "emergency_thank_you/{amount}"
     const val VERIFICATION = "verification"
-
+    const val APPROVAL_PENDING="approval_pending"
+    const val FEEDBACK="feedback"
+    const val BRANCHES ="branches"
+    const val COURSES ="courses"
+    const val BATCHES ="batches"
+    const val COUNTRIES ="countries"
+    const val ROLES ="roles"
+    const val TALENT_LIST="talent_list"
+    const val ADD_TALENT_LIST="add_talent_list"
+    const val ADD_SOCIAL_CHANNEL="add_social_channel"
+    const val NEARBY_HARCOURTIANS ="nearby_harcourtians"
+    const val MORE_FEATURES="more_features"
+    const val MEDIA_FEATURE = "media_feature"
+    const val COMING_SOON = "coming_soon"
+    const val NEARBY_HARCOURTIANS_PERMISSION = "nearby_harcourtians_permission"
+    const val JOB_PROFILE = "create_job_profile"
+    const val JOB_PROFILE_COMMING_SOON = "job_profile_coming_soon";
+    const val NEAR_BY_COMMING_SOON="nearby_coming_soon";
+    const val LOCATION_PERMISSION_INFO = "permission_info"
+    const val NEAR_ALUMNI_PROFILE = "NearAlumniProfile"
 }

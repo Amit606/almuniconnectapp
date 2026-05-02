@@ -7,16 +7,20 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.bumptech.glide.Glide
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.kwh.almuniconnect.MainActivity
 import com.kwh.almuniconnect.R
+import com.kwh.almuniconnect.analytics.AnalyticsEvent
+import com.kwh.almuniconnect.analytics.AnalyticsManager
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.random.Random
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -38,7 +42,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+
         try {
+
             val data = remoteMessage.data ?: emptyMap()
 
             val title = remoteMessage.notification?.title
@@ -52,18 +58,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             val destination = data["destination"]
             val ctaTitle = data["cta_title"]
             val ctaDestination = data["cta_destination"]
-
+            AnalyticsManager.logEvent(this,
+                AnalyticsEvent.NotificationReceived(
+                    type = data["title"] ?: remoteMessage.notification?.title,
+                    destination = data["destination"]
+                )
+            )
             showNotification(
-                title = title,
-                body = body,
-                destination = destination,
-                data = data,
-                ctaTitle = ctaTitle,
-                ctaDestination = ctaDestination
+                title,
+                body,
+                destination,
+                data,
+                ctaTitle,
+                ctaDestination
             )
 
         } catch (e: Exception) {
-            Log.e(TAG, "Notification handling failed: ${e.message}")
+            Log.e(TAG, "Notification error: ${e.message}")
         }
     }
 
@@ -77,13 +88,72 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         ctaDestination: String?
     ) {
 
-        try {
+        val mainIntent = Intent(this, MainActivity::class.java).apply {
 
-            // -------- Main Intent --------
-            val mainIntent = Intent(this, MainActivity::class.java).apply {
+            putExtra("from_notification", true)
+            putExtra("destination", destination)
+
+            data.forEach { (key, value) ->
+                putExtra(key, value)
+            }
+
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            Random.nextInt(),
+            mainIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.app_logo)
+            .setContentTitle(title ?: getString(R.string.app_name))
+            .setContentText(body ?: "")
+            .setAutoCancel(true)
+            .setSound(defaultSound)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        // -------- Load Image Without Glide --------
+
+        val imageUrl = data["image"] ?: data["image_url"] ?: data["banner"]
+
+        var bitmap: Bitmap? = null
+
+        if (!imageUrl.isNullOrEmpty()) {
+            bitmap = getBitmapFromUrl(imageUrl)
+        }
+
+        if (bitmap != null) {
+
+            builder.setStyle(
+                NotificationCompat.BigPictureStyle()
+                    .bigPicture(bitmap)
+            )
+
+            builder.setLargeIcon(bitmap)
+
+        } else if (!body.isNullOrEmpty()) {
+
+            builder.setStyle(
+                NotificationCompat.BigTextStyle().bigText(body)
+            )
+        }
+
+        // -------- CTA Button --------
+
+        if (!ctaTitle.isNullOrEmpty() && !ctaDestination.isNullOrEmpty()) {
+
+            val ctaIntent = Intent(this, MainActivity::class.java).apply {
+
+
                 putExtra("from_notification", true)
+                putExtra("destination", ctaDestination)
 
-                // Pass all data safely
                 data.forEach { (key, value) ->
                     putExtra(key, value)
                 }
@@ -91,91 +161,48 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
 
-            val mainPendingIntent = PendingIntent.getActivity(
+            val ctaPendingIntent = PendingIntent.getActivity(
                 this,
                 Random.nextInt(),
-                mainIntent,
+                ctaIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            builder.addAction(
+                R.drawable.ic_google,
+                ctaTitle,
+                ctaPendingIntent
+            )
+        }
 
-            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.app_logo)
-                .setContentTitle(title ?: getString(R.string.app_name))
-                .setContentText(body ?: "")
-                .setAutoCancel(true)
-                .setSound(defaultSound)
-                .setContentIntent(mainPendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+        NotificationManagerCompat.from(this)
+            .notify(Random.nextInt(), builder.build())
+    }
 
-            // -------- Handle Big Image (Optional) --------
-            val imageUrl = data["image"] ?: data["image_url"] ?: data["banner"]
+    // -------- Image Downloader --------
 
-            var bitmap: Bitmap? = null
+    private fun getBitmapFromUrl(imageUrl: String): Bitmap? {
 
-            if (!imageUrl.isNullOrEmpty()) {
-                try {
-                    bitmap = Glide.with(this)
-                        .asBitmap()
-                        .load(imageUrl)
-                        .submit()
-                        .get()
-                } catch (e: Exception) {
-                    Log.w(TAG, "Image load failed")
-                }
-            }
+        return try {
 
-            if (bitmap != null) {
-                builder.setStyle(
-                    NotificationCompat.BigPictureStyle()
-                        .bigPicture(bitmap)
-                )
-                builder.setLargeIcon(bitmap)
-            } else if (!body.isNullOrEmpty()) {
-                builder.setStyle(
-                    NotificationCompat.BigTextStyle().bigText(body)
-                )
-            }
+            val url = URL(imageUrl)
+            val connection = url.openConnection() as HttpURLConnection
 
-            // -------- Handle CTA (Optional) --------
-            if (!ctaTitle.isNullOrEmpty() && !ctaDestination.isNullOrEmpty()) {
+            connection.doInput = true
+            connection.connect()
 
-                val ctaIntent = Intent(this, MainActivity::class.java).apply {
-                    putExtra("from_notification", true)
-                    putExtra("destination", ctaDestination)
-
-                    // Pass full data again
-                    data.forEach { (key, value) ->
-                        putExtra(key, value)
-                    }
-
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-
-                val ctaPendingIntent = PendingIntent.getActivity(
-                    this,
-                    Random.nextInt(),
-                    ctaIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-
-                builder.addAction(
-                    R.drawable.ic_google, // change icon if needed
-                    ctaTitle,
-                    ctaPendingIntent
-                )
-            }
-
-            NotificationManagerCompat.from(this)
-                .notify(Random.nextInt(), builder.build())
+            val input = connection.inputStream
+            BitmapFactory.decodeStream(input)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Show notification failed: ${e.message}")
+
+            Log.e(TAG, "Image download failed: ${e.message}")
+            null
         }
     }
 
     private fun createNotificationChannel() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             val channel = NotificationChannel(
@@ -183,6 +210,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
+
                 description = CHANNEL_DESC
                 enableLights(true)
                 enableVibration(true)

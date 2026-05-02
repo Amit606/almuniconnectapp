@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import com.kwh.almuniconnect.model.EmergencyDemo
 
 @Composable
 fun EmergencyDetailScreen(

@@ -1,37 +1,28 @@
 package com.kwh.almuniconnect.evetns
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kwh.almuniconnect.R
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.ui.graphics.Brush
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.common.math.LinearTransformation.horizontal
 import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.appbar.HBTUTopBar
+import com.kwh.almuniconnect.model.Event
 import com.kwh.almuniconnect.utils.CommonEmptyState
 import com.kwh.almuniconnect.utils.encodeRoute
 
@@ -98,7 +89,7 @@ fun EventsScreen(
                         .padding(paddingValues)
                 ) {
 
-                    item { EventBanner() }
+                   // item { EventBanner() }
 
                     item {
                         Text(
@@ -111,7 +102,7 @@ fun EventsScreen(
                     items(events) { event ->
                         EventCard(event) {
                             navController.navigate(
-                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&location=${event.location.encodeRoute()}"
+                                "${Routes.EVENT_DETAILS}?title=${event.title.encodeRoute()}&description=${event.description.encodeRoute()}&date=${event.startAt.encodeRoute()}&location=${event.location.encodeRoute()}"
                             )
                         }
                     }
@@ -122,114 +113,105 @@ fun EventsScreen(
     }
 }
 
-
-
-
-@Composable
-fun EventBanner() {
-    Box(
-        modifier = Modifier
-            .height(250.dp)
-            .fillMaxWidth()
-    ) {
-        Image(
-            painter = painterResource(R.drawable.newggg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0x66000000))
-        )
-
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-        ) {
-            Text(
-                "SUN, 22 FEB 2026",
-                color = Color.White,
-                fontSize = 12.sp
-            )
-            Text(
-                "MCA Alumni Meet & Greet",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-    }
-}
-
 @Composable
 fun EventCard(
     event: Event,
     onClick: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White//Color(0xFFFFF4F1)
-        ),
-        elevation = CardDefaults.cardElevation(1.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
+
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Image(
-                painter = painterResource(event.image),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.FillBounds
-            )
+            // 🔥 Safer image selection logic
+            val imageRes = when {
+                event.title.contains("Holi", ignoreCase = true) ->
+                    R.drawable.ic_holi
 
-            Spacer(modifier = Modifier.width(12.dp))
+                event.title.contains("Alumni", ignoreCase = true) ||
+                        event.title.contains("Almuni", ignoreCase = true) ->
+                    R.drawable.ic_alumni
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    event.title,
-                    color = Color.Black,
-                    style = MaterialTheme.typography.labelLarge
-                )
-                Text(
-                    event.location,
-                    color = Color.DarkGray,
-                    style = MaterialTheme.typography.labelMedium
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.DateRange,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        event.date,
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
+                else ->
+                    R.drawable.ic_demo_events
             }
 
-//
+            // ✅ Correct Image (Fixed size for Row layout)
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(110.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            )
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = event.location,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(
+                            horizontal = 8.dp,
+                            vertical = 4.dp
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = event.date,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
 
 

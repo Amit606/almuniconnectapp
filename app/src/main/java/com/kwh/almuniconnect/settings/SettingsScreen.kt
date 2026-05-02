@@ -33,6 +33,7 @@ import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.NetworkClient
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.help.openLink
+import com.kwh.almuniconnect.home.CommonActionBottomSheet
 import com.kwh.almuniconnect.storage.UserSession
 import kotlinx.coroutines.launch
 
@@ -137,6 +138,13 @@ fun SettingsScreen(
                     onClick = {openLink(context, PRIVACY_POLICY_URL)
                     }
                 )
+                SettingItem(
+                    icon = Icons.Default.Feedback,
+                    title = "Feedback",
+                    subtitle = "Provide any feedback or report issues",
+                    onClick = { navController.navigate(Routes.FEEDBACK) }
+
+                )
 
                 SettingItem(
                     icon = Icons.Default.Help,
@@ -163,55 +171,36 @@ fun SettingsScreen(
         }
 
         if (showLogoutDialog) {
-            AlertDialog(
-                onDismissRequest = { showLogoutDialog = false },
-                title = { Text("Confirm Logout") },
-                text = { Text("Are you sure you want to logout from your account?") },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showLogoutDialog = false
-                            scope.launch {
-                                UserSession.logout(context)
-                                navController.navigate("login") {
-                                    popUpTo(0) { inclusive = true }
-                                }
+                CommonActionBottomSheet(
+                    showDialog = showLogoutDialog,
+                    title = "Logout",
+                    description = "You’ll stop receiving updates from your alumni network. You can always log back in anytime.",
+                    confirmText = "Logout",
+                    onDismiss = { showLogoutDialog = false },
+                    onConfirm = {
+                        scope.launch {
+                            UserSession.logout(context)
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
                             }
                         }
-                    ) {
-                        Text("Logout", color = MaterialTheme.colorScheme.error)
                     }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { showLogoutDialog = false }
-                    ) {
-                        Text("Cancel")
-                    }
-                }
-            )
-        }
+                )
 
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showDialog = false
-                        viewModel.deleteAccount()
-                    }) {
-                        Text("Delete")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text("Cancel")
-                    }
-                },
-                title = { Text("Delete Account?") },
-                text = { Text("This action cannot be undone.") }
-            )
-        }
+            }
+
+            if (showDialog) {
+                CommonActionBottomSheet(
+                    showDialog = showDialog,
+                    title = "Delete Account",
+                    description = "This will permanently delete your account and all your data. This action cannot be undone.",
+                    confirmText = "Delete",
+                    isDanger = true,
+                    onDismiss = { showDialog = false },
+                    onConfirm = { viewModel.deleteAccount() }
+                )
+
+            }
     }
 }
 @Composable

@@ -43,8 +43,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ControlPoint
 import androidx.compose.material.icons.filled.CurrencyRupee
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PostAdd
@@ -68,13 +70,17 @@ import com.kwh.almuniconnect.appbar.HBTUTopBar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.analytics.TrackScreen
 import com.kwh.almuniconnect.network.openUrl
 import com.kwh.almuniconnect.utils.CommonEmptyState
-import com.kwh.almuniconnect.utils.encodeRoute
 import com.kwh.almuniconnect.utils.getTimeAgo
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -110,7 +116,7 @@ fun JobListingScreen(navController: NavController) {
                 rightAction = {
                     IconButton(
                         onClick = {
-                            if (false) {
+                            if (true) {
                                 navController.navigate(Routes.JOB_POST)
                             } else {
                                 showSubscriptionDialog = true
@@ -118,7 +124,7 @@ fun JobListingScreen(navController: NavController) {
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.PostAdd,
+                            imageVector = Icons.Default.ControlPoint,
                             contentDescription = "Add Job"
                         )
                     }
@@ -144,8 +150,8 @@ fun JobListingScreen(navController: NavController) {
 
             is JobState.Error -> {
                 CommonEmptyState(
-                    title = "No Upcoming Events",
-                    message = "There are no upcoming events right now.\nPlease check back later.",
+                    title = "No Upcoming Jobs",
+                    message = "There are no upcoming jobs right now.\nPlease check back later.",
                     lottieRes = R.raw.no_events,
                     actionText = "Refresh",
                     onActionClick = { viewModel.loadJobs() }
@@ -183,8 +189,8 @@ fun JobListingScreen(navController: NavController) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun JobCard(job:JobAPost,navController: NavController) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+fun JobCard(job: JobAPost, navController: NavController) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -195,69 +201,56 @@ fun JobCard(job:JobAPost,navController: NavController) {
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
+
         Column(modifier = Modifier.padding(16.dp)) {
 
             // Title
             Text(
-                text = "${job.title} | ${job.totalExperience} | ${job.location}",
+                text = "${job.title} | ${job.totalExperience ?: "Not specified"} | ${job.location ?: "Remote"}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Company + Rating
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Capgemini",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = Color(0xFFFFB300),
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = "3.7 | 51573 Reviews",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
             // Experience, Salary, Location
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                InfoItem(Icons.Default.Work, job.totalExperience)
-                InfoItem(Icons.Default.CurrencyRupee, "Not disclosed")
-                InfoItem(Icons.Default.LocationOn, job.location)
 
+                InfoItem(
+                    Icons.Default.Work,
+                    job.totalExperience ?: "Not specified"
+                )
+
+                InfoItem(
+                    Icons.Default.CurrencyRupee,
+                    job.salary ?: "Not disclosed"
+                )
+
+                InfoItem(
+                    Icons.Default.LocationOn,
+                    job.location ?: "Remote"
+                )
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            InfoItem(Icons.Default.Timer, job.employmentType)
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Skills
+            InfoItem(
+                Icons.Default.Timer,
+                job.employmentType ?: "Full Time"
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Description
             Text(
                 text = job.description,
                 style = MaterialTheme.typography.bodySmall
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            InfoItemClick(Icons.Default.ChevronRight, " Job Posted By Amit Kumar Gupta"){
-                navController.navigate(Routes.HOME)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
 
             // Footer
             Row(
@@ -267,6 +260,7 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Text(
                     text = getTimeAgo(job.createdAtUtc),
                     style = MaterialTheme.typography.bodySmall,
@@ -274,20 +268,47 @@ fun JobCard(job:JobAPost,navController: NavController) {
                 )
 
                 Button(
-                    onClick = { openUrl(context,"https://www.google.com") },
+                    onClick = {
+                        navController.navigate("job_details/${job.jobId}")
+                    },
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
+                    contentPadding = PaddingValues(
+                        horizontal = 20.dp,
+                        vertical = 8.dp
+                    )
                 ) {
                     Text(
-                        text = "Apply Now",
+                        text = "Explore Job",
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
+
             }
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(job.photoUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Alumni Photo",
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape),
+                    placeholder = painterResource(R.drawable.man),
+                    error = painterResource(R.drawable.man),
+                    fallback = painterResource(R.drawable.man)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Posted by ${job.alumniName}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
-
     }
 }
 

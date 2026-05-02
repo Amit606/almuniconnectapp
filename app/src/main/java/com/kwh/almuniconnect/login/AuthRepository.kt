@@ -1,13 +1,15 @@
 package com.kwh.almuniconnect.login
 
-import android.util.Log
-import com.google.gson.Gson
+import android.content.Context
 import com.kwh.almuniconnect.api.ApiService
 import com.kwh.almuniconnect.api.SignupRequest
 import com.kwh.almuniconnect.profile.ProfileResponse
+import com.kwh.almuniconnect.storage.TokenDataStore
 
 class AuthRepository(
-    private val api: ApiService
+    private val api: ApiService,
+    private val tokenDataStore: TokenDataStore
+
 ) {
 
     /* ------------------------------------------------ */
@@ -27,7 +29,6 @@ class AuthRepository(
                 val body = response.body()
 
                 if (body != null) {
-                    Log.e("AuthRepository", "Signup Success: $body")
                     Result.success(body)
                 } else {
                     Result.failure(Exception("Empty response body"))
@@ -37,10 +38,7 @@ class AuthRepository(
 
                 val errorMsg = response.errorBody()?.string()
 
-                Log.e(
-                    "AuthRepository",
-                    "Signup Failed: ${response.code()} $errorMsg"
-                )
+
 
                 Result.failure(
                     Exception("HTTP ${response.code()}: $errorMsg")
@@ -49,7 +47,6 @@ class AuthRepository(
 
         } catch (e: Exception) {
 
-            Log.e("AuthRepository", "Signup Exception: ${e.message}")
 
             Result.failure(e)
         }
@@ -66,36 +63,39 @@ class AuthRepository(
 
         return try {
 
-            val response = api.checkEmailExist(email)
+            val response = api.checkEmailExist(email) // ✅ use param
 
             if (!response.isSuccessful) {
                 return Result.failure(
-                    Exception("HTTP ${response.code()}")
+                    Exception("HTTP ${response.code()} - ${response.message()}")
                 )
             }
 
             val body = response.body()
                 ?: return Result.failure(Exception("Empty response"))
 
-            val rawData = body.data
-                ?: return Result.success(null)
-
-            val jsonObject = Gson()
-                .toJsonTree(rawData)
-                .asJsonObject
-
-            if (jsonObject.has("userId")) {
-
-                val user = Gson().fromJson(
-                    jsonObject,
-                    ExistingUserDto::class.java
+            if (!body.success) {
+                return Result.failure(
+                    Exception(body.message ?: "Something went wrong")
                 )
-
-                Result.success(user)
-
-            } else {
-                Result.success(null)
             }
+
+            val data = body.data
+
+            // ✅ Save tokens only if available
+            if (data?.accessToken != null && data.refreshToken != null) {
+
+                tokenDataStore.saveTokens(
+                    accessToken = data.accessToken,
+                    refreshToken = data.refreshToken,
+                    accessTokenExpiry = data.accessTokenExpiry?.toLongOrNull()
+                        ?: System.currentTimeMillis(),
+                    refreshTokenExpiry = data.refreshTokenExpiry?.toLongOrNull()
+                        ?: System.currentTimeMillis()
+                )
+            }
+
+            Result.success(data?.userProfile)
 
         } catch (e: Exception) {
             Result.failure(e)

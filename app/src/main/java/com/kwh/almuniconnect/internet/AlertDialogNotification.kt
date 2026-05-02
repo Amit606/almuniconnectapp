@@ -46,7 +46,7 @@ fun AlertDialogNotification(
 
                 // 🌩️ Cloud Image
                 Image(
-                    painter = painterResource(id = R.drawable.first),
+                    painter = painterResource(id = R.drawable.ic_services),
                     contentDescription = "No Internet",
                     modifier = Modifier
                         .size(160.dp)

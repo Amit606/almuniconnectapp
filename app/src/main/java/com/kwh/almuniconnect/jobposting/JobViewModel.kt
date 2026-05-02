@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.jobposting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,11 +21,12 @@ class JobViewModel(
     val state: StateFlow<JobState> = _state
 
     private var pageNumber = 1
-    private val pageSize = 5
+    private val pageSize = 10
     private val jobList = mutableListOf<JobAPost>()
 
     fun loadJobs(reset: Boolean = false) {
         viewModelScope.launch {
+
             if (reset) {
                 pageNumber = 1
                 jobList.clear()
@@ -34,15 +36,28 @@ class JobViewModel(
 
             repository.getJobPosts(pageNumber, pageSize)
                 .onSuccess {
+
                     jobList.addAll(it.items)
-                    _state.value = JobState.Success(jobList, it.totalCount)
+
+                    _state.value = JobState.Success(
+                        jobList,
+                        it.totalCount
+                    )
+
                     pageNumber++
                 }
                 .onFailure {
+
                     _state.value = JobState.Error(
                         it.message ?: "Failed to load jobs"
                     )
                 }
         }
     }
+
+    fun getJobById(jobId: String): JobAPost? {
+        Log.e("JobViewModel", "Searching for job with ID: $jobId in list of ${jobList.size} jobs")
+        return jobList.find { it.jobId == jobId }
+    }
+
 }

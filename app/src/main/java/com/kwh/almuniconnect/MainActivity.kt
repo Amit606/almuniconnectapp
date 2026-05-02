@@ -1,5 +1,4 @@
 package com.kwh.almuniconnect
-
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -17,8 +16,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
-import com.kwh.almuniconnect.api.ApiService
-import com.kwh.almuniconnect.network.AlumniRepository
+import com.kwh.almuniconnect.analytics.AnalyticsEvent
+import com.kwh.almuniconnect.analytics.AnalyticsManager
 import com.kwh.almuniconnect.storage.FcmPrefs
 import com.kwh.almuniconnect.ui.theme.LinkedTheme
 import kotlinx.coroutines.CoroutineScope
@@ -42,29 +41,24 @@ class MainActivity : ComponentActivity() {
         notificationIntent = intent
 
 
-
-
         setContent {
             LinkedTheme {
 
+                val context = androidx.compose.ui.platform.LocalContext.current
                 val navController = rememberNavController()
 
-
-
                 // Handle FCM click safely
-
                 LaunchedEffect(notificationIntent) {
                     notificationIntent?.let {
-                        handleNotificationIntent(it, navController)
-                        notificationIntent = null   // prevent repeat
+                        handleNotificationIntent(context, it, navController)
+                        notificationIntent = null
                     }
                 }
+
                 AppNavGraph(
                     navController = navController,
                     startDestination = Routes.SPLASH
                 )
-
-
             }
         }
     }
@@ -79,6 +73,8 @@ class MainActivity : ComponentActivity() {
         setIntent(intent)
         notificationIntent = intent
     }
+
+
 }
 private fun tokenGeneration(context: Context) {
 
@@ -101,7 +97,6 @@ private fun tokenGeneration(context: Context) {
                     }
 
                     // 🔥 Optional backend update
-                    // uploadTokenToServer(newToken)
 
                     FcmPrefs.saveToken(appContext, newToken)
 
@@ -118,24 +113,37 @@ private fun tokenGeneration(context: Context) {
         }
 }
 
+
+
 private fun handleNotificationIntent(
+    context: Context,
     intent: Intent?,
     navController: NavHostController
 ) {
     if (intent == null) return
 
     val fromNotification = intent.getBooleanExtra("from_notification", false)
+    AnalyticsManager.logEvent(context,
+        AnalyticsEvent.NotificationOpened(
+            type = intent.getStringExtra("type"),
+            destination = intent.getStringExtra("destination")
+        )
+    )
     if (!fromNotification) return
 
     val destination = intent.getStringExtra("destination")
 
     when (destination) {
 
+
         Routes.JOB_DETAILS_Full -> {
             navController.safeNavigate(Routes.JOB_DETAILS_Full)
         }
         Routes.VERIFICATION -> {
             navController.safeNavigate(Routes.VERIFICATION)
+        }
+        Routes.APPROVAL_PENDING -> {
+            navController.safeNavigate(Routes.APPROVAL_PENDING)
         }
 
         Routes.ALMUNI_POST -> {
@@ -145,6 +153,7 @@ private fun handleNotificationIntent(
         Routes.EVENTS -> {
             navController.safeNavigate(Routes.EVENTS)
         }
+
 
         Routes.WHATSUP_CHANNEL -> {
             navController.safeNavigate(Routes.WHATSUP_CHANNEL)

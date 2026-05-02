@@ -28,6 +28,9 @@ class NewsViewModel(
     private val newsList = mutableListOf<NewsItem>()
 
     fun loadNews(reset: Boolean = false) {
+
+        if (!reset && newsList.isNotEmpty()) return // ✅ allowed here
+
         viewModelScope.launch {
 
             if (reset) {
@@ -40,8 +43,6 @@ class NewsViewModel(
             repository.fetchNews(pageNumber, pageSize)
                 .onSuccess { (items, totalCount) ->
 
-                    Log.d("NEWS_VM", "Loaded ${items.size} items")
-
                     newsList.addAll(items)
 
                     _state.value = NewsState.Success(
@@ -49,7 +50,7 @@ class NewsViewModel(
                         totalCount = totalCount
                     )
 
-                    pageNumber++   // ✅ increment AFTER success
+                    pageNumber++
                 }
                 .onFailure {
                     _state.value = NewsState.Error(
@@ -58,4 +59,6 @@ class NewsViewModel(
                 }
         }
     }
+
+
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -39,23 +40,30 @@ import com.kwh.almuniconnect.Routes
 import com.kwh.almuniconnect.api.*
 import com.kwh.almuniconnect.appbar.HBTUTopBar
 import com.kwh.almuniconnect.jobposting.AppTextField
+import com.kwh.almuniconnect.jobposting.LinkiedID
 import com.kwh.almuniconnect.jobposting.SectionTitle
 import com.kwh.almuniconnect.login.AuthRepository
+import com.kwh.almuniconnect.network.BranchViewModel
 import com.kwh.almuniconnect.storage.*
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController,
+                  viewModel: BranchViewModel) {
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-
+    val branches by viewModel.branches.collectAsState()
+    var branch by remember { mutableStateOf("") }
+    var selectedBranchId by remember { mutableStateOf<Int?>(null) }
     val apiService = remember { NetworkClient.createService(ApiService::class.java) }
     val repository = remember { AuthRepository(apiService) }
+    val tokenDataStore = TokenDataStore(context)
+    var isMobilePublic by remember { mutableStateOf(false) }
 
     val viewModel: ProfileViewModel =
-        viewModel(factory = ProfileViewModelFactory(repository))
+        viewModel(factory = ProfileViewModelFactory(repository,tokenDataStore))
 
     val apiState by viewModel.state.collectAsState()
 
@@ -64,8 +72,6 @@ fun ProfileScreen(navController: NavController) {
 
 
 
-    var selectedBranch by remember { mutableStateOf<Branch?>(null) }
-    var branch by remember { mutableStateOf("") }
     /* ---------- FORM STATE ---------- */
 
     var name by remember { mutableStateOf("") }
@@ -73,34 +79,29 @@ fun ProfileScreen(navController: NavController) {
     var mobile by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
     var totalExp by remember { mutableStateOf<Int?>(null) }
-    val totalYear = (1..30).toList()
+    val totalYear = (1..70).toList()
     var job by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var birthday by remember { mutableStateOf("") }
+    var cityName by remember { mutableStateOf("") }
     var linkedin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var fcmToken by remember { mutableStateOf("") }
-    val years = (1972..2026).map { it.toString() }
-    val branchNames = branches.map { it.name }
-    var selectedBranchId by remember { mutableStateOf<Int?>(null) }
-
-
-
-    val safeYear = if (year in years) year else ""
+    val years = (1965..2026).map { it.toString() }
+    val safeYear = year.trim().takeIf { it in years } ?: ""
     LaunchedEffect(Unit) {
         fcmToken = FcmPrefs.getToken(context) ?: ""
     }
-
+    LaunchedEffect(branches, branch) {
+        val branchObj = branches.find { it.name == branch }
+        selectedBranchId = branchObj?.id
+    }
     LaunchedEffect(user) {
-
         name = user.name
         email = user.email
         mobile = user.mobile
         branch = user.branch
-        year = user.year
+        year = user.year.trim()
         job = user.job
-        location = user.location
-        birthday = user.birthday
+        cityName = user.cityName
         linkedin = user.linkedin
         totalExp = user.totalExp
     }
@@ -116,7 +117,6 @@ fun ProfileScreen(navController: NavController) {
                 val profile =
                     (apiState as ProfileState.Success).profile
 
-                Log.e("ProfileScreen", "API Success: ${profile.userId}")
                 userPrefs.saveProfile(
                     UserLocalModel(
                         userId = profile.userId ?: "",
@@ -125,30 +125,24 @@ fun ProfileScreen(navController: NavController) {
                         mobile = profile.mobileNo ?: "",
                         branch = profile.courseName ?: "",
                         branchId = profile.courseId ?: 0,
-                        year = profile.passoutYear?.toString() ?: "",
+                        year = profile.passoutYear.toString() ,    // FIX
                         job = profile.companyName ?: "",
-                        location = "",
-                        birthday = profile.dateOfBirth ?: "",
+                        cityName = profile.cityName?:"",
                         linkedin = profile.linkedinUrl ?: "",
                         photo = profile.photoUrl ?: "",
-                        totalExp = profile.totalExperience ?: 0
-
-//                        accessToken = profile.accessToken ?: "",
-//                        accessTokenExpiry = profile.accessTokenExpiry ?: "",
-//                        refreshToken = profile.refreshToken ?: "",
-//                        refreshTokenExpiry = profile.refreshTokenExpiry ?: ""
+                        totalExp = profile.totalExperience ?: 0,
                     )
                 )
-
-                navController.navigate(Routes.HOME) {
+                if(profile.isVerified==true){
+                    navController.navigate(Routes.HOME) {
                     popUpTo(Routes.PROFILE) { inclusive = true }
+                }} else {
+                    navController.navigate(Routes.APPROVAL_PENDING)
                 }
             }
-
             is ProfileState.Error -> {
                 error = (apiState as ProfileState.Error).message
             }
-
             else -> {}
         }
     }
@@ -216,6 +210,7 @@ fun ProfileScreen(navController: NavController) {
                                     .padding(vertical = 24.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+
 
                                 AsyncImage(
                                     model = user.photo.ifEmpty { R.drawable.man },
@@ -286,27 +281,37 @@ fun ProfileScreen(navController: NavController) {
                                 readOnly = true,
                             ) { email = it }
 
-                            AppTextField(
-                                label = "Mobile",
-                                value = mobile,
-                                keyboardType = KeyboardType.Number
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                if (it.all(Char::isDigit) && it.length <= 10)
-                                    mobile = it
+
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    AppTextField(
+                                        label = "Mobile",
+                                        value = mobile,
+                                        keyboardType = KeyboardType.Number
+                                    ) {
+                                        if (it.all(Char::isDigit) && it.length <= 10)
+                                            mobile = it
+                                    }
+                                }
+
                             }
 
                             SectionTitle("Professional Details")
                             DropdownFieldYear(
                                 label = "Branch",
                                 selected = branch,
-                                items = branchNames,
+                                items = branches.map { it.name },
                                 onSelect = { selectedName ->
 
                                     branch = selectedName
 
-                                    // find full object from name
                                     val branchObj = branches.find { it.name == selectedName }
-                                    selectedBranchId = branchObj?.id
+                                    selectedBranchId = branchObj?.id   // safe call
                                 }
                             )
 
@@ -322,11 +327,10 @@ fun ProfileScreen(navController: NavController) {
                                 onSelect = { totalExp = it }
                             )
 
-                            AppTextField("Location", location) { location = it }
+                            AppTextField("Location", cityName) { cityName = it }
 
-                            BirthdayPicker(birthday) { birthday = it }
 
-                            AppTextField("LinkedIn URL", linkedin) {
+                            LinkiedID("LinkedIn URL", linkedin) {
                                 linkedin = it
                             }
 
@@ -351,17 +355,17 @@ fun ProfileScreen(navController: NavController) {
                                     error = validateProfile(
                                         name, email, mobile,
                                         branch, year,
-                                        job, location,
-                                        birthday, linkedin
+                                        job, cityName,  linkedin
                                     )
-
                                     if (error == null) {
                                         viewModel.submitProfile(
-                                            SignupRequest(
+
+                                                    SignupRequest(
                                                 name = name,
+                                                photoUrl= user.photo,
                                                 mobileNo = mobile,
                                                 email = email,
-                                                dateOfBirth = birthday,
+                                                dateOfBirth = "2026-04-25",
                                                 passoutYear = year.toIntOrNull() ?: 0,
                                                 courseId = selectedBranchId,
                                                 countryId = 81,
@@ -370,9 +374,10 @@ fun ProfileScreen(navController: NavController) {
                                                 totalExperience = totalExp ?: 0,
                                                 linkedinUrl = linkedin,
                                                 loggedFrom = "android",
+                                                cityName = cityName,
                                                 deviceId = DeviceUtils.getDeviceId(context),
                                                 fcmToken = fcmToken,
-                                                appVersion = "1.0.5",
+                                                appVersion = "1.2.0",
                                                 advertisementId = "",
                                                 userAgent = "android"
                                             )
@@ -469,8 +474,7 @@ fun validateProfile(
     branch: String,
     year: String,
     job: String,
-    location: String,
-    birthday: String,
+    cityName: String,
     linkedin: String
 ): String? {
 
@@ -495,11 +499,10 @@ fun validateProfile(
     if (job.isBlank())
         return "Please enter job/company"
 
-    if (location.isBlank())
+    if (cityName.isBlank())
         return "Please enter location"
 
-    if (birthday.isBlank())
-        return "Please select birthday"
+
 
     if (linkedin.isNotBlank() &&
         !linkedin.startsWith("http://") &&

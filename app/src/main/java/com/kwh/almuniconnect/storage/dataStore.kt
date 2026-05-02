@@ -25,10 +25,10 @@ class UserPreferences(private val context: Context) {
         val KEY_BRANCH = stringPreferencesKey("branch")
         val KEY_YEAR = stringPreferencesKey("year")
         val KEY_JOB = stringPreferencesKey("job")
-        val KEY_LOCATION = stringPreferencesKey("location")
         val KEY_BIRTHDAY = stringPreferencesKey("birthday")
         val KEY_LINKEDIN = stringPreferencesKey("linkedin")
         val KEY_TOTAL_EXP = intPreferencesKey("total_exp")
+        val KEY_CITY_NAME = stringPreferencesKey("cityName")
         private val KEY_USER_ID = stringPreferencesKey("user_id")
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val KEY_ACCESS_TOKEN_EXPIRY = stringPreferencesKey("access_token_expiry")
@@ -72,10 +72,10 @@ class UserPreferences(private val context: Context) {
             prefs[KEY_BRANCH_ID] = profile.branchId
             prefs[KEY_YEAR] = profile.year
             prefs[KEY_JOB] = profile.job
-            prefs[KEY_LOCATION] = profile.location
             prefs[KEY_BIRTHDAY] = profile.birthday
             prefs[KEY_LINKEDIN] = profile.linkedin
             prefs[KEY_TOTAL_EXP] = profile.totalExp
+            prefs[KEY_CITY_NAME] = profile.cityName
             prefs[KEY_ACCESS_TOKEN] = profile.accessToken
             prefs[KEY_ACCESS_TOKEN_EXPIRY] = profile.accessTokenExpiry
             prefs[KEY_REFRESH_TOKEN] = profile.refreshToken
@@ -105,7 +105,7 @@ class UserPreferences(private val context: Context) {
                         branch = prefs[KEY_BRANCH] ?: "",
                         year = prefs[KEY_YEAR] ?: "",
                         job = prefs[KEY_JOB] ?: "",
-                        location = prefs[KEY_LOCATION] ?: "",
+                        cityName = prefs[KEY_CITY_NAME] ?: "",
                         birthday = prefs[KEY_BIRTHDAY] ?: "",
                         linkedin = prefs[KEY_LINKEDIN] ?: "",
                         totalExp = prefs[KEY_TOTAL_EXP] ?: 0,

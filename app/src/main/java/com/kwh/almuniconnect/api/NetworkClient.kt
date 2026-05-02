@@ -12,12 +12,15 @@ object NetworkClient {
 
     private const val BASE_URL = "https://hbtu-alumni-api.azurewebsites.net/api/v1/"  // 🔁 Replace with your backend base URL
 
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY  // shows request/response in Logcat
-    }
+    val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.NONE
+        }
+    val tokenManager = TokenManager()
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
+    val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .addInterceptor(AuthInterceptor(tokenManager)) // 👈 interceptor attached
+
         .build()
 
     private val retrofit: Retrofit by lazy {

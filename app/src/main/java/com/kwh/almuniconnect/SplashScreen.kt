@@ -1,30 +1,12 @@
 package com.kwh.almuniconnect
 
-import android.R.interpolator.overshoot
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
+import android.util.Log
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,14 +18,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.kwh.almuniconnect.storage.UserLocalModel
+import com.kwh.almuniconnect.storage.UserPreferences
 import com.kwh.almuniconnect.storage.UserSession
-//import com.airbnb.lottie.compose.LottieAnimation
-//import com.airbnb.lottie.compose.LottieCompositionSpec
-//import com.airbnb.lottie.compose.rememberLottieComposition
+import com.kwh.almuniconnect.verification.SplashViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 @Composable
 fun SplashScreen(navController: NavController) {
 
@@ -53,64 +35,109 @@ fun SplashScreen(navController: NavController) {
     val pulse = remember { Animatable(1f) }
 
     val context = LocalContext.current
-    val isLoggedIn by UserSession.isLoggedIn(context).collectAsState(initial = false)
 
-    LaunchedEffect(isLoggedIn) {
+    val isLoggedIn by UserSession.isLoggedIn(context)
+        .collectAsState(initial = false)
 
+    val userPrefs = remember { UserPreferences(context) }
+    val user by userPrefs.getUser()
+        .collectAsState(initial = UserLocalModel())
+
+    val splashViewModel: SplashViewModel = viewModel()
+
+    val scope = rememberCoroutineScope()
+
+    // 🔥 Prevent multiple navigation
+    var hasNavigated by remember { mutableStateOf(false) }
+
+    // 🚀 Main Logic (SAFE + Reactive)
+    LaunchedEffect(isLoggedIn, user.userId) {
+
+        // 🎬 Animation
         launch {
-            scale.animateTo(
-                1f,
-                animationSpec = tween(900, easing = FastOutSlowInEasing)
-            )
+            scale.animateTo(1f, tween(900, easing = FastOutSlowInEasing))
         }
 
         launch {
-            alpha.animateTo(
-                1f,
-                animationSpec = tween(800, delayMillis = 400)
-            )
+            alpha.animateTo(1f, tween(800, delayMillis = 400))
         }
 
         launch {
-            offsetY.animateTo(
-                0f,
-                animationSpec = tween(900, delayMillis = 400)
-            )
+            offsetY.animateTo(0f, tween(900, delayMillis = 400))
         }
 
         launch {
             pulse.animateTo(
                 1.08f,
-                animationSpec = infiniteRepeatable(
+                infiniteRepeatable(
                     animation = tween(900),
                     repeatMode = RepeatMode.Reverse
                 )
             )
         }
 
-        delay(1800)
+        delay(1500)
 
-        if (isLoggedIn) {
-            //Routes.VERIFICATION   //Home
-            navController.navigate(Routes.HOME) {
-                popUpTo(Routes.SPLASH) { inclusive = true }
-            }
-        } else {
+        // 🛑 Prevent duplicate navigation
+        if (hasNavigated) return@LaunchedEffect
+
+        // 🔐 Not logged in
+        if (!isLoggedIn) {
+            hasNavigated = true
+
             navController.navigate(Routes.INTRO) {
                 popUpTo(Routes.SPLASH) { inclusive = true }
+                launchSingleTop = true
+            }
+            return@LaunchedEffect
+        }
+
+        // 👤 No user data
+        if (user.userId.isBlank()) {
+            hasNavigated = true
+
+            navController.navigate(Routes.LOGIN) {
+                popUpTo(Routes.SPLASH) { inclusive = true }
+                launchSingleTop = true
+            }
+            return@LaunchedEffect
+        }
+
+        // 🔍 Verification API
+        splashViewModel.checkAlumniVerification(user.userId) { isVerified ->
+
+            scope.launch {
+
+                // 🛑 Safety checks
+                if (hasNavigated) return@launch
+                if (navController.currentDestination?.route != Routes.SPLASH) return@launch
+
+                hasNavigated = true
+
+                val route = if (isVerified) {
+                    Routes.HOME
+                } else {
+                    Routes.APPROVAL_PENDING
+                }
+
+                navController.navigate(route) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                    launchSingleTop = true
+                }
             }
         }
     }
 
+    // 🎨 UI
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        Color(0xFF0D1B2A), // Alumni Navy
-                        Color(0xFF1B4DB1), // Royal Blue
-                        Color(0xFF3A7BD5)  // Light Blue
+                        Color(0xFF0D1B2A),
+                        Color(0xFF1B4DB1),
+                        Color(0xFF3A7BD5)
                     )
                 )
             ),
@@ -132,7 +159,7 @@ fun SplashScreen(navController: NavController) {
             Spacer(Modifier.height(20.dp))
 
             Text(
-                "AlumniConnect",
+                "Harcourtian Alumni Connect",
                 color = Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -140,7 +167,7 @@ fun SplashScreen(navController: NavController) {
             )
 
             Text(
-                "Your Professional Alumni Network",
+                "Connecting Harcourtians Worldwide.",
                 color = Color(0xFFD6E3FF),
                 fontSize = 14.sp,
                 modifier = Modifier.alpha(alpha.value)

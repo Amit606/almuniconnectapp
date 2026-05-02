@@ -46,7 +46,7 @@ fun PremiumDialog(
 
                 // 👑 Premium Image / Icon
                 Image(
-                    painter = painterResource(id = R.drawable.first), // ideally crown / premium image
+                    painter = painterResource(id = R.drawable.ic_fifth), // ideally crown / premium image
                     contentDescription = "Premium Feature",
                     modifier = Modifier.size(160.dp)
                 )

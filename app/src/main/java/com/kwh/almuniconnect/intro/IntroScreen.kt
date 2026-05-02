@@ -117,7 +117,7 @@ fun IntroScreen(
         ) {
             Text(
                 text = if (pagerState.currentPage == pages.lastIndex)
-                    "Get Started"
+                    "Join the Harcourtian Network"
                 else
                     "Next",
                 color = Color.White,

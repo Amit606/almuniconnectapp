@@ -2,6 +2,8 @@ package com.kwh.almuniconnect.evetns
 
 import com.kwh.almuniconnect.R
 import com.kwh.almuniconnect.api.ApiService
+import com.kwh.almuniconnect.model.Event
+import com.kwh.almuniconnect.model.EventDto
 
 class EventsRepository(
     private val api: ApiService
@@ -22,7 +24,8 @@ fun EventDto.toUiEvent(): Event {
         location = location,
         date = startAt.substring(0, 10), // simple formatting
         price = "Free",
-        image = R.drawable.first, // local drawable
+        description = description,
+        image = R.drawable.ic_demo_events, // local drawable
         startAt = startAt,
         endAt = endAt
     )

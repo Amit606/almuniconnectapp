@@ -1,5 +1,6 @@
 package com.kwh.almuniconnect.verification
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +22,6 @@ class PendingVerificationViewModel : ViewModel() {
             uiState = UiState.Loading
 
             val result = repository.getPending(alumniId)
-
             uiState = result.fold(
                 onSuccess = { list ->
                     if (list.isEmpty()) {
@@ -31,15 +31,14 @@ class PendingVerificationViewModel : ViewModel() {
                     }
                 },
                 onFailure = {
-                    UiState.Error(it.message ?: "Something went wrong")
+                    UiState.Error("No Pending Verifications found")
                 }
             )
         }
     }
-    fun approveAlumni(alumniId: String) {
+    fun approveAlumni(context:Context,alumniId: String) {
         viewModelScope.launch {
-
-            val result = repository.verifyAlumni(
+            val result = repository.verifyAlumni(context,
                 alumniId = alumniId,
                 isVerified = true
             )
@@ -60,15 +59,15 @@ class PendingVerificationViewModel : ViewModel() {
                     }
                 },
                 onFailure = {
-                    uiState = UiState.Error("Verification failed")
+                    uiState = UiState.Error("No Pending Verifications found")
                 }
             )
         }
     }
-    fun denyAlumni(alumniId: String) {
+    fun denyAlumni(context:Context,alumniId: String) {
         viewModelScope.launch {
 
-            val result = repository.verifyAlumni(
+            val result = repository.verifyAlumni(context,
                 alumniId = alumniId,
                 isVerified = false
             )
@@ -94,6 +93,18 @@ class PendingVerificationViewModel : ViewModel() {
             )
         }
     }
+    fun isAlumniVerified(
+        alumniId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+
+            val isVerified = repository.isAlumniVerified(alumniId)
+
+            onResult(isVerified)
+        }
+    }
+
     fun setEmptyState() {
         uiState = UiState.Empty
     }
