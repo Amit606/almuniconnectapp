@@ -3,9 +3,8 @@ name: Android CI Build APK
 on:
   push:
     branches:
-     - '**'
-  pull_request:     
-
+      - '**'
+  pull_request:
 
 jobs:
   build:
@@ -22,11 +21,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-
-     - name: Decode google-services.json
-       run: |
-       echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
-
+      - name: Decode google-services.json
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
 
       - name: Grant permission
         run: chmod +x gradlew
